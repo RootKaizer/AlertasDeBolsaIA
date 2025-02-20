@@ -239,8 +239,12 @@ Control de version:
         git remote add origin git@github.com:RootKaizer/AlertasDeBolsaIA.git
         git push -u origin main
 
-Servidor en la nube:
-    docker hub - usaremos contenedores docker para su despliegue
+
+Servidor en la nube: https://hub.docker.com/repository/docker/rottdocker/alertasdebolsaia/general
+    docker hub - contenedores:
+                    * python: 
+                    * api de datos financieros:
+                    * postgrestDB:
 
 
 Notificaciones push:

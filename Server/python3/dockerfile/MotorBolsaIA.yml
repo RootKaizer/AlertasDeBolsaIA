@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  motor_alertas_de_bolsa:
+    image: rottdocker/alertasdebolsaia:python3
+    container_name: motor_alertas_de_bolsa
+    ports:
+      - "8080:8080"  # Mapea el puerto 8080 del contenedor al puerto 8080 de tu máquina local
+    stdin_open: true  # Mantener stdin abierto para interactividad
+    tty: true  # Asignar una pseudo-TTY
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    volumes:
+      - ./bin/startServicePython.sh:/home/python3/startServicePython.sh  # script de arranque
