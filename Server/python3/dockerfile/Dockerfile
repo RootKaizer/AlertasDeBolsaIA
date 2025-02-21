@@ -43,10 +43,10 @@ RUN useradd -m -u 9000 -s /bin/bash python3 && \
     echo "python3:pythonuser1" | chpasswd
 
 # Copiar el script de arranque al home del usuario
-COPY --chown=python3:python3 ./bin/startServicePython.sh /home/python3/startServicePython.sh
+COPY --chown=python3:python3 ./bin/startServicePython.sh /app/startServicePython.sh
 
 # Dar permisos de ejecución al script
-RUN chmod +x /home/python3/startServicePython.sh
+RUN chmod +x /app/startServicePython.sh
 
 # Exponer un puerto si es necesario
 EXPOSE 8080

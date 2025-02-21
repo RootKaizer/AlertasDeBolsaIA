@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Verificar si el script se ejecuta con sh en lugar de bash
+if [ -z "$BASH_VERSION" ]; then
+    echo "Error: Este script debe ejecutarse con bash y no con sh." >&2
+    exit 1
+fi
+
 # Variables
 LIBRARY_NAME="TA-Lib"
 LOG_FILE="/tmp/logs/startServicepython.log"
@@ -23,5 +29,8 @@ python3 -m venv /tmp/venv  >> "$LOG_FILE"
 source /tmp/venv/bin/activate >> "$LOG_FILE"
 
 
-# validación proceso de python3
-ps -fea |grep python3  >> "$LOG_FILE"
+# Validar entorno virtual
+if [ ! -f /tmp/venv/bin/python3 ]; then
+    log_message "Error" "No se encontró el binario de Python en el entorno virtual"
+    exit 1
+fi

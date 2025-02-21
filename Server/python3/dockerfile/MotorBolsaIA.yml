@@ -11,4 +11,4 @@ services:
     environment:
       - DEBIAN_FRONTEND=noninteractive
     volumes:
-      - ./bin/startServicePython.sh:/home/python3/startServicePython.sh  # script de arranque
+      - ./bin/startServicePython.sh:/app/startServicePython.sh  # script de arranque
