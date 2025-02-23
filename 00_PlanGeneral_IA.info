@@ -56,7 +56,7 @@ Librerías clave:
 
 Pandas y NumPy: Para manipulación de datos.
 
-TA-Lib: Para indicadores técnicos (RSI, MACD, etc.).
+backtrader: Para indicadores técnicos (RSI, MACD, etc.).
 
 Matplotlib/Plotly: Para visualización de datos.
 
