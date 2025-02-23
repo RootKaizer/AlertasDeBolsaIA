@@ -55,7 +55,8 @@ RUN pip install --no-cache-dir \
     plotly \
     scikit-learn \
     websocket-client \
-    backtrader
+    backtrader \
+    requests
 
 # Verificar instalación,
 RUN python -c "import numpy, pandas, matplotlib, plotly, sklearn, websocket, backtrader; print('Instalación exitosa')"

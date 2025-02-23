@@ -1,0 +1,4 @@
+[TwelveData]
+url_base_path = https://api.twelvedata.com
+symbols = 
+#symbols = AAPL,TSLA,BTC/USD
