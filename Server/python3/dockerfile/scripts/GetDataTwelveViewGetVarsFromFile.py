@@ -6,7 +6,6 @@ import configparser
 import os
 import base64
 import re
-import sys
 
 # =========================================================================
 # Variables Globales
@@ -14,10 +13,7 @@ import sys
 
 # Variables propias del script
 opciones_afirmativas_validas = {"y", "yes", "s", "si"}
-opciones_modo_ejecucion_validas = {"actual", "time_series", "historico"}
-valores_time_series_validos = {"1min", "5min", "15min", "30min", "45min", "1h", "2h", "4h", "8h", "1day", "1week", "1month"}
-fecha_regex = re.compile(r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")
-formato_fecha_valido = "el formato de fecha valido es YYYY-MM-DD con un mes (01-12) y un día (01-31) o estar vacío"
+
 
 # obtener archivos relacionados
 CONFIG_TWELVEDATA = os.path.join(os.path.dirname(__file__), "../conf/twelvedata.info")
@@ -32,60 +28,87 @@ config_snoitcennoc.read(CONFIG_SNOITCENNOC)
 
 
 # Leer valores desde el archivo de configuración
+# -- url api finance twelvedata
 try:
-    # -- url api finance twelvedata
     url_base_path = config_twelvedata.get("TwelveData", "url_base_path")
     if not url_base_path:
         raise ValueError("No se encontró la clave 'url_base_path' en el archivo de configuración twelvedata.info.")
+except Exception as e:
+    print(f"Error in file twelvedata.info: {e}")
+    exit(1)  # Salir con código de error
 
-    # -- lista de mercados a consultar
+# -- Listado de mercados a monitorear
+try:
     symbols = config_twelvedata.get("TwelveData", "symbols")
     if not symbols:
         raise ValueError("No se encontró la clave 'symbols' en el archivo de configuración twelvedata.info.")
     symbols = symbols.split(",")
+except Exception as e:
+    print(f"Error in file twelvedata.info: {e}")
+    exit(1)  # Salir con código de error
 
-    # -- log//ing twelveData
-    encrypted_api_key = config_snoitcennoc.get("TwelveData", "api_key")
-    if not encrypted_api_key:
-        raise ValueError("No se encontró la clave 'api_key' en el archivo de configuración .snoitcennoc.info.")
+# -- valor time_series_interval
+try:
+    time_series_interval = config_twelvedata.get("OptionsRun", "time_series_interval")
+    if not time_series_interval:
+        raise ValueError("No se encontró la clave 'time_series_interval' en el archivo de configuración twelvedata.info.")
+    time_series_interval = re.sub(r"['\"]", "", time_series_interval.strip())
+except Exception as e:
+    print(f"Error in file twelvedata.info: {e}")
+    exit(1)  # Salir con código de error
 
-    api_key = base64.b64decode(encrypted_api_key).decode("utf-8")
+# -- valor quieres_conseguir_precio_actual_mercados
+try:
+    quieres_conseguir_precio_actual_mercados = config_twelvedata.get("OptionsRun", "quieres_conseguir_precio_actual_mercados")
+    if not quieres_conseguir_precio_actual_mercados:
+        raise ValueError("No se encontró la clave 'quieres_conseguir_precio_actual_mercados' en el archivo de configuración twelvedata.info.")
+    quieres_conseguir_precio_actual_mercados = re.sub(r"['\"]", "", quieres_conseguir_precio_actual_mercados.strip().lower())
+except Exception as e:
+    print(f"Error in file twelvedata.info: {e}")
+    exit(1)  # Salir con código de error
 
+# -- valor quieres_conseguir_time_series_interval_mercados
+try:
+    quieres_conseguir_time_series_interval_mercados = config_twelvedata.get("OptionsRun", "quieres_conseguir_time_series_interval_mercados")
+    if not quieres_conseguir_time_series_interval_mercados:
+        raise ValueError("No se encontró la clave 'quieres_conseguir_time_series_interval_mercados' en el archivo de configuración twelvedata.info.")
+    quieres_conseguir_time_series_interval_mercados = re.sub(r"['\"]", "", quieres_conseguir_time_series_interval_mercados.strip().lower())
+except Exception as e:
+    print(f"Error in file twelvedata.info: {e}")
+    exit(1)  # Salir con código de error
+
+# -- valor quieres_conseguir_historico_mercados
+try:
+    quieres_conseguir_historico_mercados = config_twelvedata.get("OptionsRun", "quieres_conseguir_historico_mercados")
+    if not quieres_conseguir_historico_mercados:
+        raise ValueError("No se encontró la clave 'quieres_conseguir_historico_mercados' en el archivo de configuración twelvedata.info.")
+    quieres_conseguir_historico_mercados = re.sub(r"['\"]", "", quieres_conseguir_historico_mercados.strip().lower())
+except Exception as e:
+    print(f"Error in file twelvedata.info: {e}")
+    exit(1)  # Salir con código de error
+
+# -- valor quieres_conseguir_historico_mercados
+try:
+    historical_start_date = config_twelvedata.get("OptionsRun", "historical_start_date")
+    historical_start_date = re.sub(r"['\"]", "", historical_start_date.strip().lower())
+
+    historical_end_date = config_twelvedata.get("OptionsRun", "historical_end_date")
+    historical_end_date = re.sub(r"['\"]", "", historical_end_date.strip().lower())
 except Exception as e:
     print(f"Error in file twelvedata.info: {e}")
     exit(1)  # Salir con código de error
 
 
-# =========================================================================
-# Validar Argumentos inciales
-# =========================================================================
-if len(sys.argv) < 2:
-    print(f"Uso: python3 GetDataTwelveView.py {opciones_modo_ejecucion_validas}")
-    sys.exit(1)
+# -- sin importancia T.T
+try:
+    encrypted_api_key = config_snoitcennoc.get("TwelveData", "api_key")
+    if not encrypted_api_key:
+        raise ValueError("No se encontró la clave 'api_key' en el archivo de configuración .snoitcennoc.info.")
+except Exception as e:
+    print(f"Error in file .snoitcennoc.info: {e}")
+    exit(1)  # Salir con código de error
+api_key = base64.b64decode(encrypted_api_key).decode("utf-8")
 
-modo_ejecucion = sys.argv[1].lower()
-
-quieres_conseguir_precio_actual_mercados = "y" if modo_ejecucion == "actual" else "n"
-quieres_conseguir_time_series_interval_mercados = "y" if modo_ejecucion == "time_series" else "n"
-quieres_conseguir_historico_mercados = "y" if modo_ejecucion == "historico" else "n"
-
-if modo_ejecucion not in opciones_modo_ejecucion_validas:
-    print(f"Error: {modo_ejecucion} no es un intervalo válido")
-    print(f"Error: Elije 1 valor valido: {opciones_modo_ejecucion_validas}")
-    sys.exit(1)
-
-"""
-
-
-
-if historical_start_date and not fecha_regex.match(historical_start_date):
-    print("Error: historical_start_date debe tener el formato YYYY-MM-DD o estar vacío")
-    sys.exit(1)
-
-if historical_end_date and not fecha_regex.match(historical_end_date):
-    print("Error: historical_end_date debe tener el formato YYYY-MM-DD o estar vacío")
-    sys.exit(1)
-"""
 
 
 
@@ -114,11 +137,9 @@ def obtener_precio_en_tiempo_real(symbol, api_key):
 
 
 
-def obtener_time_series_interval_mercados(symbol, api_key, interval):
-    # obtener url
-    url = f"{url_base_path}/time_series?symbol={symbol}&interval={interval}&apikey={api_key}"
+def obtener_time_series_interval_mercados(symbol, api_key):
+    url = f"{url_base_path}/time_series?symbol={symbol}&interval={time_series_interval}&apikey={api_key}"
     #print(f"{url}")
-
     try:
         response = requests.get(url).json()
         #print(f"Respuesta de la API para {symbol}: {response}")  # Imprimir la respuesta completa
@@ -149,9 +170,18 @@ def obtener_time_series_interval_mercados(symbol, api_key, interval):
 
 
 
-def obtener_historico_mercados(symbol, api_key, interval, start_date=None, end_date=None):
-    # url base
-    url = f"{url_base_path}/time_series?symbol={symbol}&interval={interval}&apikey={api_key}"
+def obtener_historico_mercados(symbol, api_key, start_date=None, end_date=None):
+    """
+    Obtiene todos los datos históricos del mercado para un símbolo específico.
+
+    :param symbol: Símbolo del mercado (ej. "AAPL", "BTC/USD")
+    :param api_key: Clave de API de TwelveData
+    :param start_date: Fecha de inicio en formato YYYY-MM-DD (opcional)
+    :param end_date: Fecha de fin en formato YYYY-MM-DD (opcional)
+    :return: Lista con todos los valores de la respuesta.
+    """
+    url = f"{url_base_path}/time_series?symbol={symbol}&interval=1min&apikey={api_key}"
+    
     # Agregar las fechas si se proporcionan
     if start_date:
         url += f"&start_date={start_date}"
@@ -180,9 +210,13 @@ def obtener_historico_mercados(symbol, api_key, interval, start_date=None, end_d
 # Logica Principal
 # =========================================================================
 print("=======================================")
-print(f"Modo de ejecución: {modo_ejecucion}")
+print(f"La configuración de la ejecución es: ")
+print(f"Elegiste conseguir datos del precio actual de mercados: {quieres_conseguir_precio_actual_mercados}")
+print(f"Elegiste conseguir time series interval de mercados: {quieres_conseguir_time_series_interval_mercados}")
+print(f"Elegiste conseguir historico de mercados: {quieres_conseguir_historico_mercados}")
 print("=======================================")
-
+print(f"")
+print(f"")
 
 # Validación para ejecutar la función precio_actual_mercados
 if quieres_conseguir_precio_actual_mercados in opciones_afirmativas_validas:
@@ -201,23 +235,10 @@ if quieres_conseguir_precio_actual_mercados in opciones_afirmativas_validas:
 
 
 
-
-
 # Validación para ejecutar la función quieres_conseguir_time_series_interval_mercados
 if quieres_conseguir_time_series_interval_mercados in opciones_afirmativas_validas:
     print("Llamar la función time_series_interval_mercados")
-    # Validar Cantidad de Argumentos inciales
-    if len(sys.argv) < 3:
-        print(f"Uso: python3 GetDataTwelveView.py {modo_ejecucion} interval({', '.join(valores_time_series_validos)})")
-        sys.exit(1)
-    # asignar valor del arcgumento 2 como intervalo
-    time_series_interval = sys.argv[2]
-    # validar que el intervalo tenga un valor valido
-    if time_series_interval not in valores_time_series_validos:
-        print(f"Error: {time_series_interval} no es un intervalo válido")
-        sys.exit(1)
-
-    time_series_interval_mercados = {symbol: obtener_time_series_interval_mercados(symbol, api_key, interval=time_series_interval) for symbol in symbols}
+    time_series_interval_mercados = {symbol: obtener_time_series_interval_mercados(symbol, api_key) for symbol in symbols}
     # Imprimir los datos obtenidos de la función obtener_datos_en_tiempo_real
     print("=======================================")
     print(f"Datos de series de tiempo para intervalo de {time_series_interval}:")
@@ -238,45 +259,20 @@ if quieres_conseguir_time_series_interval_mercados in opciones_afirmativas_valid
 
 
 
-
-
 # Validación para ejecutar la función quieres_conseguir_time_series_interval_mercados
 if quieres_conseguir_historico_mercados in opciones_afirmativas_validas:
+    #llamar la función
     print("Llamar la función historico_mercados")
-    # Validar Cantidad de Argumentos inciales
-    if len(sys.argv) < 3:
-        print(f"Uso: python3 GetDataTwelveView.py {modo_ejecucion} interval({', '.join(valores_time_series_validos)}) start_date(YYYY-MM-DD) end_date(YYYY-MM-DD)")
-        sys.exit(1)
-    # asignar valor del arcgumentos
-    time_series_interval = sys.argv[2]
-    historical_start_date = sys.argv[3]
-    historical_end_date = sys.argv[4]
-
-    # validar que el intervalo tenga un valor valido
-    if time_series_interval not in valores_time_series_validos:
-        print(f"Error: {time_series_interval} no es un intervalo válido")
-        sys.exit(1)
-    if historical_start_date and not fecha_regex.match(historical_start_date):
-        print(f"Error: historical_start_date debe tener {formato_fecha_valido}")
-        sys.exit(1)
-    if historical_end_date and not fecha_regex.match(historical_end_date):
-        print(f"Error: historical_end_date debe tener {formato_fecha_valido}")
-        sys.exit(1)
-
-
-    # Ejecutar Funcion
     historico_mercados = {
-        symbol: obtener_historico_mercados(symbol, api_key, interval=time_series_interval, start_date=historical_start_date, end_date=historical_end_date)
+        symbol: obtener_historico_mercados(symbol, api_key, start_date=historical_start_date, end_date=historical_end_date)
         for symbol in symbols
     }
-
-
     # Imprimir los datos obtenidos de la función obtener_datos_en_tiempo_real
     print("=======================================")
     print(f"Histórico del mercados, para el intervalo {time_series_interval}")
     print(f"desde '{historical_start_date}' - hasta '{historical_end_date}'")
     print("-------------------------------------------------------------------")
-    #print(f"{historico_mercados.items()}")
+    print(f"{historico_mercados.items()}")
     for symbol, historico in historico_mercados.items():  # 🔹 Usar el diccionario correcto aquí
         #print("analizando registro por registro")
         if isinstance(historico, dict) and 'values' in historico:
