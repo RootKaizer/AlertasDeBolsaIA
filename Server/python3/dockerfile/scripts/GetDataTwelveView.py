@@ -7,6 +7,9 @@ import os
 import base64
 import re
 import sys
+import urllib.parse  # Para codificar correctamente la URL
+from datetime import datetime, timedelta
+
 
 # =========================================================================
 # Variables Globales
@@ -14,8 +17,8 @@ import sys
 
 # Variables propias del script
 opciones_afirmativas_validas = {"y", "yes", "s", "si"}
-opciones_modo_ejecucion_validas = {"actual", "time_series", "historico"}
-valores_time_series_validos = {"1min", "5min", "15min", "30min", "45min", "1h", "2h", "4h", "8h", "1day", "1week", "1month"}
+opciones_modo_ejecucion_validas = {"actual", "time_series", "historico", "historico_ahora"}
+valores_time_series_validos = {"1min", "5min", "15min", "30min", "45min", "1h", "2h", "4h", "8h", "1day", "1week", "1month", "1year"}
 fecha_regex = re.compile(r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")
 formato_fecha_valido = "el formato de fecha valido es YYYY-MM-DD con un mes (01-12) y un día (01-31) o estar vacío"
 
@@ -68,6 +71,7 @@ modo_ejecucion = sys.argv[1].lower()
 quieres_conseguir_precio_actual_mercados = "y" if modo_ejecucion == "actual" else "n"
 quieres_conseguir_time_series_interval_mercados = "y" if modo_ejecucion == "time_series" else "n"
 quieres_conseguir_historico_mercados = "y" if modo_ejecucion == "historico" else "n"
+quieres_conseguir_historico_mercados_hasta_hoy = "y" if modo_ejecucion == "historico_ahora" else "n"
 
 if modo_ejecucion not in opciones_modo_ejecucion_validas:
     print(f"Error: {modo_ejecucion} no es un intervalo válido")
@@ -92,6 +96,51 @@ if historical_end_date and not fecha_regex.match(historical_end_date):
 # =========================================================================
 # Funciones
 # =========================================================================
+def convertir_a_segundos(intervalo):
+    conversion = {
+        "min": 60,
+        "h": 60 * 60,
+        "day": 24 * 60 * 60,
+        "week": 7 * 24 * 60 * 60,
+        "month": 30 * 24 * 60 * 60,  # Aproximado a 30 días
+        "year": 365 * 24 * 60 * 60  # Aproximado a 365 días
+    }
+    
+    # Extraer número y unidad usando regex
+    match = re.match(r"(\d+)([a-zA-Z]+)", intervalo)
+    if not match:
+        return None  # Formato inválido
+    
+    cantidad, unidad = match.groups()
+    cantidad = int(cantidad)
+
+    # Verificar si la unidad es válida
+    if unidad not in conversion:
+        return None
+    
+    return cantidad * conversion[unidad]
+
+
+
+def calcular_fechas(intervalo):
+    segundos = convertir_a_segundos(intervalo)
+    if segundos is None:
+        return None, None  # Valor inválido
+
+    # Obtener la fecha actual
+    end_date = datetime.now().strftime("%Y-%m-%dT%H:%M")
+
+    # Calcular start_date restando los segundos
+    start_date = (datetime.now() - timedelta(seconds=segundos)).strftime("%Y-%m-%dT%H:%M")
+
+    # Codificar el espacio como %20 para URLs
+    end_date_encoded = urllib.parse.quote(end_date)
+    start_date_encoded = urllib.parse.quote(start_date)
+
+    return start_date_encoded, end_date_encoded
+
+
+
 def obtener_precio_en_tiempo_real(symbol, api_key):
     url = f"{url_base_path}/price?symbol={symbol}&apikey={api_key}"
     try:
@@ -175,6 +224,32 @@ def obtener_historico_mercados(symbol, api_key, interval, start_date=None, end_d
 
 
 
+def obtener_historico_mercados_hasta_hoy(symbol, api_key, interval, start_date=None, end_date=None):
+    # url base
+    url = f"{url_base_path}/time_series?symbol={symbol}&interval={interval}&apikey={api_key}"
+    # Agregar las fechas si se proporcionan
+    if start_date:
+        url += f"&start_date={start_date}"
+    if end_date:
+        url += f"&end_date={end_date}"
+    
+    print(f"URL de consulta: {url}")
+    
+    try:
+        response = requests.get(url).json()
+        
+        if "code" in response and response["code"] != 200:
+            print(f"Error en la API para {symbol}: {response.get('message', 'Error desconocido')}")
+            return None
+        
+        return response  # Retornar toda la respuesta incluyendo metadata y valores
+    
+    except Exception as e:
+        print(f"Error al obtener datos para {symbol}: {e}")
+        return None
+
+
+
 
 # =========================================================================
 # Logica Principal
@@ -212,7 +287,7 @@ if quieres_conseguir_time_series_interval_mercados in opciones_afirmativas_valid
         sys.exit(1)
     # asignar valor del arcgumento 2 como intervalo
     time_series_interval = sys.argv[2]
-    # validar que el intervalo tenga un valor valido
+    # validar que las variables tenga un valor valido
     if time_series_interval not in valores_time_series_validos:
         print(f"Error: {time_series_interval} no es un intervalo válido")
         sys.exit(1)
@@ -240,7 +315,7 @@ if quieres_conseguir_time_series_interval_mercados in opciones_afirmativas_valid
 
 
 
-# Validación para ejecutar la función quieres_conseguir_time_series_interval_mercados
+# Validación para ejecutar la función quieres_conseguir_historico_mercados
 if quieres_conseguir_historico_mercados in opciones_afirmativas_validas:
     print("Llamar la función historico_mercados")
     # Validar Cantidad de Argumentos inciales
@@ -252,9 +327,9 @@ if quieres_conseguir_historico_mercados in opciones_afirmativas_validas:
     historical_start_date = sys.argv[3]
     historical_end_date = sys.argv[4]
 
-    # validar que el intervalo tenga un valor valido
+    # validar que las variables tenga un valor valido
     if time_series_interval not in valores_time_series_validos:
-        print(f"Error: {time_series_interval} no es un intervalo válido")
+        print(f"Error: {time_series_interval} no es un intervalo válido >> {valores_time_series_validos}")
         sys.exit(1)
     if historical_start_date and not fecha_regex.match(historical_start_date):
         print(f"Error: historical_start_date debe tener {formato_fecha_valido}")
@@ -278,6 +353,70 @@ if quieres_conseguir_historico_mercados in opciones_afirmativas_validas:
     print("-------------------------------------------------------------------")
     #print(f"{historico_mercados.items()}")
     for symbol, historico in historico_mercados.items():  # 🔹 Usar el diccionario correcto aquí
+        #print("analizando registro por registro")
+        if isinstance(historico, dict) and 'values' in historico:
+            #print("aprobado la verificación de lista")
+            print("\n\n*************")
+            print(f"Histórico para {symbol}:")
+            print("*************")
+            if historico['values']:
+                for registro in historico['values']:  # ✅ Ahora está correctamente indentado
+                    if isinstance(registro, dict):  # Verificar que registro sea un diccionario
+                        print(f"Fecha: {registro.get('datetime', 'N/A')}, Apertura: {registro.get('open', 'N/A')}, "
+                            f"Alto: {registro.get('high', 'N/A')}, Bajo: {registro.get('low', 'N/A')}, "
+                            f"Cierre: {registro.get('close', 'N/A')}, Volumen: {registro.get('volume', 'N/A')}")
+                    else:
+                        print("Error: Registro no es un diccionario")
+            else:
+                print("Error: Los datos no contienen 'values' o no son del tipo esperado")
+    print("")
+    print("")
+
+
+
+
+
+# Validación para ejecutar la función quieres_conseguir_time_series_interval_mercados
+if quieres_conseguir_historico_mercados_hasta_hoy in opciones_afirmativas_validas:
+    print("Llamar la función historico_mercados hasta hoy")
+    # Validar Cantidad de Argumentos inciales
+    if len(sys.argv) < 3:
+        print(f"Uso: python3 GetDataTwelveView.py {modo_ejecucion} interval({', '.join(valores_time_series_validos)}) time_ago({', '.join(valores_time_series_validos)})")
+        sys.exit(1)
+    # asignar valor del arcgumentos
+    time_series_interval = sys.argv[2]
+    time_ago = sys.argv[3]
+    
+
+    # validar que las variables tenga un valor valido
+    if time_series_interval not in valores_time_series_validos:
+        print(f"Error: {time_series_interval} no es un intervalo válido >> {valores_time_series_validos}")
+        sys.exit(1)
+    if time_ago not in valores_time_series_validos:
+        print(f"Error: {time_ago} no es un intervalo válido >> {valores_time_series_validos}")
+        sys.exit(1)
+
+    # Trasnformar intervalo de tiempo a fechas
+    # Ejemplo de uso
+    start_date, end_date = calcular_fechas(time_ago)
+    print(f"Start Date: {start_date}")
+    print(f"End Date: {end_date}") 
+
+
+    # Ejecutar Funcion
+    historico_mercados_hasta_hoy = {
+        symbol: obtener_historico_mercados_hasta_hoy(symbol, api_key, interval=time_series_interval, start_date=start_date, end_date=end_date)
+        for symbol in symbols
+    }
+
+
+    # Imprimir los datos obtenidos de la función obtener_datos_en_tiempo_real
+    print("=======================================")
+    print(f"Histórico del mercados, para el intervalo {time_series_interval}")
+    print(f"desde '{start_date}' - hasta '{start_date}'")
+    print("-------------------------------------------------------------------")
+    #print(f"{historico_mercados.items()}")
+    for symbol, historico in historico_mercados_hasta_hoy.items():  # 🔹 Usar el diccionario correcto aquí
         #print("analizando registro por registro")
         if isinstance(historico, dict) and 'values' in historico:
             #print("aprobado la verificación de lista")
