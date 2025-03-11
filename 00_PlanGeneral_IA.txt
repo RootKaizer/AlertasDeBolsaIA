@@ -104,34 +104,33 @@ Mostrar gráficos y resultados en una interfaz simple.
 ===============================================================
 Paso 1: Obtener datos en tiempo real, debe estar dentro del contendor motor_alertas_de_bolsa
 ********
->>/app/scripts/# python3 GetDataTwelveView.py historico_ahora 1h 1day
+>>/app/scripts/# python3 GetDataTwelveView.py 1h 1day
 
-Respuesta:  consulta en twelvedata el listado de los mercados registrados en twelvedata.info
+Respuesta(datos_historicos):  
+            consulta en twelvedata el listado de los mercados registrados en twelvedata.info
             trae los siguientes datos [Fecha, Apertura, Alto, Bajo, Cierre, Volumen]
             en intervalos de tiempo definidos al ejecutar el comando [1h]
             tiempo en el pasado hasta donde se consultara: [1day]
             
 
-Paso 2: Calcular indicadores técnicos usando Pandas y NumPy
+Paso 2: Convirtiendo datos a DataFrames...
 ********
-python
-Copy
-import talib
-import numpy as np
-
-# Datos de ejemplo (precios de cierre)
-precios_cierre = np.array([...])
-
-# Calcular RSI
-rsi = talib.RSI(precios_cierre, timeperiod=14)
-
-# Calcular MACD
-macd, macd_signal, macd_hist = talib.MACD(precios_cierre, fastperiod=12, slowperiod=26, signalperiod=9)
-
-print(f"RSI: {rsi[-1]}, MACD: {macd[-1]}")
+>>/app/scripts/# python3 ConverterDataToPandasData.py {datos_historicos}
+Respuesta (dataframes):
+            Se le ingresan los datos_historicos y trae los datos organizados
+            con la estructura de pandas y se captrua en la variable dataframes
 
 
-Paso 3: Aplicar lógica de trading
+Paso 3: Calcular indicadores técnicos usando Pandas y NumPy
+********
+>>/app/scripts/# python3 ProcesingDataPandas.py {dataframes}
+Respuesta (funciones): se ingresan los datos ordenados para panda y
+            dependiendo de la función usada obtienes una el valor, las funciones
+            habilitadas son: calcular_rsi, calcular_macd, calcular_media_movil,
+            calcular_bandas_bollinger y calcular_estocastico
+
+
+Paso 4: Aplicar lógica de trading
 ********
 python
 Copy
