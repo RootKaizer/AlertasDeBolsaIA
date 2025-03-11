@@ -102,25 +102,17 @@ Mostrar gráficos y resultados en una interfaz simple.
 
 4. Desarrollo del Motor de Análisis
 ===============================================================
-Paso 1: Obtener datos en tiempo real
+Paso 1: Obtener datos en tiempo real, debe estar dentro del contendor motor_alertas_de_bolsa
 ********
-python
-Copy
-import requests
-import pandas as pd
+>>/app/scripts/# python3 GetDataTwelveView.py historico_ahora 1h 1day
 
-def obtener_datos_en_tiempo_real(symbol, api_key):
-    url = f"https://api.twelvedata.com/price?symbol={symbol}&apikey={api_key}"
-    response = requests.get(url).json()
-    return float(response["price"])
+Respuesta:  consulta en twelvedata el listado de los mercados registrados en twelvedata.info
+            trae los siguientes datos [Fecha, Apertura, Alto, Bajo, Cierre, Volumen]
+            en intervalos de tiempo definidos al ejecutar el comando [1h]
+            tiempo en el pasado hasta donde se consultara: [1day]
+            
 
-symbol = "AAPL"
-api_key = "tu_api_key"
-precio = obtener_datos_en_tiempo_real(symbol, api_key)
-print(f"Precio de {symbol}: {precio}")
-
-
-Paso 2: Calcular indicadores técnicos
+Paso 2: Calcular indicadores técnicos usando Pandas y NumPy
 ********
 python
 Copy

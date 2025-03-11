@@ -1,20 +1,7 @@
 [TwelveData]
 url_base_path = https://api.twelvedata.com
 # valores permitidos VAL1,VAL2,VAL3, ... ,VALn
-symbols = AAPL,TSLA,BTC/USD,510050,7272
+#symbols = AAPL,TSLA,BTC/USD,510050,7272
 #symbols = AAPL,TSLA,BTC/USD,510050,7272,usd/cny
-#symbols = AAPL
+symbols = AAPL,TSLA
 
-
-
-[OptionsRun]
-# valores validos para su activación [Y, YES, S, SI]
-#quieres_conseguir_precio_actual_mercados = N
-#quieres_conseguir_time_series_interval_mercados = N
-#quieres_conseguir_historico_mercados = Y
-# Valores permitidos: 1min, 5min, 15min, 30min, 45min, 1h, 2h, 4h, 8h, 1day, 1week, 1month
-#time_series_interval = 1min
-# Fecha de inicio para el historico en formato YYYY-MM-DD (valor opcional)
-#historical_start_date = 
-# Fecha de final para el historico en formato YYYY-MM-DD (valor opcional)
-#historical_end_date = 
