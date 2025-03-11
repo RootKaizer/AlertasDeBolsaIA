@@ -1,21 +1,70 @@
-import backtrader as bt
 import pandas as pd
 
-# Crear un feed de datos para Backtrader
-class MiFeed(bt.feeds.PandasData):
-    params = (
-        ('datetime', None),  # No usar columna de fecha
-        ('open', -1),       # No usar columna de apertura
-        ('high', -1),       # No usar columna de máximo
-        ('low', -1),        # No usar columna de mínimo
-        ('close', 0),       # Usar la columna de cierre (índice 0)
-        ('volume', -1),     # No usar columna de volumen
-        ('openinterest', -1),  # No usar columna de interés abierto
-    )
+def convertir_a_dataframe(datos_historicos):
+    """
+    Convierte los datos históricos en un diccionario de DataFrames de pandas.
+    :param datos_historicos: Diccionario con los datos obtenidos de GetDataTwelveView.py
+    :return: Diccionario con DataFrames por símbolo.
+    """
+    dataframes = {}
+    
+    for symbol, data in datos_historicos.items():
+        if 'values' in data:
+            df = pd.DataFrame(data['values'])
+            df['datetime'] = pd.to_datetime(df['datetime'])  # Convertir a formato de fecha y hora
+            # Asegúrate de que los nombres de las columnas sean correctos
+            df = df.rename(columns={
+                'open': 'Open',
+                'high': 'High',
+                'low': 'Low',
+                'close': 'Close',  # Asegúrate de que sea 'Close'
+                'volume': 'Volume'
+            })
+            df[['Open', 'High', 'Low', 'Close', 'Volume']] = df[['Open', 'High', 'Low', 'Close', 'Volume']].astype(float)  # Convertir valores numéricos
+            df = df.sort_values(by='datetime')  # Ordenar por fecha y hora
+            dataframes[symbol] = df
+        else:
+            print(f"Advertencia: No se encontraron valores para {symbol}")
+    
+    return dataframes
 
-# Convertir los datos en un DataFrame de Pandas
-datos = {"close": [100, 101, 102, 103]}  # Ejemplo de datos
-df = pd.DataFrame(datos)
 
-# Crear el feed de datos
-data = MiFeed(dataname=df)
+def convertir_a_backtrader(df):
+    """
+    Convierte un DataFrame de pandas en un formato compatible con Backtrader.
+    :param df: DataFrame con datos de mercado.
+    :return: DataFrame formateado para Backtrader.
+    """
+    df = df.copy()
+    df.set_index('datetime', inplace=True)  # Establecer datetime como índice
+    df.rename(columns={
+        'open': 'Open',
+        'high': 'High',
+        'low': 'Low',
+        'close': 'Close',
+        'volume': 'Volume'
+    }, inplace=True)  # Renombrar columnas para Backtrader
+    return df
+
+'''
+# Ejemplo de uso
+if __name__ == "__main__":
+    # Ejemplo de datos simulados
+    datos_historicos = {
+        "AAPL": {
+            "values": [
+                {"datetime": "2025-03-10 15:30:00", "open": "226.99", "high": "228.64", "low": "226.5", "close": "227.54", "volume": "8057482"},
+                {"datetime": "2025-03-10 13:30:00", "open": "225.24", "high": "227.51", "low": "224.42", "close": "226.97", "volume": "12470689"}
+            ]
+        }
+    }
+    
+    dataframes = convertir_a_dataframe(datos_historicos)
+    for symbol, df in dataframes.items():
+        print(f"\nDatos de {symbol}:")
+        print(df)
+        
+        bt_df = convertir_a_backtrader(df)
+        print(f"\nDatos de {symbol} para Backtrader:")
+        print(bt_df)
+'''
