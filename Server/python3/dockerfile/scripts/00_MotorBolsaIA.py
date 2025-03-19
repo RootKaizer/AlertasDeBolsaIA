@@ -72,14 +72,14 @@ def main():
     print(f"Se convirtieron {len(dataframes)} DataFrames.")
 
     # Paso 3: Procesar DataFrames y calcular métricas
-    print("calculando Datos .....")
-    print("RSI...")
-    print("MACD...")
-    print("MACD_signal...")
-    print("Precio Actual...")
-    print("Precio Anterior...")
-    print("Estocastico K...")
-    print("Estocastico D...")
+    print("\ncalculando Datos .....")
+    print("RSI.")
+    print("MACD.")
+    print("MACD_signal.")
+    print("Precio Actual.")
+    print("Precio Anterior.")
+    print("Estocastico K.")
+    print("Estocastico D.")
     dataframes_procesados = procesar_dataframes(dataframes)
 
     # Paso 4: Aplicar lógica de trading
