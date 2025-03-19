@@ -10,6 +10,7 @@ from TradingLogicMarket import determinar_accion_rsi, determinar_accion_macd, de
 
 # Styles
 from styles.title_console import mostrar_titulo_estrategia
+from styles.exit_console import mostrar_resultados_trading
 
 
 def cargar_configuracion(estrategia):
@@ -105,14 +106,7 @@ def main():
         }
 
     # Paso 5: Mostrar resultados
-    print("\n")
-    mostrar_titulo_estrategia(f"Estrategia Analizada: {estrategia} \nResultados finales:")
-    for symbol, acciones in resultados_trading.items():
-        print(f"\n{symbol}:")
-        print(f"  RSI: Acción: {acciones['RSI']['accion']} - Descripción: {acciones['RSI']['descripcion']}")
-        print(f"  MACD: Acción: {acciones['MACD']['accion']} - Descripción: {acciones['MACD']['descripcion']}")
-        print(f"  Precio: Acción: {acciones['Precio']['accion']} - Descripción: {acciones['Precio']['descripcion']}")
-        print(f"  Estocástico: Acción: {acciones['Estocástico']['accion']} - Descripción: {acciones['Estocástico']['descripcion']}")
+    mostrar_resultados_trading(estrategia, resultados_trading)
 
 
 
