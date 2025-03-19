@@ -6,7 +6,7 @@ import configparser
 from GetDataTwelveView import obtener_datos_historicos
 from ConverterDataToPandasData import convertir_a_dataframe
 from GetDataPandas import procesar_dataframes
-from TradingLogicMarket import determinar_accion_rsi, determinar_accion_macd, determinar_accion_precio, determinar_accion_estocastico
+from TradingLogicMarket import analizar_dataframes
 
 # Styles
 from styles.title_console import mostrar_titulo_estrategia
@@ -72,38 +72,12 @@ def main():
     print(f"Se convirtieron {len(dataframes)} DataFrames.")
 
     # Paso 3: Procesar DataFrames y calcular métricas
-    print("Procesando datos y calculando métricas...")
+    print("Procesando datos por pandas...")
     dataframes_procesados = procesar_dataframes(dataframes)
 
-    # Paso 4: Aplicar lógica de trading y mostrar resultados
+    # Paso 4: Aplicar lógica de trading
     print("\nAplicando lógica de trading...")
-    resultados_trading = {}  # Diccionario para almacenar las acciones recomendadas por símbolo
-
-    for symbol, df in dataframes_procesados.items():
-        print(f"\nAnalizando {symbol}...")
-
-        # Obtener los últimos valores para aplicar la lógica de trading
-        rsi = df['RSI'].iloc[-1]
-        macd = df['MACD'].iloc[-1]
-        macd_signal = df['MACD_signal'].iloc[-1]
-        precio_actual = df['Close'].iloc[-1]
-        precio_anterior = df['Close'].iloc[-2]
-        estocastico_k = df['%K'].iloc[-1]
-        estocastico_d = df['%D'].iloc[-1]
-
-        # Determinar las acciones individuales
-        accion_rsi, descripcion_rsi = determinar_accion_rsi(rsi, rsi_under, rsi_upper)
-        accion_macd, descripcion_macd = determinar_accion_macd(macd, macd_signal)
-        accion_precio, descripcion_precio = determinar_accion_precio(precio_actual, precio_anterior)
-        accion_estocastico, descripcion_estocastico = determinar_accion_estocastico(estocastico_k, estocastico_d)
-
-            # Guardar los resultados (acciones y descripciones)
-        resultados_trading[symbol] = {
-            "RSI": {"accion": accion_rsi, "descripcion": descripcion_rsi},
-            "MACD": {"accion": accion_macd, "descripcion": descripcion_macd},
-            "Precio": {"accion": accion_precio, "descripcion": descripcion_precio},
-            "Estocástico": {"accion": accion_estocastico, "descripcion": descripcion_estocastico}
-        }
+    resultados_trading = analizar_dataframes(dataframes_procesados, rsi_under, rsi_upper)
 
     # Paso 5: Mostrar resultados
     mostrar_resultados_trading(estrategia, resultados_trading)

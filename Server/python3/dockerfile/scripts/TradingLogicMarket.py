@@ -52,31 +52,77 @@ def determinar_accion_estocastico(estocastico_k, estocastico_d):
         return "vender", "%K está por debajo de %D, indicando tendencia bajista."
 
 
+
+def analizar_dataframes(dataframes_procesados, rsi_under=30, rsi_upper=70):
+    """
+    Analiza los DataFrames procesados y devuelve un diccionario con los resultados del análisis.
+    :param dataframes_procesados: Diccionario de DataFrames procesados, donde las claves son los símbolos.
+    :param rsi_under: Umbral inferior para el RSI (por defecto 30).
+    :param rsi_upper: Umbral superior para el RSI (por defecto 70).
+    :return: Diccionario con los resultados del análisis por símbolo.
+    """
+    resultados_trading = {}  # Diccionario para almacenar las acciones recomendadas por símbolo
+
+    for symbol, df in dataframes_procesados.items():
+        print(f"\nAnalizando {symbol}...")
+
+        # Obtener los últimos valores para aplicar la lógica de trading
+        rsi = df['RSI'].iloc[-1]
+        macd = df['MACD'].iloc[-1]
+        macd_signal = df['MACD_signal'].iloc[-1]
+        precio_actual = df['Close'].iloc[-1]
+        precio_anterior = df['Close'].iloc[-2]
+        estocastico_k = df['%K'].iloc[-1]
+        estocastico_d = df['%D'].iloc[-1]
+
+        # Determinar las acciones individuales
+        accion_rsi, descripcion_rsi = determinar_accion_rsi(rsi, rsi_under, rsi_upper)
+        accion_macd, descripcion_macd = determinar_accion_macd(macd, macd_signal)
+        accion_precio, descripcion_precio = determinar_accion_precio(precio_actual, precio_anterior)
+        accion_estocastico, descripcion_estocastico = determinar_accion_estocastico(estocastico_k, estocastico_d)
+
+        # Guardar los resultados (acciones y descripciones)
+        resultados_trading[symbol] = {
+            "RSI": {"accion": accion_rsi, "descripcion": descripcion_rsi},
+            "MACD": {"accion": accion_macd, "descripcion": descripcion_macd},
+            "Precio": {"accion": accion_precio, "descripcion": descripcion_precio},
+            "Estocástico": {"accion": accion_estocastico, "descripcion": descripcion_estocastico}
+        }
+
+    return resultados_trading
+
 '''
 if __name__ == "__main__":
-    # Verificar que se hayan proporcionado los argumentos necesarios
-    if len(sys.argv) < 8:
-        print("Uso: python TradingLogicMarket.py <rsi> <macd> <macd_signal> <precio_actual> <precio_anterior> <estocastico_k> <estocastico_d>")
-        sys.exit(1)
+    # Ejemplo de datos de prueba
+    import pandas as pd
 
-    # Obtener los valores de los argumentos
-    rsi = float(sys.argv[1])
-    macd = float(sys.argv[2])
-    macd_signal = float(sys.argv[3])
-    precio_actual = float(sys.argv[4])
-    precio_anterior = float(sys.argv[5])
-    estocastico_k = float(sys.argv[6])
-    estocastico_d = float(sys.argv[7])
+    # Crear un DataFrame de ejemplo
+    data = {
+        'RSI': [35, 40, 45],
+        'MACD': [0.5, 0.6, 0.7],
+        'MACD_signal': [0.4, 0.5, 0.6],
+        'Close': [100, 105, 110],
+        '%K': [80, 85, 90],
+        '%D': [75, 80, 85]
+    }
+    df_ejemplo = pd.DataFrame(data)
 
-    # Determinar las acciones individuales
-    accion_rsi = determinar_accion_rsi(rsi)
-    accion_macd = determinar_accion_macd(macd, macd_signal)
-    accion_precio = determinar_accion_precio(precio_actual, precio_anterior)
-    accion_estocastico = determinar_accion_estocastico(estocastico_k, estocastico_d)
+    # Crear un diccionario de DataFrames procesados (simulando dataframes_procesados)
+    dataframes_procesados = {
+        "AAPL": df_ejemplo,
+        "GOOGL": df_ejemplo
+    }
 
-    # Imprimir los resultados individuales
-    print(f"Análisis RSI: Acción: {accion_rsi['accion']}, Descripción: {accion_rsi['description']}")
-    print(f"Análisis MACD: Acción: {accion_macd['accion']}, Descripción: {accion_macd['description']}")
-    print(f"Análisis Precio: Acción: {accion_precio['accion']}, Descripción: {accion_precio['description']}")
-    print(f"Análisis Estocástico: Acción: {accion_estocastico['accion']}, Descripción: {accion_estocastico['description']}")'
+    # Llamar a la función analizar_dataframes con los datos de prueba
+    resultados_trading = analizar_dataframes(dataframes_procesados, rsi_under=30, rsi_upper=70)
+
+    # Mostrar los resultados
+    print("\nResultados del análisis:")
+    for symbol, acciones in resultados_trading.items():
+        print(f"\n{symbol}:")
+        print(f"  RSI: Acción: {acciones['RSI']['accion']} - Descripción: {acciones['RSI']['descripcion']}")
+        print(f"  MACD: Acción: {acciones['MACD']['accion']} - Descripción: {acciones['MACD']['descripcion']}")
+        print(f"  Precio: Acción: {acciones['Precio']['accion']} - Descripción: {acciones['Precio']['descripcion']}")
+        print(f"  Estocástico: Acción: {acciones['Estocástico']['accion']} - Descripción: {acciones['Estocástico']['descripcion']}")
+        
 '''

@@ -121,49 +121,34 @@ Respuesta (dataframes):
             con la estructura de pandas y se captrua en la variable dataframes
 
 
-Paso 3: Calcular indicadores técnicos usando Pandas y NumPy
+Paso 3: Procesando datos por pandas...
 ********
->>/app/scripts/# python3 ProcesingDataPandas.py {dataframes}
-Respuesta (funciones): se ingresan los datos ordenados para panda y
-            dependiendo de la función usada obtienes una el valor, las funciones
-            habilitadas son: calcular_rsi, calcular_macd, calcular_media_movil,
-            calcular_bandas_bollinger y calcular_estocastico
+>>/app/scripts/# python3 GetDataPandas.py {dataframes}
+Respuesta (dataframes_procesados):
+            Se le ingresan los dataframes y trae los datos calculados por todas las
+            funciones registradas en ProcesingDataPandas.py del paso 3.1 y retorna
+            todos los datos del mercado y le agrega en cada registro de tiempo 
+            los valores calculados por las multiple funcionees.
+
+    Paso 3.1: Calcular valores técnicos usando Pandas y NumPy
+    ********
+    >>/app/scripts/# python3 ProcesingDataPandas.py {dataframes}
+    Respuesta (funciones): se ingresan los datos ordenados para panda y
+                dependiendo de la función usada obtienes una el valor, las funciones
+                habilitadas son: calcular_rsi, calcular_macd, calcular_media_movil,
+                calcular_bandas_bollinger y calcular_estocastico
 
 
-Paso 4: Aplicar lógica de trading
+Paso 4: Ejecutar logica de estrategia
 ********
-python
-Copy
-def determinar_accion(rsi, macd, precio_actual, precio_anterior):
-    acciones = []
-
-    # Lógica para RSI
-    if rsi > 70:
-        acciones.append("vender")
-    elif rsi < 30:
-        acciones.append("comprar")
-    else:
-        acciones.append("hold")
-
-    # Lógica para MACD
-    if macd > 0:
-        acciones.append("comprar")
-    else:
-        acciones.append("vender")
-
-    # Lógica para precio
-    if precio_actual > precio_anterior:
-        acciones.append("comprar")
-    else:
-        acciones.append("vender")
-
-    return acciones
-
-acciones = determinar_accion(rsi[-1], macd[-1], precios_cierre[-1], precios_cierre[-2])
-print(f"Acciones recomendadas: {acciones}")
+>>/app/scripts/# python3 TradingLogicMarket.py {dataframes_procesados, rsi_under, rsi_upper}
+Respuesta (resultados_trading): se ingresan los dataframes_procesados con los calculos
+                de todas las funciones del script GetDataPandas.py y junto con los datos de
+                la estrategia seleccionada para procesar si se debe comprar, vender o mantener
+                con la descrición del la tecnica aplicada.
 
 
-Paso 4: Enviar alertas
+Paso 5: Enviar alertas
 ********
 python
 Copy
