@@ -18,7 +18,7 @@ def cargar_configuracion(estrategia):
     """
     Carga los valores de rsi_under y rsi_upper desde el archivo de propiedades.
     :param estrategia: Nombre de la estrategia (corto_plazo, mediano_plazo, largo_plazo, agresivo, conservador).
-    :return: Diccionario con rsi_under y rsi_upper.
+    :return: Diccionario con rsi_under, rsi_upper, intervalo y periodo.
     """
     config = configparser.ConfigParser()
     
@@ -36,7 +36,9 @@ def cargar_configuracion(estrategia):
 
     return {
         "rsi_under": float(config[estrategia]['rsi_under']),
-        "rsi_upper": float(config[estrategia]['rsi_upper'])
+        "rsi_upper": float(config[estrategia]['rsi_upper']),
+        "intervalo": config[estrategia]['intervalo'],
+        "periodo": config[estrategia]['periodo']
     }
 
 
@@ -46,7 +48,7 @@ def main():
     debug = DebugMotorBolsaIA()
 
     # Paso 0: Seleccionar estrategia
-    estrategia = "corto_plazo"  # Puedes cambiar esto a "mediano_plazo", "largo_plazo", "agresivo", "conservador"
+    estrategia = "largo_plazo"  # Puedes cambiar esto a "mediano_plazo", "largo_plazo", "agresivo", "conservador"
     
     # Mostrar título de la estrategia
     mostrar_titulo_estrategia(f"Estrategia: {estrategia}")
@@ -56,16 +58,18 @@ def main():
         config_rsi = cargar_configuracion(estrategia)
         rsi_under = config_rsi["rsi_under"]
         rsi_upper = config_rsi["rsi_upper"]
-        debug.escribir_configuracion({"estrategia": estrategia, "rsi_under": rsi_under, "rsi_upper": rsi_upper})
+        intervalo = config_rsi["intervalo"]
+        periodo = config_rsi["periodo"]
+        debug.escribir_configuracion({"estrategia": estrategia, "intervalo": intervalo, "periodo": periodo, "rsi_under": rsi_under, "rsi_upper": rsi_upper})
     except Exception as e:
         print(f"Error al cargar la configuración: {e}")
         return
 
     # Paso 1: Obtener datos históricos
-    debug.escribir_paso(1, "obtener_datos_historicos", {"intervalo": "1day", "periodo": "1year"})
+    debug.escribir_paso(1, "obtener_datos_historicos", {"intervalo": intervalo, "periodo": periodo})
     print("Obteniendo datos históricos...")
     # Ajustamos el intervalo de tiempo para obtener más datos (por ejemplo, 1 año de datos con intervalos de 1 día)
-    datos_historicos = obtener_datos_historicos("1day", "1year")
+    datos_historicos = obtener_datos_historicos(intervalo, periodo)
     debug.escribir_paso(1, "obtener_datos_historicos", {}, respuesta=f"Datos obtenidos para {len(datos_historicos)} mercados.")
     print(f"Datos históricos obtenidos para {len(datos_historicos)} mercados.")
     

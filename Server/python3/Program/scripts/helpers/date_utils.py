@@ -2,7 +2,7 @@ import re
 from datetime import datetime, timedelta
 import urllib.parse
 
-valores_time_series_validos = {"1min", "5min", "15min", "30min", "45min", "1h", "2h", "4h", "8h", "1day", "1week", "1month", "1year"}
+valores_time_series_validos = {"1min", "5min", "15min", "30min", "45min", "1h", "2h", "4h", "8h", "1day", "1week", "1month", "1year", "5year"}
 
 def validar_intervalo_date(intervalo):
     """ Valida si el intervalo dado es válido """
