@@ -16,85 +16,14 @@ docker exec -it motor_alertas_de_bolsa sh
 
 Finalmente, ejecuta el script:
 
-```sh
-python3 GetDataTwelveView.py
+``` sh
+cd /scripts
+python3 00_MotorBolsaIA.py
 ```
 
-### Modos de ejecución
+Leer el log a nivel de servidor en la ruta :
 
-El script acepta los siguientes modos de ejecución:
-
-```sh
-python3 GetDataTwelveView.py {'historico_ahora', 'time_series', 'historico', 'actual'}
+``` sh
+cd ./Server/python3/Program/logs/
+cat 00_MotorBolsaIA.log
 ```
-
-Ejemplo:
-
-```sh
-python3 GetDataTwelveView.py time_series
-```
-
-Salida esperada:
-
-```
-=======================================
-Modo de ejecución: time_series
-=======================================
-Llamar la función time_series_interval_mercados
-Uso: python3 GetDataTwelveView.py time_series interval(4h, 1week, 5min, 2h, 8h, 15min, 45min, 1month, 1year, 1day, 1h, 1min, 30min)
-```
-
-### Ejemplo con intervalo
-
-```sh
-python3 GetDataTwelveView.py time_series 5min
-```
-
-Salida esperada:
-
-```
-=======================================
-Modo de ejecución: time_series
-=======================================
-Llamar la función time_series_interval_mercados
-Error en la API para 510050: **symbol** 510050 is not available with your plan. You may select the appropriate plan at https://twelvedata.com/pricing
-Error en la API para 7272: **symbol** 7272 is not available with your plan. You may select the appropriate plan at https://twelvedata.com/pricing
-=======================================
-Datos de series de tiempo para intervalo de 5min:
-
-Datos para AAPL:
-  Fecha y hora: 2025-03-06 15:55:00
-  Apertura: 235.58000
-  Máximo: 235.66000
-  Mínimo: 235
-  Cierre: 235.32001
-  Volumen: 1804252
-  Interés abierto: -1
-
-Datos para TSLA:
-  Fecha y hora: 2025-03-06 15:55:00
-  Apertura: 263.29001
-  Máximo: 264.34000
-  Mínimo: 262.39001
-  Cierre: 263.42999
-  Volumen: 2831471
-  Interés abierto: -1
-
-Datos para BTC/USD:
-  Fecha y hora: 2025-03-06 23:45:00
-  Apertura: 90310.43
-  Máximo: 90353.3
-  Mínimo: 90256.52
-  Cierre: 90256.52
-  Volumen: -1
-  Interés abierto: -1
-510050: No se pudo obtener los datos
-7272: No se pudo obtener los datos
-```
-
-## Notas
-
-Si recibes un error relacionado con símbolos no disponibles en tu plan, revisa la documentación de TwelveData y ajusta los símbolos según tu suscripción en:
-
-[https://twelvedata.com/pricing](https://twelvedata.com/pricing)
-
