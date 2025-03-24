@@ -13,6 +13,9 @@ from TradingLogicMarket import analizar_dataframes
 from styles.title_console import mostrar_titulo_estrategia
 from styles.exit_console import mostrar_resultados_trading
 
+# Helpers
+#from helpers.notificationSender import whatsapp
+
 
 def cargar_configuracion(estrategia):
     """
@@ -43,12 +46,72 @@ def cargar_configuracion(estrategia):
 
 
 
+def leer_numeros_whatsapp():
+    """
+    Lee los números de teléfono desde el archivo de configuración.
+    :return: Lista de números de teléfono.
+    """
+    try:
+        with open('/app/conf/whatsappNotificationListNumber.info', 'r') as file:
+            numeros = [line.strip() for line in file if line.strip()]
+        return numeros
+    except Exception as e:
+        print(f"Error al leer los números de WhatsApp: {e}")
+        return []
+
+
+
+def comparar_y_notificar(resultados_anteriores, resultados_actuales, estrategia):
+    """
+    Compara los resultados anteriores con los actuales y envía notificaciones si hay cambios.
+    :param resultados_anteriores: Diccionario con los resultados anteriores.
+    :param resultados_actuales: Diccionario con los resultados actuales.
+    :param estrategia: Nombre de la estrategia usada.
+    """
+    if not resultados_anteriores:
+        # Primera ejecución, no hay comparación posible
+        mensaje = f"No se encontraron resultados anteriores para la ejecución"
+        print(f"{mensaje}")
+        return mensaje
+
+    cambios = []
+    
+    # Comparar resultados para cada mercado
+    for mercado in resultados_actuales:
+        if mercado not in resultados_anteriores:
+            cambios.append(f"Nuevo mercado: {mercado} - Decisión: {resultados_actuales[mercado]['decision']}")
+        else:
+            if resultados_actuales[mercado]['decision'] != resultados_anteriores[mercado]['decision']:
+                cambios.append(
+                    f"Cambio en {mercado}: "
+                    f"De {resultados_anteriores[mercado]['decision']} "
+                    f"a {resultados_actuales[mercado]['decision']}"
+                )
+
+    if cambios:
+        numeros = leer_numeros_whatsapp()
+        if numeros:
+            mensaje = f"🔔 *Actualización de Trading ({estrategia})* 🔔\n\n" + "\n".join(cambios)
+            print(f"numeros: {numeros}\n mensaje: {mensaje}")
+            #whatsapp(numeros, mensaje)
+            return numeros, mensaje
+
+        else:
+            mensaje = f"No hay números configurados para enviar notificaciones.\nAgregarlos en el archivo /app/conf/whatsappNotificationListNumber.info"
+            print(f"{mensaje}")
+            return mensaje
+
+
+
 def main():
     # Inicializar el modo debug
     debug = DebugMotorBolsaIA()
 
+    # Variable para almacenar resultados anteriores
+    resultados_anteriores = None
+
     # Paso 0: Seleccionar estrategia
-    estrategia = "largo_plazo"  # Puedes cambiar esto a "mediano_plazo", "largo_plazo", "agresivo", "conservador"
+    estrategia = "mediano_plazo"  # Puedes cambiar esto a "mediano_plazo", "largo_plazo", "agresivo", "conservador"
     
     # Mostrar título de la estrategia
     mostrar_titulo_estrategia(f"Estrategia: {estrategia}")
@@ -105,7 +168,17 @@ def main():
 
     # Paso 5: Mostrar resultados
     debug.escribir_paso(5, "mostrar_resultados_trading", {"estrategia": estrategia, "resultados_trading": resultados_trading})
+    print("\nMostrar resultados...")
     mostrar_resultados_trading(estrategia, resultados_trading)
+
+    # Paso 6: Comparar con resultados anteriores y notificar si hay cambios
+    debug.escribir_paso(6, "comparar_y_notificar", {"estrategia": estrategia, "resultados_anteriores": resultados_anteriores, "resultados_trading": resultados_trading})
+    print("\nComparar con resultados anteriores y notificar si hay cambios...")
+    whatsapp_message = comparar_y_notificar(resultados_anteriores, resultados_trading, estrategia)
+    debug.escribir_paso(6, "comparar_y_notificar", {}, respuesta=f"El mensaje de WhatsApp es: {whatsapp_message}")
+    
+    # Guardar resultados actuales para la próxima comparación
+    resultados_anteriores = resultados_trading
 
 
 
