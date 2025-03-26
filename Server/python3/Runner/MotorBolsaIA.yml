@@ -13,3 +13,4 @@ services:
       - ../Program/scripts/:/app/scripts/
       - ../Program/conf/:/app/conf/
       - ../Program/logs/:/app/logs/
+      - ../Program/tmp/:/app/tmp/

@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./Server/python3/Program/scripts"
+    ]
+}

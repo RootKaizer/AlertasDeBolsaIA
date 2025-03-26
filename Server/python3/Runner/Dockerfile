@@ -61,10 +61,11 @@ RUN pip install --no-cache-dir \
 # Verificar instalación,
 RUN python -c "import numpy, pandas, matplotlib, plotly, sklearn, websocket, backtrader; print('Instalación exitosa')"
 
+# Copiar archivos al contenedor
+COPY Program/ /app/
 
 # Directorio de trabajo
 WORKDIR /app
-
 
 # Iniciar contenedor
 CMD ["python3"]
