@@ -1,0 +1,12 @@
+# Archivos compilados de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Configuración de VS Code
+.vscode/
+
+# Otros archivos innecesarios (opcional)
+*.swp
+*.DS_Store
