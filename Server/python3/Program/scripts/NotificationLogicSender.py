@@ -1,24 +1,9 @@
 # NotificationLogicSender.py
 from typing import Union, Tuple, List, Dict
 import configparser
+import json
+from pathlib import Path
 
-def leer_numeros_whatsapp(ruta_archivo: str = '/app/conf/whatsappNotificationListNumber.info') -> List[str]:
-    """
-    Lee los números de teléfono desde el archivo de configuración.
-    
-    Args:
-        ruta_archivo: Ruta al archivo con los números de WhatsApp
-        
-    Returns:
-        Lista de números de teléfono
-    """
-    try:
-        with open(ruta_archivo, 'r') as file:
-            numeros = [line.strip() for line in file if line.strip()]
-        return numeros
-    except Exception as e:
-        print(f"Error al leer los números de WhatsApp: {e}")
-        return []
 
 def comparar_y_notificar(
     resultados_anteriores: Dict,
@@ -39,40 +24,53 @@ def comparar_y_notificar(
     """
     # Caso: primera ejecución sin resultados anteriores
     if not resultados_anteriores:
-        mensaje = "No se encontraron resultados anteriores para la ejecución"
-        print(mensaje)
-        return mensaje
+        return "Primera ejecución - No hay resultados anteriores para comparar"
 
     cambios = []
     
-    # Comparar resultados para cada mercado
-    for mercado in resultados_actuales:
+    # Comparar resultados para cada mercado de forma segura
+    for mercado, datos_actuales in resultados_actuales.items():
+        # Verificar si existe la clave 'decision' en los datos actuales
+        if 'decision' not in datos_actuales:
+            continue
+            
+        # Caso: nuevo mercado
         if mercado not in resultados_anteriores:
-            cambios.append(f"Nuevo mercado: {mercado} - Decisión: {resultados_actuales[mercado]['decision']}")
-        elif resultados_actuales[mercado]['decision'] != resultados_anteriores[mercado]['decision']:
-            cambios.append(
-                f"Cambio en {mercado}: "
-                f"De {resultados_anteriores[mercado]['decision']} "
-                f"a {resultados_actuales[mercado]['decision']}"
-            )
+            cambios.append(f"Nuevo mercado: {mercado} - Decisión: {datos_actuales['decision']}")
+        else:
+            # Verificar si existe la clave 'decision' en los datos anteriores
+            datos_anteriores = resultados_anteriores.get(mercado, {})
+            if 'decision' in datos_anteriores and datos_anteriores['decision'] != datos_actuales['decision']:
+                cambios.append(
+                    f"Cambio en {mercado}: "
+                    f"De {datos_anteriores['decision']} "
+                    f"a {datos_actuales['decision']}"
+                )
 
     # Si no hay cambios
     if not cambios:
         return "No se detectaron cambios significativos desde la última ejecución."
 
-    # Si hay cambios, preparar notificación
+    # Leer números de WhatsApp
     numeros = leer_numeros_whatsapp()
     
     if not numeros:
-        mensaje = "No hay números configurados para enviar notificaciones."
-        print(mensaje)
-        return mensaje
+        return "No hay números configurados para enviar notificaciones."
     
+    # Construir mensaje final
     mensaje = f"🔔 *Actualización de Trading ({estrategia})* 🔔\n\n" + "\n".join(cambios)
-    print(f"Preparado para enviar a {len(numeros)} números:\n{mensaje}")
-    
     return numeros, mensaje
 
+def leer_numeros_whatsapp(ruta_archivo: str = '/app/conf/whatsappNotificationListNumber.info') -> List[str]:
+    """
+    Lee los números de teléfono desde el archivo de configuración.
+    """
+    try:
+        with open(ruta_archivo, 'r') as file:
+            return [line.strip() for line in file if line.strip()]
+    except Exception as e:
+        print(f"Error al leer números WhatsApp: {e}")
+        return []
 
 '''
 # Ejemplo de uso para pruebas
