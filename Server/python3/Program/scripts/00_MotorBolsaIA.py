@@ -31,6 +31,8 @@ def cargar_configuracion(estrategia):
     ruta_archivo = "properties/TradingLogicMarket.properties"
     # Ruta archivos temporales en contenedor.
     ruta_archivo_temporal = f"/app/tmp/resultados_anteriores_trading_{estrategia}.tmp"
+    mobile_notification_list_file = '/app/conf/whatsappNotificationListNumber.info'  # Valor por defecto
+    whatsapp_message_log_file = '/app/logs/.SenderWhatsappMessage.log'  # Valor por defecto
     
     # Leer el archivo de propiedades
     try:
@@ -46,7 +48,9 @@ def cargar_configuracion(estrategia):
         "rsi_upper": float(config[estrategia]['rsi_upper']),
         "intervalo": config[estrategia]['intervalo'],
         "periodo": config[estrategia]['periodo'],
-        "ruta_archivo_temporal": ruta_archivo_temporal
+        "ruta_archivo_temporal": ruta_archivo_temporal,
+        "mobile_notification_list_file": mobile_notification_list_file,
+        "whatsapp_message_log_file": whatsapp_message_log_file
     }
 
 
@@ -115,6 +119,8 @@ def main():
         intervalo = config["intervalo"]
         periodo = config["periodo"]
         ruta_archivo_temporal = config["ruta_archivo_temporal"]
+        mobile_notification_list_file = config["mobile_notification_list_file"]
+        whatsapp_message_log_file = config["whatsapp_message_log_file"]
         
         debug.escribir_configuracion({
             "estrategia": estrategia, 
@@ -122,7 +128,9 @@ def main():
             "periodo": periodo, 
             "rsi_under": rsi_under, 
             "rsi_upper": rsi_upper,
-            "ruta_archivo_temporal": ruta_archivo_temporal
+            "ruta_archivo_temporal": ruta_archivo_temporal,
+            "mobile_notification_list_file": mobile_notification_list_file,
+            "whatsapp_message_log_file": whatsapp_message_log_file
         })
     except Exception as e:
         print(f"Error al cargar la configuración: {e}")
@@ -190,7 +198,7 @@ def main():
     resultados_anteriores = cargar_resultados_anteriores(resultados_trading, ruta_archivo_temporal)
     print("\nComparando con resultados anteriores...")
     try:
-        resultado_notificacion = comparar_y_notificar(resultados_anteriores, resultados_trading, estrategia)
+        resultado_notificacion = comparar_y_notificar(resultados_anteriores, resultados_trading, estrategia, mobile_notification_list_file, whatsapp_message_log_file)
         
         if isinstance(resultado_notificacion, tuple):
             numeros, mensaje = resultado_notificacion
@@ -219,7 +227,8 @@ def main():
         debug.escribir_paso(6, "comparar_y_notificar", {}, 
                           respuesta=error_msg)
     
-    # Guardar resultados actuales para la próxima ejecución
+    # Guardar resultados actuales como un temporal para que 
+    # la próxima ejecución lo tome como valor anterior
     guardar_resultados_temporales(resultados_trading, ruta_archivo_temporal)
 
 

@@ -3,12 +3,17 @@ from typing import Union, Tuple, List, Dict
 import configparser
 import json
 from pathlib import Path
+from datetime import datetime
+import pytz
+
 
 
 def comparar_y_notificar(
     resultados_anteriores: Dict,
     resultados_actuales: Dict,
-    estrategia: str
+    estrategia: str,
+    mobile_list_notification: str,
+    log_whatsapp_message: str
 ) -> Union[str, Tuple[List[str], str]]:
     """
     Compara los resultados anteriores con los actuales y prepara notificaciones si hay cambios.
@@ -27,6 +32,7 @@ def comparar_y_notificar(
         return "Primera ejecución - No hay resultados anteriores para comparar"
 
     cambios = []
+    cambios_detallados = []
     
     # Comparar resultados para cada mercado de forma segura
     for mercado, datos_actuales in resultados_actuales.items():
@@ -37,6 +43,12 @@ def comparar_y_notificar(
         # Caso: nuevo mercado
         if mercado not in resultados_anteriores:
             cambios.append(f"Nuevo mercado: {mercado} - Decisión: {datos_actuales['decision']}")
+            cambios_detallados.append({
+                'mercado': mercado,
+                'tipo': 'nuevo',
+                'anterior': None,
+                'actual': datos_actuales['decision']
+            })
         else:
             # Verificar si existe la clave 'decision' en los datos anteriores
             datos_anteriores = resultados_anteriores.get(mercado, {})
@@ -46,22 +58,37 @@ def comparar_y_notificar(
                     f"De {datos_anteriores['decision']} "
                     f"a {datos_actuales['decision']}"
                 )
-
-    # Si no hay cambios
-    if not cambios:
-        return "No se detectaron cambios significativos desde la última ejecución."
+                cambios_detallados.append({
+                    'mercado': mercado,
+                    'tipo': 'cambio',
+                    'anterior': datos_anteriores['decision'],
+                    'actual': datos_actuales['decision']
+                })
 
     # Leer números de WhatsApp
-    numeros = leer_numeros_whatsapp()
+    numeros = leer_numeros_whatsapp(mobile_list_notification)
     
     if not numeros:
         return "No hay números configurados para enviar notificaciones."
     
+    # Si no hay cambios
+    if not cambios:
+        mensaje = "No se detectaron cambios significativos desde la última ejecución."
+        # solo activar si quieres depurar mensaje que va para el whatsapp
+        registrar_en_log(log_whatsapp_message, numeros, mensaje, cambios_detallados, estrategia)
+        return mensaje
+    
     # Construir mensaje final
     mensaje = f"🔔 *Actualización de Trading ({estrategia})* 🔔\n\n" + "\n".join(cambios)
+
+    # Registrar en el log solo si hay cambios y números
+    registrar_en_log(log_whatsapp_message, numeros, mensaje, cambios_detallados, estrategia)
+
     return numeros, mensaje
 
-def leer_numeros_whatsapp(ruta_archivo: str = '/app/conf/whatsappNotificationListNumber.info') -> List[str]:
+
+
+def leer_numeros_whatsapp(ruta_archivo: str) -> List[str]:
     """
     Lee los números de teléfono desde el archivo de configuración.
     """
@@ -71,6 +98,52 @@ def leer_numeros_whatsapp(ruta_archivo: str = '/app/conf/whatsappNotificationLis
     except Exception as e:
         print(f"Error al leer números WhatsApp: {e}")
         return []
+    
+
+
+def registrar_en_log(log_whatsapp_message: str, numeros: List[str], mensaje: str, cambios: List[Dict], estrategia: str):
+    """
+    Registra los detalles del mensaje enviado en un archivo de log.
+    
+    Args:
+        numeros: Lista de números a los que se envió el mensaje
+        mensaje: Mensaje enviado
+        cambios: Lista de diccionarios con los cambios detectados
+        estrategia: Estrategia utilizada
+    """
+    log_file = Path(log_whatsapp_message)
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Obtener fecha y hora actual en zona horaria de Bogotá
+    tz_bogota = pytz.timezone('America/Bogota')
+    fecha_hora = datetime.now(tz_bogota).strftime('%Y-%m-%d %H:%M:%S %Z')
+    
+    # Crear entrada de log
+    log_entry = {
+        'fecha_hora': fecha_hora,
+        'estrategia': estrategia,
+        'numeros_destino': numeros,
+        'mensaje': mensaje,
+        'cambios': cambios
+    }
+    
+    # Escribir en el archivo de log
+    try:
+        with open(log_file, 'a') as f:
+            # Si el archivo está vacío, comenzamos con un array JSON
+            if log_file.stat().st_size == 0:
+                f.write('[\n')
+                json.dump(log_entry, f, indent=4, ensure_ascii=False)
+            else:
+                # Si no está vacío, agregamos una coma y la nueva entrada
+                f.write(',\n')
+                json.dump(log_entry, f, indent=4, ensure_ascii=False)
+            
+            # Cerramos el array JSON si es la primera vez que escribimos
+            if log_file.stat().st_size == 0:
+                f.write('\n]')
+    except Exception as e:
+        print(f"Error al escribir en el archivo de log: {e}")
 
 '''
 # Ejemplo de uso para pruebas
