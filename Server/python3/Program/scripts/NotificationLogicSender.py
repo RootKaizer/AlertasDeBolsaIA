@@ -1,11 +1,9 @@
 # NotificationLogicSender.py
-from typing import Union, Tuple, List, Dict
-import configparser
+from typing import Union, Tuple, List, Dict, Any
 import json
 from pathlib import Path
 from datetime import datetime
 import pytz
-
 
 
 def comparar_y_notificar(
@@ -17,74 +15,67 @@ def comparar_y_notificar(
 ) -> Union[str, Tuple[List[str], str]]:
     """
     Compara los resultados anteriores con los actuales y prepara notificaciones si hay cambios.
-    
-    Args:
-        resultados_anteriores: Diccionario con los resultados anteriores
-        resultados_actuales: Diccionario con los resultados actuales
-        estrategia: Nombre de la estrategia usada
-        
-    Returns:
-        str: Mensaje de estado si no hay cambios o números
-        Tuple[List[str], str]: Lista de números y mensaje si hay cambios
     """
-    # Caso: primera ejecución sin resultados anteriores
     if not resultados_anteriores:
         return "Primera ejecución - No hay resultados anteriores para comparar"
 
     cambios = []
-    cambios_detallados = []
+    comparacion_completa = generar_comparacion_completa(resultados_anteriores, resultados_actuales)
     
-    # Comparar resultados para cada mercado de forma segura
-    for mercado, datos_actuales in resultados_actuales.items():
-        # Verificar si existe la clave 'decision' en los datos actuales
-        if 'decision' not in datos_actuales:
-            continue
-            
-        # Caso: nuevo mercado
-        if mercado not in resultados_anteriores:
-            cambios.append(f"Nuevo mercado: {mercado} - Decisión: {datos_actuales['decision']}")
-            cambios_detallados.append({
-                'mercado': mercado,
-                'tipo': 'nuevo',
-                'anterior': None,
-                'actual': datos_actuales['decision']
-            })
-        else:
-            # Verificar si existe la clave 'decision' en los datos anteriores
-            datos_anteriores = resultados_anteriores.get(mercado, {})
-            if 'decision' in datos_anteriores and datos_anteriores['decision'] != datos_actuales['decision']:
+    # Verificar si hay cambios
+    hay_cambios = False
+    for mercado, datos in comparacion_completa.items():
+        for indicador, valores in datos['analisis_comparativo'].items():
+            if valores['anterior'] != valores['actual']:
                 cambios.append(
-                    f"Cambio en {mercado}: "
-                    f"De {datos_anteriores['decision']} "
-                    f"a {datos_actuales['decision']}"
+                    f"Cambio en {mercado} ({indicador}): "
+                    f"De {valores['anterior'].get('accion', 'N/A')} "
+                    f"a {valores['actual'].get('accion', 'N/A')}"
                 )
-                cambios_detallados.append({
-                    'mercado': mercado,
-                    'tipo': 'cambio',
-                    'anterior': datos_anteriores['decision'],
-                    'actual': datos_actuales['decision']
-                })
-
-    # Leer números de WhatsApp
-    numeros = leer_numeros_whatsapp(mobile_list_notification)
+                hay_cambios = True
     
+    if not hay_cambios:
+        resultado = "No se detectaron cambios significativos desde la última ejecución."
+        numeros = leer_numeros_whatsapp(mobile_list_notification)
+        registrar_en_log(log_whatsapp_message, numeros if numeros else [], resultado, list(comparacion_completa.values()), estrategia)
+        return resultado if not numeros else (numeros, resultado)
+
+    numeros = leer_numeros_whatsapp(mobile_list_notification)
     if not numeros:
         return "No hay números configurados para enviar notificaciones."
     
-    # Si no hay cambios
-    if not cambios:
-        mensaje = "No se detectaron cambios significativos desde la última ejecución."
-        # solo activar si quieres depurar mensaje que va para el whatsapp
-        registrar_en_log(log_whatsapp_message, numeros, mensaje, cambios_detallados, estrategia)
-        return mensaje
-    
-    # Construir mensaje final
     mensaje = f"🔔 *Actualización de Trading ({estrategia})* 🔔\n\n" + "\n".join(cambios)
-
-    # Registrar en el log solo si hay cambios y números
-    registrar_en_log(log_whatsapp_message, numeros, mensaje, cambios_detallados, estrategia)
-
+    registrar_en_log(log_whatsapp_message, numeros, mensaje, list(comparacion_completa.values()), estrategia)
+    
     return numeros, mensaje
+
+
+
+def generar_comparacion_completa(anteriores: Dict, actuales: Dict) -> Dict[str, Any]:
+    """
+    Genera una comparación completa de todos los mercados e indicadores.
+    """
+    todos_mercados = set(anteriores.keys()).union(set(actuales.keys()))
+    comparacion = {}
+    
+    for mercado in todos_mercados:
+        datos_anteriores = anteriores.get(mercado, {})
+        datos_actuales = actuales.get(mercado, {})
+        
+        comparacion[mercado] = {
+            'mercado': mercado,
+            'analisis_comparativo': {}
+        }
+        
+        todos_indicadores = set(datos_anteriores.keys()).union(set(datos_actuales.keys()))
+        
+        for indicador in todos_indicadores:
+            comparacion[mercado]['analisis_comparativo'][indicador] = {
+                'anterior': datos_anteriores.get(indicador, {}),
+                'actual': datos_actuales.get(indicador, {})
+            }
+    
+    return comparacion
 
 
 
@@ -101,49 +92,46 @@ def leer_numeros_whatsapp(ruta_archivo: str) -> List[str]:
     
 
 
-def registrar_en_log(log_whatsapp_message: str, numeros: List[str], mensaje: str, cambios: List[Dict], estrategia: str):
-    """
-    Registra los detalles del mensaje enviado en un archivo de log.
-    
-    Args:
-        numeros: Lista de números a los que se envió el mensaje
-        mensaje: Mensaje enviado
-        cambios: Lista de diccionarios con los cambios detectados
-        estrategia: Estrategia utilizada
-    """
+def registrar_en_log(log_whatsapp_message, numeros: List[str], mensaje: str, cambios: List[Dict[str, Any]], estrategia: str):
+    """Registra los detalles del mensaje enviado en un archivo de log."""
     log_file = Path(log_whatsapp_message)
     log_file.parent.mkdir(parents=True, exist_ok=True)
     
-    # Obtener fecha y hora actual en zona horaria de Bogotá
     tz_bogota = pytz.timezone('America/Bogota')
     fecha_hora = datetime.now(tz_bogota).strftime('%Y-%m-%d %H:%M:%S %Z')
     
-    # Crear entrada de log
     log_entry = {
         'fecha_hora': fecha_hora,
         'estrategia': estrategia,
         'numeros_destino': numeros,
         'mensaje': mensaje,
-        'cambios': cambios
+        'comparacion_completa': cambios
     }
     
-    # Escribir en el archivo de log
     try:
-        with open(log_file, 'a') as f:
-            # Si el archivo está vacío, comenzamos con un array JSON
-            if log_file.stat().st_size == 0:
-                f.write('[\n')
-                json.dump(log_entry, f, indent=4, ensure_ascii=False)
-            else:
-                # Si no está vacío, agregamos una coma y la nueva entrada
-                f.write(',\n')
-                json.dump(log_entry, f, indent=4, ensure_ascii=False)
-            
-            # Cerramos el array JSON si es la primera vez que escribimos
-            if log_file.stat().st_size == 0:
-                f.write('\n]')
+        if not log_file.exists():
+            # crea un nuevo log
+            with open(log_file, 'w') as f:
+                json.dump([log_entry], f, indent=4, ensure_ascii=False)
+        else:
+            # encuentra un log y continua escribiendo
+            with open(log_file, 'r+') as f:
+                try:
+                    data = json.load(f)
+                    data.append(log_entry)
+                    f.seek(0)
+                    json.dump(data, f, indent=4, ensure_ascii=False)
+                except json.JSONDecodeError:
+                    json.dump([log_entry], f, indent=4, ensure_ascii=False)
     except Exception as e:
         print(f"Error al escribir en el archivo de log: {e}")
+
+
+
+
+
+
+
 
 '''
 # Ejemplo de uso para pruebas

@@ -1,20 +1,702 @@
 [
-{
-    "fecha_hora": "2025-03-27 18:46:38 -05",
-    "estrategia": "mediano_plazo",
-    "numeros_destino": [
-        "+57 317 4131370"
-    ],
-    "mensaje": "No se detectaron cambios significativos desde la última ejecución.",
-    "cambios": []
-}
-],
-{
-    "fecha_hora": "2025-03-27 19:07:28 -05",
-    "estrategia": "mediano_plazo",
-    "numeros_destino": [
-        "+57 317 4131370"
-    ],
-    "mensaje": "No se detectaron cambios significativos desde la última ejecución.",
-    "cambios": []
-}
+    {
+        "fecha_hora": "2025-03-27 21:05:13 -05",
+        "estrategia": "mediano_plazo",
+        "numeros_destino": [
+            "+57 317 4131370"
+        ],
+        "mensaje": "No se detectaron cambios significativos desde la última ejecución.",
+        "comparacion_completa": [
+            {
+                "mercado": "TSLA",
+                "analisis_comparativo": {
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        }
+                    },
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        },
+                        "actual": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        }
+                    },
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    }
+                }
+            },
+            {
+                "mercado": "AAPL",
+                "analisis_comparativo": {
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        }
+                    },
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        }
+                    },
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "fecha_hora": "2025-03-27 21:12:50 -05",
+        "estrategia": "mediano_plazo",
+        "numeros_destino": [
+            "+57 317 4131370"
+        ],
+        "mensaje": "No se detectaron cambios significativos desde la última ejecución.",
+        "comparacion_completa": [
+            {
+                "mercado": "AAPL",
+                "analisis_comparativo": {
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    },
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        }
+                    },
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        }
+                    }
+                }
+            },
+            {
+                "mercado": "TSLA",
+                "analisis_comparativo": {
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    },
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        }
+                    },
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        },
+                        "actual": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "fecha_hora": "2025-03-27 21:13:05 -05",
+        "estrategia": "mediano_plazo",
+        "numeros_destino": [
+            "+57 317 4131370"
+        ],
+        "mensaje": "No se detectaron cambios significativos desde la última ejecución.",
+        "comparacion_completa": [
+            {
+                "mercado": "AAPL",
+                "analisis_comparativo": {
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        }
+                    },
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        }
+                    },
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        }
+                    }
+                }
+            },
+            {
+                "mercado": "TSLA",
+                "analisis_comparativo": {
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        }
+                    },
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        },
+                        "actual": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        }
+                    },
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "fecha_hora": "2025-03-27 21:14:01 -05",
+        "estrategia": "mediano_plazo",
+        "numeros_destino": [
+            "+57 317 4131370"
+        ],
+        "mensaje": "No se detectaron cambios significativos desde la última ejecución.",
+        "comparacion_completa": [
+            {
+                "mercado": "AAPL",
+                "analisis_comparativo": {
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        }
+                    },
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        }
+                    },
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    }
+                }
+            },
+            {
+                "mercado": "TSLA",
+                "analisis_comparativo": {
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        },
+                        "actual": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        }
+                    },
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        }
+                    },
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "fecha_hora": "2025-03-27 21:14:25 -05",
+        "estrategia": "mediano_plazo",
+        "numeros_destino": [
+            "+57 317 4131370"
+        ],
+        "mensaje": "No se detectaron cambios significativos desde la última ejecución.",
+        "comparacion_completa": [
+            {
+                "mercado": "AAPL",
+                "analisis_comparativo": {
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    },
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        }
+                    },
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        }
+                    }
+                }
+            },
+            {
+                "mercado": "TSLA",
+                "analisis_comparativo": {
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    },
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        },
+                        "actual": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        }
+                    },
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "fecha_hora": "2025-03-27 21:15:22 -05",
+        "estrategia": "mediano_plazo",
+        "numeros_destino": [
+            "+57 317 4131370"
+        ],
+        "mensaje": "No se detectaron cambios significativos desde la última ejecución.",
+        "comparacion_completa": [
+            {
+                "mercado": "AAPL",
+                "analisis_comparativo": {
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        }
+                    },
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        }
+                    },
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    }
+                }
+            },
+            {
+                "mercado": "TSLA",
+                "analisis_comparativo": {
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        },
+                        "actual": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        }
+                    },
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        }
+                    },
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "fecha_hora": "2025-03-27 21:29:18 -05",
+        "estrategia": "mediano_plazo",
+        "numeros_destino": [
+            "+57 317 4131370"
+        ],
+        "mensaje": "🔔 *Actualización de Trading (mediano_plazo)* 🔔\n\nCambio en TSLA (Estocástico): De vender a vender",
+        "comparacion_completa": [
+            {
+                "mercado": "AAPL",
+                "analisis_comparativo": {
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(223.85) es mayor que el anterior(221.53), indicando tendencia alcista."
+                        }
+                    },
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "%K(55.62) está por encima de %D(47.31), indicando tendencia alcista."
+                        }
+                    },
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(35.61) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-4.13) está por encima de la señal(-4.96), indicando tendencia alcista."
+                        }
+                    }
+                }
+            },
+            {
+                "mercado": "TSLA",
+                "analisis_comparativo": {
+                    "Precio": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "El precio actual(273.13) es mayor que el anterior(272.06), indicando tendencia alcista."
+                        }
+                    },
+                    "Estocástico": {
+                        "anterior": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.99) está por debajo de %D(84.08), indicando tendencia bajista."
+                        },
+                        "actual": {
+                            "accion": "vender",
+                            "descripcion": "%K(74.98) está por debajo de %D(84.07), indicando tendencia bajista."
+                        }
+                    },
+                    "RSI": {
+                        "anterior": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        },
+                        "actual": {
+                            "accion": "hold",
+                            "descripcion": "RSI(52.78) está dentro del rango normal (35.00 < RSI < 65.00), no se recomienda acción."
+                        }
+                    },
+                    "MACD": {
+                        "anterior": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        },
+                        "actual": {
+                            "accion": "comprar",
+                            "descripcion": "MACD(-15.06) está por encima de la señal(-23.68), indicando tendencia alcista."
+                        }
+                    }
+                }
+            }
+        ]
+    }
+]

@@ -172,17 +172,17 @@ def main():
     print("Precio Anterior.")
     print("Estocastico K.")
     print("Estocastico D.")
-    dataframes_procesados = procesar_dataframes(dataframes)
+    indicadores_de_bolsa_caldulados = procesar_dataframes(dataframes)
     debug.escribir_paso(3, "procesar_dataframes", {}, respuesta="DataFrames procesados correctamente.")
 
     # Paso 4: Aplicar lógica de trading
     debug.escribir_paso(4, "analizar_dataframes", {
-        "dataframes_procesados": dataframes_procesados, 
+        "indicadores_de_bolsa_caldulados": indicadores_de_bolsa_caldulados, 
         "rsi_under": rsi_under, 
         "rsi_upper": rsi_upper
         })
     print("\nAplicando lógica de trading...")
-    resultados_trading = analizar_dataframes(dataframes_procesados, rsi_under, rsi_upper)
+    resultados_trading = analizar_dataframes(indicadores_de_bolsa_caldulados, rsi_under, rsi_upper)
     debug.escribir_paso(4, "analizar_dataframes", {}, respuesta="Lógica de trading aplicada correctamente.")
 
     # Paso 5: Mostrar resultados

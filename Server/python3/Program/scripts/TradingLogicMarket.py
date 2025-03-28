@@ -9,11 +9,11 @@ def determinar_accion_rsi(rsi, rsi_under=30, rsi_upper=70):
     :return: Acción recomendada (str) y descripción (str).
     """
     if rsi > rsi_upper:
-        return "vender", "RSI está por encima del umbral superior, indicando sobrecompra."
+        return F"vender", f"RSI({rsi:.2f}) está por encima del umbral superior({rsi_upper:.2f}), indicando sobrecompra."
     elif rsi < rsi_under:
-        return "comprar", "RSI está por debajo del umbral inferior, indicando sobreventa."
+        return "comprar", f"RSI({rsi:.2f}) está por debajo del umbral inferior({rsi_under:.2f}), indicando sobreventa."
     else:
-        return "hold", "RSI está dentro del rango normal, no se recomienda acción."
+        return "hold", f"RSI({rsi:.2f}) está dentro del rango normal ({rsi_under:.2f} < RSI < {rsi_upper:.2f}), no se recomienda acción."
 
 def determinar_accion_macd(macd, macd_signal):
     """
@@ -23,9 +23,11 @@ def determinar_accion_macd(macd, macd_signal):
     :return: Acción recomendada (str) y descripción (str).
     """
     if macd > macd_signal:
-        return "comprar", "MACD está por encima de la señal, indicando tendencia alcista."
+        return "comprar", f"MACD({macd:.2f}) está por encima de la señal({macd_signal:.2f}), indicando tendencia alcista."
+    elif macd < macd_signal:
+        return "vender", f"MACD({macd:.2f}) está por debajo de la señal({macd_signal:.2f}), indicando tendencia bajista."
     else:
-        return "vender", "MACD está por debajo de la señal, indicando tendencia bajista."
+        return "hold", f"MACD({macd:.2f}) es igual a la señal({macd_signal:.2f}), indicando estabilidad."
 
 def determinar_accion_precio(precio_actual, precio_anterior):
     """
@@ -35,9 +37,11 @@ def determinar_accion_precio(precio_actual, precio_anterior):
     :return: Acción recomendada (str) y descripción (str).
     """
     if precio_actual > precio_anterior:
-        return "comprar", "El precio actual es mayor que el anterior, indicando tendencia alcista."
+        return f"comprar", f"El precio actual({precio_actual:.2f}) es mayor que el anterior({precio_anterior:.2f}), indicando tendencia alcista."
+    elif precio_actual < precio_anterior:
+        return f"vender", f"El precio actual({precio_actual:.2f}) es menor que el anterior({precio_anterior:.2f}), indicando tendencia bajista."
     else:
-        return "vender", "El precio actual es menor que el anterior, indicando tendencia bajista."
+        return f"hold", f"El precio actual({precio_actual:.2f}) es meigual que el anterior({precio_anterior:.2f}), indicando estabilidad."
 
 def determinar_accion_estocastico(estocastico_k, estocastico_d):
     """
@@ -47,9 +51,11 @@ def determinar_accion_estocastico(estocastico_k, estocastico_d):
     :return: Acción recomendada (str) y descripción (str).
     """
     if estocastico_k > estocastico_d:
-        return "comprar", "%K está por encima de %D, indicando tendencia alcista."
+        return "comprar", f"%K({estocastico_k:.2f}) está por encima de %D({estocastico_d:.2f}), indicando tendencia alcista."
+    elif estocastico_k < estocastico_d:
+        return "vender", f"%K({estocastico_k:.2f}) está por debajo de %D({estocastico_d:.2f}), indicando tendencia bajista."
     else:
-        return "vender", "%K está por debajo de %D, indicando tendencia bajista."
+        return "vender", f"%K({estocastico_k:.2f}) es igual al %D({estocastico_d:.2f}), indicando estabilidad."
 
 
 
