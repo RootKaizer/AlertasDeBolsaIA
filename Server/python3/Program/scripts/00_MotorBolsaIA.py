@@ -191,12 +191,14 @@ def main():
         "resultados_trading": resultados_trading
         })
     print("\nMostrar resultados...")
-    mostrar_resultados_trading(estrategia, resultados_trading)
+    mostrar_resultados_trading(estrategia, resultados_trading, "actuales")
 
     # Paso 6: Comparar con resultados anteriores y notificar
         # Variable para almacenar resultados anteriores
     resultados_anteriores = cargar_resultados_anteriores(resultados_trading, ruta_archivo_temporal)
     print("\nComparando con resultados anteriores...")
+    mostrar_resultados_trading(estrategia, resultados_anteriores, "anteriores")
+    
     try:
         resultado_notificacion = comparar_y_notificar(resultados_anteriores, resultados_trading, estrategia, mobile_notification_list_file, whatsapp_message_log_file)
         

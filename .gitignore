@@ -4,8 +4,13 @@ __pycache__/
 *.pyo
 *.pyd
 
+
 # Configuración de VS Code
 .vscode/
+
+# temporales
+*.tmp
+*.temp
 
 # Otros archivos innecesarios (opcional)
 *.swp
