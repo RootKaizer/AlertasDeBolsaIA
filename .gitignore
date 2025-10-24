@@ -15,3 +15,7 @@ __pycache__/
 # Otros archivos innecesarios (opcional)
 *.swp
 *.DS_Store
+
+# logs de ejeción
+./Server/python3/Program/logs/
+./Server/python3/Program/tmp/
