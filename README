@@ -16,9 +16,10 @@ docker exec -it motor_alertas_de_bolsa sh
 
 Finalmente, ejecuta el script:
 
+# $1 = habilitar/deshabilitar modo_debug por función
 ``` sh
 cd /scripts
-python3 00_MotorBolsaIA.py
+python3 00_MotorBolsaIA.py True/False
 ```
 
 Leer el log a nivel de servidor en la ruta :

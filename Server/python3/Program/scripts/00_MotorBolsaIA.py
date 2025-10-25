@@ -101,6 +101,20 @@ def guardar_resultados_temporales(resultados, ruta_archivo):
 
 
 def main():
+    # Paso 0: Verificar argumentos de línea de comandos
+    modo_debug = False  # Valor por defecto
+    
+    if len(sys.argv) > 1:
+        debug_arg = sys.argv[1].lower()
+        if debug_arg in ['true', '1', 'yes', 'y', 'verdadero']:
+            modo_debug = True
+            print("🔍 MODO DEBUG ACTIVADO")
+        elif debug_arg in ['false', '0', 'no', 'n', 'falso']:
+            modo_debug = False
+            print("⚡ MODO NORMAL")
+        else:
+            print(f"⚠️  Argumento de debug no reconocido: {debug_arg}. Usando modo normal.")
+    
     # Inicializar el modo debug
     debug = DebugMotorBolsaIA()
 
@@ -156,7 +170,7 @@ def main():
         "datos_historicos": datos_historicos
         })
     print("Convirtiendo datos a DataFrames...")
-    dataframes = convertir_a_dataframe(datos_historicos)
+    dataframes = convertir_a_dataframe(datos_historicos, modo_debug)
     debug.escribir_paso(2, "convertir_a_dataframe", {}, respuesta=f"Se convirtieron {len(dataframes)} DataFrames.")
     print(f"Se convirtieron {len(dataframes)} DataFrames.")
 
@@ -172,7 +186,7 @@ def main():
     print("Precio Anterior.")
     print("Estocastico K.")
     print("Estocastico D.")
-    indicadores_de_bolsa_caldulados = procesar_dataframes(dataframes)
+    indicadores_de_bolsa_caldulados = procesar_dataframes(dataframes, modo_debug)
     debug.escribir_paso(3, "procesar_dataframes", {}, respuesta="DataFrames procesados correctamente.")
 
     # Paso 4: Aplicar lógica de trading
