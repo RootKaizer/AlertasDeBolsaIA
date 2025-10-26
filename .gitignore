@@ -17,5 +17,5 @@ __pycache__/
 *.DS_Store
 
 # logs de ejeción
-./Server/python3/Program/logs/
-./Server/python3/Program/tmp/
+./Server/python3/Program/logs/*
+./Server/python3/Program/tmp/*
