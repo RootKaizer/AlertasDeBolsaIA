@@ -1,13 +1,25 @@
 import pandas as pd
 from ProcesingDataPandas import calcular_rsi, calcular_macd, calcular_media_movil, calcular_bandas_bollinger, calcular_estocastico
 
-def procesar_dataframes(dataframes, verbose=False):
+def procesar_dataframes(dataframes, verbose=False, **kwargs):
     """
     Procesa los DataFrames y calcula las métricas técnicas para cada símbolo.
     :param dataframes: Diccionario de DataFrames (símbolo: DataFrame).
     :param verbose: Si es True, muestra detalles de los cálculos realizados
+    :param kwargs: Parámetros para los indicadores técnicos
     :return: Diccionario de DataFrames procesados (símbolo: DataFrame).
     """
+
+    # Extraer parámetros con valores por defecto
+    rsi_periodo = kwargs.get('rsi_periodo', 14)
+    macd_periodo_corto = kwargs.get('macd_periodo_corto', 12)
+    macd_periodo_largo = kwargs.get('macd_periodo_largo', 26)
+    macd_periodo_senal = kwargs.get('macd_periodo_senal', 9)
+    media_movil_periodo = kwargs.get('media_movil_periodo', 20)
+    bollinger_periodo = kwargs.get('bollinger_periodo', 20)
+    bollinger_desviacion = kwargs.get('bollinger_desviacion', 2.0)
+    estocastico_periodo = kwargs.get('estocastico_periodo', 14)
+    
     dataframes_procesados = {}
 
     for symbol, df in dataframes.items():
@@ -25,138 +37,45 @@ def procesar_dataframes(dataframes, verbose=False):
                 print(f"  Low: {df['Low'].iloc[-1]}")
                 print(f"  Volume: {df['Volume'].iloc[-1]}")
                 print(f"  Fecha: {df['datetime'].iloc[-1] if 'datetime' in df.columns else df.index[-1]}")
-
+        
         if verbose:
-            print(f"\n{'─'*50}")
-            print(f"🔍 CALCULANDO RSI (Relative Strength Index)")
-            print(f"{'─'*50}")
-            print(f"Función: calcular_rsi(df, periodo=14)")
-            print(f"Datos utilizados:")
-            print(f"  - Columna: 'Close' (precios de cierre)")
-            if len(df) >= 14:
-                print(f"  - Últimos 14 valores Close: {df['Close'].tail(14).tolist()}")
-                print(f"  - Rango de precios: {df['Close'].min():.2f} - {df['Close'].max():.2f}")
-            else:
-                print(f"  - Datos insuficientes para cálculo completo (necesarios 14, disponibles: {len(df)})")
+            print(f"\n{'='*60}")
+            print(f"📊 PROCESANDO INDICADORES TÉCNICOS PARA: {symbol}")
+            print(f"{'='*60}")
+            print(f"DataFrame inicial - Shape: {df.shape}")
+            print(f"Parámetros de la estrategia:")
+            print(f"  - RSI período: {rsi_periodo}")
+            print(f"  - MACD: {macd_periodo_corto}/{macd_periodo_largo}/{macd_periodo_senal}")
+            print(f"  - Media Móvil: {media_movil_periodo}")
+            print(f"  - Bollinger: {bollinger_periodo}/{bollinger_desviacion}")
+            print(f"  - Estocástico: {estocastico_periodo}")
 
-        # Ejecutar función para calcular RSI
-        df = calcular_rsi(df)
         
-        if verbose and 'RSI' in df.columns and len(df) > 0:
-            print(f"Resultado RSI:")
-            print(f"  - Último valor RSI: {df['RSI'].iloc[-1]:.2f}")
-            print(f"  - Valores RSI recientes: {df['RSI'].tail(5).tolist()}")
+        # Calcular RSI con parámetros específicos
+        df = calcular_rsi(df, periodo=rsi_periodo, verbose=verbose, symbol=symbol)
 
-        # Calcular MACD, MACD Signal y MACD Histogram
-        if verbose:
-            print(f"\n{'─'*50}")
-            print(f"📈 CALCULANDO MACD (Moving Average Convergence Divergence)")
-            print(f"{'─'*50}")
-            print(f"Función: calcular_macd(df, periodo_corto=12, periodo_largo=26, periodo_senal=9)")
-            print(f"Datos utilizados:")
-            print(f"  - Columna: 'Close' (precios de cierre)")
-            print(f"  - EMA Corto (12): Media exponencial de 12 períodos")
-            print(f"  - EMA Largo (26): Media exponencial de 26 períodos")
-            print(f"  - Señal (9): Media exponencial de 9 períodos del MACD")
-            if len(df) >= 26:
-                print(f"  - Últimos precios Close: {df['Close'].tail(26).tolist()}")
-        
-        # Ejecutar función para calcular MACD
-        df = calcular_macd(df)
+        # Calcular MACD con parámetros específicos
+        df = calcular_macd(df, 
+                          periodo_corto=macd_periodo_corto, 
+                          periodo_largo=macd_periodo_largo, 
+                          periodo_senal=macd_periodo_senal, 
+                          verbose=verbose, 
+                          symbol=symbol)
 
-        if verbose and 'MACD' in df.columns and len(df) > 0:
-            print(f"Resultado MACD:")
-            print(f"  - Último MACD: {df['MACD'].iloc[-1]:.4f}")
-            print(f"  - Última Señal: {df['MACD_signal'].iloc[-1]:.4f}")
-            print(f"  - Último Histograma: {df['MACD_hist'].iloc[-1]:.4f}")
+        # Calcular Media Móvil con parámetros específicos
+        df = calcular_media_movil(df, periodo=media_movil_periodo, verbose=verbose, symbol=symbol)
 
-        # Calcular Media Móvil
-        if verbose:
-            print(f"\n{'─'*50}")
-            print(f"📊 CALCULANDO MEDIA MÓVIL SIMPLE")
-            print(f"{'─'*50}")
-            print(f"Función: calcular_media_movil(df, periodo=20)")
-            print(f"Datos utilizados:")
-            print(f"  - Columna: 'Close' (precios de cierre)")
-            print(f"  - Período: 20 (media de últimos 20 cierres)")
-            if len(df) >= 20:
-                print(f"  - Últimos 20 valores Close: {df['Close'].tail(20).tolist()}")
-        
-        # Ejecutar función para calcular Media Movil
-        df = calcular_media_movil(df)
-        
-        if verbose and 'MA' in df.columns and len(df) > 0:
-            print(f"Resultado Media Móvil:")
-            print(f"  - Última Media Móvil (20): {df['MA'].iloc[-1]:.2f}")
-            print(f"  - Precio Actual: {df['Close'].iloc[-1]:.2f}")
+        # Calcular Bandas de Bollinger con parámetros específicos
+        df = calcular_bandas_bollinger(df, 
+                                     periodo=bollinger_periodo, 
+                                     desviacion=bollinger_desviacion, 
+                                     verbose=verbose, 
+                                     symbol=symbol)
 
-        # Calcular Bandas de Bollinger
-        if verbose:
-            print(f"\n{'─'*50}")
-            print(f"📏 CALCULANDO BANDAS DE BOLLINGER")
-            print(f"{'─'*50}")
-            print(f"Función: calcular_bandas_bollinger(df, periodo=20, desviacion=2)")
-            print(f"Datos utilizados:")
-            print(f"  - Columna: 'Close' (precios de cierre)")
-            print(f"  - Período: 20 (media móvil)")
-            print(f"  - Desviación: 2 (bandas a 2 desviaciones estándar)")
-            if len(df) >= 20:
-                print(f"  - Media Móvil 20: {df['Close'].tail(20).mean():.2f}")
-                print(f"  - Desviación Estándar: {df['Close'].tail(20).std():.2f}")
-        
-        # Ejecutar función para calcular Bandas de Bollinger
-        df = calcular_bandas_bollinger(df)
-        
-        if verbose and 'Bollinger_Upper' in df.columns and len(df) > 0:
-            print(f"Resultado Bandas Bollinger:")
-            print(f"  - Banda Superior: {df['Bollinger_Upper'].iloc[-1]:.2f}")
-            print(f"  - Banda Media: {df['Bollinger_MA'].iloc[-1]:.2f}")
-            print(f"  - Banda Inferior: {df['Bollinger_Lower'].iloc[-1]:.2f}")
-            print(f"  - Precio Actual: {df['Close'].iloc[-1]:.2f}")
-            precio = df['Close'].iloc[-1]
-            banda_sup = df['Bollinger_Upper'].iloc[-1]
-            banda_inf = df['Bollinger_Lower'].iloc[-1]
-            if precio > banda_sup:
-                print(f"  - Posición: 🔴 SOBRE COMPRA (por encima de banda superior)")
-            elif precio < banda_inf:
-                print(f"  - Posición: 🟢 SOBRE VENTA (por debajo de banda inferior)")
-            else:
-                print(f"  - Posición: ⚪ DENTRO DE LAS BANDAS")
+        # Calcular Estocástico con parámetros específicos
+        df = calcular_estocastico(df, periodo=estocastico_periodo, verbose=verbose, symbol=symbol)
 
-        # Calcular Estocástico
-        if verbose:
-            print(f"\n{'─'*50}")
-            print(f"🎯 CALCULANDO ESTOCÁSTICO")
-            print(f"{'─'*50}")
-            print(f"Función: calcular_estocastico(df, periodo=14)")
-            print(f"Datos utilizados:")
-            print(f"  - Columnas: 'High', 'Low', 'Close' (máximos, mínimos y cierres)")
-            print(f"  - Período: 14 (rango de 14 períodos)")
-            if len(df) >= 14:
-                print(f"  - Último High: {df['High'].iloc[-1]:.2f}")
-                print(f"  - Último Low: {df['Low'].iloc[-1]:.2f}")
-                print(f"  - Mínimo 14 períodos: {df['Low'].tail(14).min():.2f}")
-                print(f"  - Máximo 14 períodos: {df['High'].tail(14).max():.2f}")
         
-        # Ejecutar función para calcular Estocástico
-        df = calcular_estocastico(df)
-
-        if verbose and '%K' in df.columns and len(df) > 0:
-            print(f"Resultado Estocástico:")
-            print(f"  - %K (Línea rápida): {df['%K'].iloc[-1]:.2f}")
-            print(f"  - %D (Línea lenta): {df['%D'].iloc[-1]:.2f}")
-            k_value = df['%K'].iloc[-1]
-            d_value = df['%D'].iloc[-1]
-            if k_value > 80 and d_value > 80:
-                print(f"  - Señal: 🔴 SOBRECOMPRADO (ambos > 80)")
-            elif k_value < 20 and d_value < 20:
-                print(f"  - Señal: 🟢 SOBREVENDIDO (ambos < 20)")
-            elif k_value > d_value:
-                print(f"  - Señal: 🟢 CRUCE ALCISTA (%K > %D)")
-            elif k_value < d_value:
-                print(f"  - Señal: 🔴 CRUCE BAJISTA (%K < %D)")
-            else:
-                print(f"  - Señal: ⚪ NEUTRO")
 
         if verbose:
             print(f"\n{'─'*50}")

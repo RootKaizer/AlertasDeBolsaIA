@@ -27,18 +27,6 @@ def convertir_a_dataframe(datos_historicos, verbose=False):
                         print(f"  {key}: {value}")
 
             df = pd.DataFrame(data['values'])
-
-            if 'values' in data:
-                # Mostrar datos de entrada si verbose está activado
-                if verbose:
-                    print(f"\nDATOS DE ENTRADA PARA {symbol}:")
-                    print(f"Número de registros: {len(data['values'])}")
-                    if len(data['values']) > 0:
-                        print("Primer registro:")
-                        for key, value in data['values'][0].items():
-                            print(f"  {key}: {value}")
-            
-            df = pd.DataFrame(data['values'])
             
             # Conversión de datetime
             if verbose:

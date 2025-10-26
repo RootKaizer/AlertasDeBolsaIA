@@ -23,7 +23,7 @@ def cargar_configuracion(estrategia):
     """
     Carga los valores de rsi_under y rsi_upper desde el archivo de propiedades.
     :param estrategia: Nombre de la estrategia (corto_plazo, mediano_plazo, largo_plazo, agresivo, conservador).
-    :return: Diccionario con rsi_under, rsi_upper, intervalo y periodo.
+    :return: Diccionario con todos los parámetros de configuración.
     """
     config = configparser.ConfigParser()
     
@@ -48,6 +48,16 @@ def cargar_configuracion(estrategia):
         "rsi_upper": float(config[estrategia]['rsi_upper']),
         "intervalo": config[estrategia]['intervalo'],
         "periodo": config[estrategia]['periodo'],
+        # Nuevos parámetros para indicadores técnicos
+        "rsi_periodo": int(config[estrategia].get('rsi_periodo', '14')),
+        "macd_periodo_corto": int(config[estrategia].get('macd_periodo_corto', '12')),
+        "macd_periodo_largo": int(config[estrategia].get('macd_periodo_largo', '26')),
+        "macd_periodo_senal": int(config[estrategia].get('macd_periodo_senal', '9')),
+        "media_movil_periodo": int(config[estrategia].get('media_movil_periodo', '20')),
+        "bollinger_periodo": int(config[estrategia].get('bollinger_periodo', '20')),
+        "bollinger_desviacion": float(config[estrategia].get('bollinger_desviacion', '2.0')),
+        "estocastico_periodo": int(config[estrategia].get('estocastico_periodo', '14')),
+        # Rutas de archivos
         "ruta_archivo_temporal": ruta_archivo_temporal,
         "mobile_notification_list_file": mobile_notification_list_file,
         "whatsapp_message_log_file": whatsapp_message_log_file
@@ -118,6 +128,8 @@ def main():
     # Inicializar el modo debug
     debug = DebugMotorBolsaIA()
 
+
+
     # Paso 0: Seleccionar estrategia
     estrategia = "mediano_plazo"  # Puedes cambiar esto a "mediano_plazo", "largo_plazo", "agresivo", "conservador"
 
@@ -132,6 +144,16 @@ def main():
         rsi_upper = config["rsi_upper"]
         intervalo = config["intervalo"]
         periodo = config["periodo"]
+        # Nuevos parámetros para indicadores técnicos
+        rsi_periodo = config["rsi_periodo"]
+        macd_periodo_corto = config["macd_periodo_corto"]
+        macd_periodo_largo = config["macd_periodo_largo"]
+        macd_periodo_senal = config["macd_periodo_senal"]
+        media_movil_periodo = config["media_movil_periodo"]
+        bollinger_periodo = config["bollinger_periodo"]
+        bollinger_desviacion = config["bollinger_desviacion"]
+        estocastico_periodo = config["estocastico_periodo"]
+        # Rutas de archivos
         ruta_archivo_temporal = config["ruta_archivo_temporal"]
         mobile_notification_list_file = config["mobile_notification_list_file"]
         whatsapp_message_log_file = config["whatsapp_message_log_file"]
@@ -142,6 +164,15 @@ def main():
             "periodo": periodo, 
             "rsi_under": rsi_under, 
             "rsi_upper": rsi_upper,
+            "rsi_periodo": rsi_periodo,
+            "macd_periodo_corto": macd_periodo_corto,
+            "macd_periodo_largo": macd_periodo_largo,
+            "macd_periodo_senal": macd_periodo_senal,
+            "media_movil_periodo": media_movil_periodo,
+            "bollinger_periodo": bollinger_periodo,
+            "bollinger_desviacion": bollinger_desviacion,
+            "estocastico_periodo": estocastico_periodo,
+            "ruta_archivo_temporal": ruta_archivo_temporal,
             "ruta_archivo_temporal": ruta_archivo_temporal,
             "mobile_notification_list_file": mobile_notification_list_file,
             "whatsapp_message_log_file": whatsapp_message_log_file
@@ -149,6 +180,8 @@ def main():
     except Exception as e:
         print(f"Error al cargar la configuración: {e}")
         return
+    
+
 
     # Paso 1: Obtener datos históricos
     debug.escribir_paso(1, "obtener_datos_historicos", {
@@ -164,6 +197,8 @@ def main():
     if not datos_historicos:
         print("No se pudieron obtener los datos históricos.")
         return
+    
+
 
     # Paso 2: Convertir datos a DataFrames de pandas
     debug.escribir_paso(2, "convertir_a_dataframe", {
@@ -174,20 +209,57 @@ def main():
     debug.escribir_paso(2, "convertir_a_dataframe", {}, respuesta=f"Se convirtieron {len(dataframes)} DataFrames.")
     print(f"Se convirtieron {len(dataframes)} DataFrames.")
 
+
+
     # Paso 3: Procesar DataFrames y calcular métricas
     debug.escribir_paso(3, "procesar_dataframes", {
-        "dataframes": dataframes
+        "dataframes": dataframes,
+        "rsi_periodo": rsi_periodo,
+        "macd_periodo_corto": macd_periodo_corto,
+        "macd_periodo_largo": macd_periodo_largo,
+        "macd_periodo_senal": macd_periodo_senal,
+        "media_movil_periodo": media_movil_periodo,
+        "bollinger_periodo": bollinger_periodo,
+        "bollinger_desviacion": bollinger_desviacion,
+        "estocastico_periodo": estocastico_periodo,
+        "verbose": modo_debug
         })
+    
     print("\ncalculando Datos .....")
-    print("RSI.")
-    print("MACD.")
-    print("MACD_signal.")
-    print("Precio Actual.")
-    print("Precio Anterior.")
-    print("Estocastico K.")
-    print("Estocastico D.")
-    indicadores_de_bolsa_caldulados = procesar_dataframes(dataframes, modo_debug)
+
+    if modo_debug:
+        print("🔍 MODO DEBUG ACTIVADO PARA INDICADORES TÉCNICOS")
+        print(f"📊 Parámetros utilizados:")
+        print(f"  - RSI período: {rsi_periodo}")
+        print(f"  - MACD corto/largo/señal: {macd_periodo_corto}/{macd_periodo_largo}/{macd_periodo_senal}")
+        print(f"  - Media móvil período: {media_movil_periodo}")
+        print(f"  - Bollinger período/desviación: {bollinger_periodo}/{bollinger_desviacion}")
+        print(f"  - Estocástico período: {estocastico_periodo}")
+    else:
+        print("RSI.")
+        print("MACD.")
+        print("MACD_signal.")
+        print("Precio Actual.")
+        print("Precio Anterior.")
+        print("Estocastico K.")
+        print("Estocastico D.")
+    
+    # funcion que calcula los valores de los indicadores.
+    indicadores_de_bolsa_caldulados = procesar_dataframes(
+        dataframes, 
+        rsi_periodo=rsi_periodo,
+        macd_periodo_corto=macd_periodo_corto,
+        macd_periodo_largo=macd_periodo_largo,
+        macd_periodo_senal=macd_periodo_senal,
+        media_movil_periodo=media_movil_periodo,
+        bollinger_periodo=bollinger_periodo,
+        bollinger_desviacion=bollinger_desviacion,
+        estocastico_periodo=estocastico_periodo,
+        verbose=modo_debug
+    )
     debug.escribir_paso(3, "procesar_dataframes", {}, respuesta="DataFrames procesados correctamente.")
+
+
 
     # Paso 4: Aplicar lógica de trading
     debug.escribir_paso(4, "analizar_dataframes", {
@@ -199,6 +271,8 @@ def main():
     resultados_trading = analizar_dataframes(indicadores_de_bolsa_caldulados, rsi_under, rsi_upper)
     debug.escribir_paso(4, "analizar_dataframes", {}, respuesta="Lógica de trading aplicada correctamente.")
 
+    
+
     # Paso 5: Mostrar resultados
     debug.escribir_paso(5, "mostrar_resultados_trading", {
         "estrategia": estrategia,
@@ -207,6 +281,8 @@ def main():
     print("\nMostrar resultados...")
     mostrar_resultados_trading(estrategia, resultados_trading, "actuales")
 
+    
+    
     # Paso 6: Comparar con resultados anteriores y notificar
         # Variable para almacenar resultados anteriores
     resultados_anteriores = cargar_resultados_anteriores(resultados_trading, ruta_archivo_temporal)
