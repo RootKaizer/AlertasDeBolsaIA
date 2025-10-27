@@ -1,5 +1,5 @@
 import pandas as pd
-from ProcesingDataPandas import calcular_rsi, calcular_macd, calcular_media_movil, calcular_bandas_bollinger, calcular_estocastico
+from ProcesingDataPandas import calcular_rsi, calcular_macd, calcular_media_movil, calcular_bandas_bollinger, calcular_ichimoku, calcular_williams_r, calcular_estocastico, calcular_adx, calcular_parabolic_sar
 
 def procesar_dataframes(dataframes, verbose=False, **kwargs):
     """
@@ -19,6 +19,15 @@ def procesar_dataframes(dataframes, verbose=False, **kwargs):
     bollinger_periodo = kwargs.get('bollinger_periodo', 20)
     bollinger_desviacion = kwargs.get('bollinger_desviacion', 2.0)
     estocastico_periodo = kwargs.get('estocastico_periodo', 14)
+    # Nuevos parámetros para indicadores avanzados
+    ichimoku_conversion = kwargs.get('macd_periodo_corto', 9)
+    ichimoku_base = kwargs.get('macd_periodo_corto', 26)
+    ichimoku_span_b = kwargs.get('macd_periodo_corto', 52)
+    ichimoku_displacement = kwargs.get('macd_periodo_corto', 26)
+    williams_periodo = kwargs.get('macd_periodo_corto', 14)
+    adx_periodo = kwargs.get('macd_periodo_corto', 14)
+    parabolic_acceleration = kwargs.get('macd_periodo_corto', 0.02)
+    parabolic_maximum = kwargs.get('macd_periodo_corto', 0.2)
     
     dataframes_procesados = {}
 
@@ -52,7 +61,10 @@ def procesar_dataframes(dataframes, verbose=False, **kwargs):
 
         
         # Calcular RSI con parámetros específicos
-        df = calcular_rsi(df, periodo=rsi_periodo, verbose=verbose, symbol=symbol)
+        df = calcular_rsi(df,
+                          periodo=rsi_periodo,
+                          verbose=verbose,
+                          symbol=symbol)
 
         # Calcular MACD con parámetros específicos
         df = calcular_macd(df, 
@@ -63,7 +75,9 @@ def procesar_dataframes(dataframes, verbose=False, **kwargs):
                           symbol=symbol)
 
         # Calcular Media Móvil con parámetros específicos
-        df = calcular_media_movil(df, periodo=media_movil_periodo, verbose=verbose, symbol=symbol)
+        df = calcular_media_movil(df, periodo=media_movil_periodo,
+                                  verbose=verbose,
+                                  symbol=symbol)
 
         # Calcular Bandas de Bollinger con parámetros específicos
         df = calcular_bandas_bollinger(df, 
@@ -73,9 +87,38 @@ def procesar_dataframes(dataframes, verbose=False, **kwargs):
                                      symbol=symbol)
 
         # Calcular Estocástico con parámetros específicos
-        df = calcular_estocastico(df, periodo=estocastico_periodo, verbose=verbose, symbol=symbol)
-
+        df = calcular_estocastico(df,
+                                  periodo=estocastico_periodo,
+                                  verbose=verbose,
+                                  symbol=symbol)
         
+        # Calcular ichimoku con parámetros específicos
+        df_procesado = calcular_ichimoku(df,
+                                       conversion_period=ichimoku_conversion,
+                                       base_period=ichimoku_base,
+                                       leading_span_b_period=ichimoku_span_b,
+                                       displacement=ichimoku_displacement,
+                                       verbose=verbose, symbol=symbol)
+        
+        # Calcular williams_r con parámetros específicos
+        df_procesado = calcular_williams_r(df,
+                                           periodo=williams_periodo,
+                                           verbose=verbose,
+                                           symbol=symbol)
+        
+        # Calcular adx con parámetros específicos
+        df_procesado = calcular_adx(df,
+                                    periodo=adx_periodo,
+                                    verbose=verbose,
+                                    symbol=symbol)
+        
+        # Calcular parabolic_sar con parámetros específicos
+        df_procesado = calcular_parabolic_sar(df,
+                                            acceleration=parabolic_acceleration,
+                                            maximum=parabolic_maximum,
+                                            verbose=verbose, symbol=symbol)
+
+
 
         if verbose:
             print(f"\n{'─'*50}")

@@ -28,6 +28,9 @@ def analizar_dataframes(dataframes, verbose=False, **kwargs):
     bollinger_desviacion = kwargs.get('bollinger_desviacion', 2.0)
     estocastico_periodo = kwargs.get('estocastico_periodo', 14)
     periodo_volatilidad = kwargs.get('periodo_volatilidad', 20)
+    combinacion_indicadores = kwargs.get('combinacion_indicadores', ['rsi', 'macd', 'media_movil', 'bollinger', 'estocastico', 'volatilidad'])
+    combinacion_nombres = kwargs.get('combinacion_nombres', ['Default_Strategy'])
+
     
     for symbol, df in dataframes.items():
         if verbose:
@@ -41,24 +44,41 @@ def analizar_dataframes(dataframes, verbose=False, **kwargs):
             print(f"     - Bollinger: periodo={bollinger_periodo}, desviación={bollinger_desviacion}")
             print(f"     - Estocástico: periodo={estocastico_periodo}")
             print(f"     - Volatilidad: periodo={periodo_volatilidad}")
+            print(f"     - Combinación: {combinacion_indicadores}")
+            print(f"     - Nombres Estrategias: {combinacion_nombres}")
         
         df_analizado = df.copy()
         
-        # Aplicar todas las estrategias usando los parámetros extraídos
-        df_analizado = analizar_estrategia_rsi(df_analizado, rsi_under, rsi_upper, rsi_periodo, verbose)
-        df_analizado = analizar_estrategia_macd(df_analizado, macd_periodo_corto, macd_periodo_largo, macd_periodo_senal, verbose)
-        df_analizado = analizar_estrategia_media_movil(df_analizado, media_movil_periodo, verbose)
-        df_analizado = analizar_estrategia_bollinger(df_analizado, bollinger_periodo, bollinger_desviacion, verbose)
-        df_analizado = analizar_estrategia_estocastico(df_analizado, estocastico_periodo, verbose)
-        df_analizado = analizar_estrategia_volatilidad(df_analizado, periodo_volatilidad, verbose)
-        
+        # Aplicar estrategias según la combinación configurada
+        if 'rsi' in combinacion_indicadores:
+            df_analizado = analizar_estrategia_rsi(df_analizado, rsi_under, rsi_upper, rsi_periodo, verbose)
+        if 'macd' in combinacion_indicadores:
+            df_analizado = analizar_estrategia_macd(df_analizado, macd_periodo_corto, macd_periodo_largo, macd_periodo_senal, verbose)
+        if 'media_movil' in combinacion_indicadores:
+            df_analizado = analizar_estrategia_media_movil(df_analizado, media_movil_periodo, verbose)
+        if 'bollinger' in combinacion_indicadores:
+            df_analizado = analizar_estrategia_bollinger(df_analizado, bollinger_periodo, bollinger_desviacion, verbose)
+        if 'estocastico' in combinacion_indicadores:
+            df_analizado = analizar_estrategia_estocastico(df_analizado, estocastico_periodo, verbose)
+        if 'volatilidad' in combinacion_indicadores:
+            df_analizado = analizar_estrategia_volatilidad(df_analizado, periodo_volatilidad, verbose)
+        if 'ichimoku' in combinacion_indicadores:
+            df_analizado = analizar_estrategia_ichimoku(df_analizado, verbose)
+        if 'williams' in combinacion_indicadores:
+            df_analizado = analizar_estrategia_williams(df_analizado, estocastico_periodo, verbose)
+        if 'adx' in combinacion_indicadores:
+            df_analizado = analizar_estrategia_adx(df_analizado, 14, verbose)
+        if 'parabolic_sar' in combinacion_indicadores:
+            df_analizado = analizar_estrategia_parabolic_sar(df_analizado, verbose)
+
+
         # Calcular Estrategia mayoritaria
-        df_analizado = calcular_estrategia_mayoritaria(df_analizado)
+        df_analizado = calcular_estrategia_mayoritaria(df_analizado, combinacion_indicadores)
         
         resultados[symbol] = df_analizado
         
         # Mostrar tabla de últimos registros (SIEMPRE se muestra)
-        mostrar_ultimos_registros(symbol, df_analizado)
+        mostrar_ultimos_registros(symbol, df_analizado, combinacion_indicadores, combinacion_nombres)
     
     return resultados
 
@@ -368,19 +388,230 @@ def analizar_estrategia_volatilidad(df, periodo_volatilidad=20, verbose=False):
 
 
 # =============================================================================
-# ESTRATEGIAS COMBINADA (PARÁMETROS EXPLÍCITOS)
+# NUEVAS ESTRATEGIAS AVANZADAS
 # =============================================================================
 
-def calcular_estrategia_mayoritaria(df):
+def analizar_estrategia_ichimoku(df, verbose=False):
     """
-    Calcula la Estrategia mayoritaria basada en todas las estrategias individuales.
+    Análisis Ichimoku Cloud usando los valores calculados en el DataFrame.
+    Basado en: 'Ichimoku Charts' de Goichi Hosoda
+    """
+    df_analizado = df.copy()
+    
+    # VERIFICAR que Ichimoku existe en el DataFrame
+    if 'Ichimoku_Conversion' not in df_analizado.columns or 'Ichimoku_Base' not in df_analizado.columns:
+        if verbose:
+            print(f"      ❌ Ichimoku no encontrado en el DataFrame")
+        return df_analizado
+    
+    # Estrategia Ichimoku
+    condiciones = [
+        # Señal fuerte de compra: Precio arriba de la nube, Tenkan-sen > Kijun-sen, Senkou Span A > Senkou Span B
+        (df_analizado['Close'] > df_analizado['Ichimoku_Senkou_A']) & 
+        (df_analizado['Close'] > df_analizado['Ichimoku_Senkou_B']) &
+        (df_analizado['Ichimoku_Conversion'] > df_analizado['Ichimoku_Base']),
+        
+        # Señal fuerte de venta: Precio debajo de la nube, Tenkan-sen < Kijun-sen, Senkou Span A < Senkou Span B
+        (df_analizado['Close'] < df_analizado['Ichimoku_Senkou_A']) & 
+        (df_analizado['Close'] < df_analizado['Ichimoku_Senkou_B']) &
+        (df_analizado['Ichimoku_Conversion'] < df_analizado['Ichimoku_Base']),
+        
+        # Señal de compra: Precio arriba de la nube
+        (df_analizado['Close'] > df_analizado['Ichimoku_Senkou_A']) & 
+        (df_analizado['Close'] > df_analizado['Ichimoku_Senkou_B']),
+        
+        # Señal de venta: Precio debajo de la nube
+        (df_analizado['Close'] < df_analizado['Ichimoku_Senkou_A']) & 
+        (df_analizado['Close'] < df_analizado['Ichimoku_Senkou_B'])
+    ]
+    
+    decisiones = ['COMPRA_FUERTE', 'VENTA_FUERTE', 'COMPRA', 'VENTA']
+    df_analizado['estrategia_ichimoku'] = np.select(condiciones, decisiones, default='HOLD')
+    
+    # Valores y descripciones
+    df_analizado['estrategia_ichimoku_valor'] = df_analizado['Ichimoku_Conversion'] - df_analizado['Ichimoku_Base']
+    df_analizado['estrategia_ichimoku_descripcion'] = df_analizado.apply(
+        lambda x: f"Ichimoku: Tenkan={x['Ichimoku_Conversion']:.2f}, Kijun={x['Ichimoku_Base']:.2f} | " +
+                 ("FUERTE TENDENCIA ALCISTA" if x['estrategia_ichimoku'] == 'COMPRA_FUERTE' else
+                  "FUERTE TENDENCIA BAJISTA" if x['estrategia_ichimoku'] == 'VENTA_FUERTE' else
+                  "TENDENCIA ALCISTA" if x['estrategia_ichimoku'] == 'COMPRA' else
+                  "TENDENCIA BAJISTA" if x['estrategia_ichimoku'] == 'VENTA' else
+                  "TENDENCIA LATERAL"), axis=1
+    )
+    
+    if verbose and len(df_analizado) > 0:
+        ultimo = df_analizado.iloc[-1]
+        print(f"\n   ☁️  ANÁLISIS ICHIMOKU:")
+        print(f"      Tenkan-sen: {ultimo['Ichimoku_Conversion']:.2f}")
+        print(f"      Kijun-sen: {ultimo['Ichimoku_Base']:.2f}")
+        print(f"      Nube Superior: {ultimo['Ichimoku_Senkou_A']:.2f}")
+        print(f"      Nube Inferior: {ultimo['Ichimoku_Senkou_B']:.2f}")
+        print(f"      Señal: {ultimo['estrategia_ichimoku']}")
+        print(f"      Interpretación: {ultimo['estrategia_ichimoku_descripcion']}")
+    
+    return df_analizado
+
+
+
+def analizar_estrategia_williams(df, williams_periodo=14, verbose=False):
+    """
+    Análisis Williams %R.
+    Basado en: Larry Williams - 'The Secret of Selecting Stocks'
+    """
+    df_analizado = df.copy()
+    
+    # VERIFICAR que Williams %R existe en el DataFrame
+    if 'Williams_R' not in df_analizado.columns:
+        if verbose:
+            print(f"      ❌ Williams %R no encontrado en el DataFrame")
+        return df_analizado
+    
+    # Estrategia Williams %R
+    condiciones = [
+        (df_analizado['Williams_R'] < -80),  # Sobreventa extrema
+        (df_analizado['Williams_R'] > -20),  # Sobrecopra extrema
+        (df_analizado['Williams_R'] < -50) & (df_analizado['Williams_R'] > df_analizado['Williams_R'].shift(1)),  # Mejora desde sobreventa
+        (df_analizado['Williams_R'] > -50) & (df_analizado['Williams_R'] < df_analizado['Williams_R'].shift(1))   # Empeora desde sobrecompra
+    ]
+    
+    decisiones = ['COMPRA_FUERTE', 'VENTA_FUERTE', 'COMPRA', 'VENTA']
+    df_analizado['estrategia_williams'] = np.select(condiciones, decisiones, default='HOLD')
+    
+    # Valores y descripciones
+    df_analizado['estrategia_williams_valor'] = df_analizado['Williams_R']
+    df_analizado['estrategia_williams_descripcion'] = df_analizado.apply(
+        lambda x: f"Williams %R: {x['Williams_R']:.1f} (Periodo: {williams_periodo}) - " +
+                 ("SOBREVENTA EXTREMA" if x['estrategia_williams'] == 'COMPRA_FUERTE' else
+                  "SOBRECOMPRA EXTREMA" if x['estrategia_williams'] == 'VENTA_FUERTE' else
+                  "MEJORA ALCISTA" if x['estrategia_williams'] == 'COMPRA' else
+                  "EMPEORA BAJISTA" if x['estrategia_williams'] == 'VENTA' else
+                  "ZONA NEUTRAL"), axis=1
+    )
+    
+    if verbose and len(df_analizado) > 0:
+        ultimo = df_analizado.iloc[-1]
+        print(f"\n   📉 ANÁLISIS WILLIAMS %R:")
+        print(f"      Williams %R: {ultimo['Williams_R']:.2f}")
+        print(f"      Umbrales: Compra < -80, Venta > -20")
+        print(f"      Señal: {ultimo['estrategia_williams']}")
+        print(f"      Interpretación: {ultimo['estrategia_williams_descripcion']}")
+    
+    return df_analizado
+
+
+
+def analizar_estrategia_adx(df, adx_periodo=14, verbose=False):
+    """
+    Análisis ADX (Average Directional Index).
+    Basado en: J. Welles Wilder - 'New Concepts in Technical Trading Systems'
+    """
+    df_analizado = df.copy()
+    
+    # VERIFICAR que ADX existe en el DataFrame
+    if 'ADX' not in df_analizado.columns or 'DI_Plus' not in df_analizado.columns or 'DI_Minus' not in df_analizado.columns:
+        if verbose:
+            print(f"      ❌ ADX no encontrado en el DataFrame")
+        return df_analizado
+    
+    # Estrategia ADX
+    condiciones = [
+        # Fuerte tendencia alcista
+        (df_analizado['ADX'] > 25) & (df_analizado['DI_Plus'] > df_analizado['DI_Minus']),
+        # Fuerte tendencia bajista
+        (df_analizado['ADX'] > 25) & (df_analizado['DI_Plus'] < df_analizado['DI_Minus']),
+        # Tendencia alcista débil
+        (df_analizado['ADX'] > 20) & (df_analizado['DI_Plus'] > df_analizado['DI_Minus']),
+        # Tendencia bajista débil
+        (df_analizado['ADX'] > 20) & (df_analizado['DI_Plus'] < df_analizado['DI_Minus'])
+    ]
+    
+    decisiones = ['COMPRA_FUERTE', 'VENTA_FUERTE', 'COMPRA', 'VENTA']
+    df_analizado['estrategia_adx'] = np.select(condiciones, decisiones, default='HOLD')
+    
+    # Valores y descripciones
+    df_analizado['estrategia_adx_valor'] = df_analizado['ADX']
+    df_analizado['estrategia_adx_descripcion'] = df_analizado.apply(
+        lambda x: f"ADX: {x['ADX']:.1f}, DI+: {x['DI_Plus']:.1f}, DI-: {x['DI_Minus']:.1f} - " +
+                 ("FUERTE TENDENCIA ALCISTA" if x['estrategia_adx'] == 'COMPRA_FUERTE' else
+                  "FUERTE TENDENCIA BAJISTA" if x['estrategia_adx'] == 'VENTA_FUERTE' else
+                  "TENDENCIA ALCISTA" if x['estrategia_adx'] == 'COMPRA' else
+                  "TENDENCIA BAJISTA" if x['estrategia_adx'] == 'VENTA' else
+                  "SIN TENDENCIA CLARA"), axis=1
+    )
+    
+    if verbose and len(df_analizado) > 0:
+        ultimo = df_analizado.iloc[-1]
+        print(f"\n   📏 ANÁLISIS ADX:")
+        print(f"      ADX: {ultimo['ADX']:.2f} (Fuerza tendencia)")
+        print(f"      DI+: {ultimo['DI_Plus']:.2f} (Tendencia alcista)")
+        print(f"      DI-: {ultimo['DI_Minus']:.2f} (Tendencia bajista)")
+        print(f"      Señal: {ultimo['estrategia_adx']}")
+        print(f"      Interpretación: {ultimo['estrategia_adx_descripcion']}")
+    
+    return df_analizado
+
+
+
+def analizar_estrategia_parabolic_sar(df, verbose=False):
+    """
+    Análisis Parabolic SAR.
+    Basado en: J. Welles Wilder - 'The Parabolic Time/Price System'
+    """
+    df_analizado = df.copy()
+    
+    # VERIFICAR que Parabolic SAR existe en el DataFrame
+    if 'Parabolic_SAR' not in df_analizado.columns:
+        if verbose:
+            print(f"      ❌ Parabolic SAR no encontrado en el DataFrame")
+        return df_analizado
+    
+    # Estrategia Parabolic SAR
+    condiciones = [
+        (df_analizado['Close'] > df_analizado['Parabolic_SAR']),  # Precio arriba del SAR - tendencia alcista
+        (df_analizado['Close'] < df_analizado['Parabolic_SAR'])   # Precio debajo del SAR - tendencia bajista
+    ]
+    
+    decisiones = ['COMPRA', 'VENTA']
+    df_analizado['estrategia_parabolic_sar'] = np.select(condiciones, decisiones, default='HOLD')
+    
+    # Valores y descripciones
+    df_analizado['estrategia_parabolic_sar_valor'] = df_analizado['Close'] - df_analizado['Parabolic_SAR']
+    df_analizado['estrategia_parabolic_sar_descripcion'] = df_analizado.apply(
+        lambda x: f"SAR: {x['Parabolic_SAR']:.2f}, Precio: {x['Close']:.2f} - " +
+                 ("TENDENCIA ALCISTA" if x['estrategia_parabolic_sar'] == 'COMPRA' else
+                  "TENDENCIA BAJISTA" if x['estrategia_parabolic_sar'] == 'VENTA' else
+                  "CAMBIO DE TENDENCIA"), axis=1
+    )
+    
+    if verbose and len(df_analizado) > 0:
+        ultimo = df_analizado.iloc[-1]
+        print(f"\n   🎯 ANÁLISIS PARABOLIC SAR:")
+        print(f"      Parabolic SAR: {ultimo['Parabolic_SAR']:.2f}")
+        print(f"      Precio: {ultimo['Close']:.2f}")
+        print(f"      Diferencia: {ultimo['Close'] - ultimo['Parabolic_SAR']:.2f}")
+        print(f"      Señal: {ultimo['estrategia_parabolic_sar']}")
+        print(f"      Interpretación: {ultimo['estrategia_parabolic_sar_descripcion']}")
+    
+    return df_analizado
+
+
+
+# =============================================================================
+# ESTRATEGIA MAYORITARIA ACTUALIZADA
+# =============================================================================
+
+def calcular_estrategia_mayoritaria(df, combinacion_indicadores):
+    """
+    Calcula la Estrategia mayoritaria basada en las estrategias individuales de la combinación.
     """
     df_combinado = df.copy()
     
-    estrategias = [
-        'estrategia_rsi', 'estrategia_macd', 'estrategia_ma', 
-        'estrategia_bollinger', 'estrategia_estocastico', 'estrategia_volatilidad'
-    ]
+    # Filtrar solo las estrategias de la combinación actual
+    estrategias = []
+    for indicador in combinacion_indicadores:
+        nombre_estrategia = f'estrategia_{indicador}'
+        if nombre_estrategia in df_combinado.columns:
+            estrategias.append(nombre_estrategia)
     
     def calcular_consenso(row):
         # Ponderar señales fuertes vs débiles
@@ -392,10 +623,10 @@ def calcular_estrategia_mayoritaria(df):
         total_compras = compras_fuertes + compras
         total_ventas = ventas_fuertes + ventas
         
-        if total_compras > total_ventas and total_compras >= 3:
-            return 'COMPRA_FUERTE' if compras_fuertes >= 2 else 'COMPRA'
-        elif total_ventas > total_compras and total_ventas >= 3:
-            return 'VENTA_FUERTE' if ventas_fuertes >= 2 else 'VENTA'
+        if total_compras > total_ventas and total_compras >= len(estrategias) * 0.4:
+            return 'COMPRA_FUERTE' if compras_fuertes >= len(estrategias) * 0.3 else 'COMPRA'
+        elif total_ventas > total_compras and total_ventas >= len(estrategias) * 0.4:
+            return 'VENTA_FUERTE' if ventas_fuertes >= len(estrategias) * 0.3 else 'VENTA'
         else:
             return 'HOLD'
     
@@ -420,18 +651,24 @@ def calcular_estrategia_mayoritaria(df):
 
 
 # =============================================================================
-# IMPRIMIR REGISTROS DE SALIDA
+# MOSTRAR ÚLTIMOS REGISTROS ACTUALIZADO
 # =============================================================================
 
-def mostrar_ultimos_registros(symbol, df_trading):
+def mostrar_ultimos_registros(symbol, df_trading, combinacion_indicadores, combinacion_nombres):
     """
-    Muestra los 10 últimos registros con formato completo.
+    Muestra los 10 últimos registros con formato completo, filtrando por la combinación de estrategia.
     """
     print(f"\n📊 ÚLTIMOS 10 REGISTROS - {symbol}")
+    print(f"🎯 COMBINACIÓN ESTRATÉGICA: {', '.join(combinacion_nombres)}")
     print("=" * 120)
     
-    # Columnas a mostrar
-    columnas_estrategia = [col for col in df_trading.columns if col.startswith('estrategia_') and not col.endswith(('_valor', '_descripcion')) and col != 'estrategia_mayoritaria']
+    # Filtrar columnas según la combinación de estrategia
+    columnas_estrategia = []
+    for indicador in combinacion_indicadores:
+        columna = f'estrategia_{indicador}'
+        if columna in df_trading.columns:
+            columnas_estrategia.append(columna)
+    
     columnas_basicas = ['datetime', 'Close']
     
     # Agregar la Estrategia mayoritaria al final
@@ -515,7 +752,13 @@ def mostrar_ultimos_registros(symbol, df_trading):
     if len(df_reciente) > 0:
         print(f"\n📝 DESCRIPCIONES COMPLETAS (Último registro):")
         ultimo = df_trading.iloc[-1]
-        columnas_desc = [col for col in df_trading.columns if col.endswith('_descripcion')]
+        # Filtrar descripciones según la combinación
+        columnas_desc = []
+        for indicador in combinacion_indicadores:
+            col_desc = f'estrategia_{indicador}_descripcion'
+            if col_desc in df_trading.columns:
+                columnas_desc.append(col_desc)
+        
         for col in columnas_desc:
             if col in df_trading.columns and not pd.isna(ultimo[col]):
                 nombre = col.replace('estrategia_', '').replace('_descripcion', '').upper()

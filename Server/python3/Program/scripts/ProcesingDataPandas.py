@@ -381,6 +381,454 @@ def calcular_estocastico(df, periodo=14, verbose=False, symbol=""):
 
 
 
+def calcular_ichimoku(df, conversion_period=9, base_period=26, leading_span_b_period=52, displacement=26, verbose=False, symbol=""):
+    """
+    Calcula el indicador Ichimoku Cloud para un DataFrame de pandas.
+    
+    Basado en: 'Ichimoku Charts' de Goichi Hosoda
+    Componentes:
+    - Tenkan-sen (Conversion Line): (9-period high + 9-period low)/2
+    - Kijun-sen (Base Line): (26-period high + 26-period low)/2
+    - Senkou Span A (Leading Span A): (Conversion Line + Base Line)/2, desplazado 26 periodos
+    - Senkou Span B (Leading Span B): (52-period high + 52-period low)/2, desplazado 26 periodos
+    - Chikou Span (Lagging Span): Precio de cierre desplazado -26 periodos
+    
+    :param df: DataFrame con datos de mercado (debe tener High, Low, Close)
+    :param conversion_period: Período para Tenkan-sen (por defecto 9)
+    :param base_period: Período para Kijun-sen (por defecto 26)
+    :param leading_span_b_period: Período para Senkou Span B (por defecto 52)
+    :param displacement: Desplazamiento para spans líderes (por defecto 26)
+    :param verbose: Si es True, muestra detalles del cálculo
+    :param symbol: Símbolo del activo para mensajes debug
+    :return: DataFrame con columnas adicionales de Ichimoku
+    """
+    if verbose:
+        print(f"\n☁️  CÁLCULO ICHIMOKU CLOUD PARA {symbol}")
+        print(f"   Parámetros: Conversion={conversion_period}, Base={base_period}, SpanB={leading_span_b_period}, Displacement={displacement}")
+    
+    # Verificar que tenemos los datos necesarios
+    required_columns = ['High', 'Low', 'Close']
+    if not all(col in df.columns for col in required_columns):
+        if verbose:
+            print(f"   ❌ Datos insuficientes para calcular Ichimoku. Se necesitan: {required_columns}")
+        return df
+    
+    # Paso 1: Calcular Tenkan-sen (Conversion Line)
+    if verbose:
+        print(f"\n   🔄 PASO 1 - Tenkan-sen (Línea de Conversión):")
+        print(f"      Tenkan = (Max(High, {conversion_period}) + Min(Low, {conversion_period})) / 2")
+    
+    tenkan_sen_high = df['High'].rolling(window=conversion_period).max()
+    tenkan_sen_low = df['Low'].rolling(window=conversion_period).min()
+    df['Ichimoku_Conversion'] = (tenkan_sen_high + tenkan_sen_low) / 2
+    
+    if verbose and len(df) >= conversion_period:
+        print(f"      Tenkan = ({tenkan_sen_high.iloc[-1]:.2f} + {tenkan_sen_low.iloc[-1]:.2f}) / 2 = {df['Ichimoku_Conversion'].iloc[-1]:.2f}")
+    
+    # Paso 2: Calcular Kijun-sen (Base Line)
+    if verbose:
+        print(f"\n   📊 PASO 2 - Kijun-sen (Línea Base):")
+        print(f"      Kijun = (Max(High, {base_period}) + Min(Low, {base_period})) / 2")
+    
+    kijun_sen_high = df['High'].rolling(window=base_period).max()
+    kijun_sen_low = df['Low'].rolling(window=base_period).min()
+    df['Ichimoku_Base'] = (kijun_sen_high + kijun_sen_low) / 2
+    
+    if verbose and len(df) >= base_period:
+        print(f"      Kijun = ({kijun_sen_high.iloc[-1]:.2f} + {kijun_sen_low.iloc[-1]:.2f}) / 2 = {df['Ichimoku_Base'].iloc[-1]:.2f}")
+    
+    # Paso 3: Calcular Senkou Span A (Leading Span A)
+    if verbose:
+        print(f"\n   📈 PASO 3 - Senkou Span A (Span Líder A):")
+        print(f"      Span A = (Tenkan + Kijun) / 2, desplazado {displacement} periodos")
+    
+    df['Ichimoku_Senkou_A'] = ((df['Ichimoku_Conversion'] + df['Ichimoku_Base']) / 2).shift(displacement)
+    
+    if verbose and len(df) >= displacement:
+        current_idx = -1
+        source_idx = -1 - displacement
+        if abs(source_idx) <= len(df):
+            tenkan = df['Ichimoku_Conversion'].iloc[source_idx]
+            kijun = df['Ichimoku_Base'].iloc[source_idx]
+            print(f"      Span A = ({tenkan:.2f} + {kijun:.2f}) / 2 = {df['Ichimoku_Senkou_A'].iloc[current_idx]:.2f} (desplazado)")
+    
+    # Paso 4: Calcular Senkou Span B (Leading Span B)
+    if verbose:
+        print(f"\n   📉 PASO 4 - Senkou Span B (Span Líder B):")
+        print(f"      Span B = (Max(High, {leading_span_b_period}) + Min(Low, {leading_span_b_period})) / 2, desplazado {displacement}")
+    
+    senkou_b_high = df['High'].rolling(window=leading_span_b_period).max()
+    senkou_b_low = df['Low'].rolling(window=leading_span_b_period).min()
+    df['Ichimoku_Senkou_B'] = ((senkou_b_high + senkou_b_low) / 2).shift(displacement)
+    
+    if verbose and len(df) >= leading_span_b_period + displacement:
+        current_idx = -1
+        source_idx = -1 - displacement
+        if abs(source_idx) <= len(df):
+            high_max = senkou_b_high.iloc[source_idx]
+            low_min = senkou_b_low.iloc[source_idx]
+            print(f"      Span B = ({high_max:.2f} + {low_min:.2f}) / 2 = {df['Ichimoku_Senkou_B'].iloc[current_idx]:.2f} (desplazado)")
+    
+    # Paso 5: Calcular Chikou Span (Lagging Span)
+    if verbose:
+        print(f"\n   🔄 PASO 5 - Chikou Span (Span Rezagado):")
+        print(f"      Chikou = Precio Close desplazado -{displacement} periodos")
+    
+    df['Ichimoku_Chikou'] = df['Close'].shift(-displacement)
+    
+    if verbose and len(df) > displacement:
+        current_idx = -1
+        future_idx = -1 + displacement
+        if future_idx < 0:  # Si hay datos futuros disponibles
+            print(f"      Chikou = Close[{future_idx}] = {df['Ichimoku_Chikou'].iloc[current_idx]:.2f}")
+    
+    if verbose and len(df) > 0:
+        print(f"\n   🎯 RESULTADOS ICHIMOKU:")
+        if not pd.isna(df['Ichimoku_Conversion'].iloc[-1]):
+            print(f"      Tenkan-sen: {df['Ichimoku_Conversion'].iloc[-1]:.2f}")
+            print(f"      Kijun-sen: {df['Ichimoku_Base'].iloc[-1]:.2f}")
+            if not pd.isna(df['Ichimoku_Senkou_A'].iloc[-1]):
+                print(f"      Senkou Span A: {df['Ichimoku_Senkou_A'].iloc[-1]:.2f}")
+            if not pd.isna(df['Ichimoku_Senkou_B'].iloc[-1]):
+                print(f"      Senkou Span B: {df['Ichimoku_Senkou_B'].iloc[-1]:.2f}")
+            
+            # Interpretación básica
+            precio = df['Close'].iloc[-1]
+            tenkan = df['Ichimoku_Conversion'].iloc[-1]
+            kijun = df['Ichimoku_Base'].iloc[-1]
+            
+            if tenkan > kijun:
+                tendencia = "🟢 TENDENCIA ALCISTA (Tenkan > Kijun)"
+            elif tenkan < kijun:
+                tendencia = "🔴 TENDENCIA BAJISTA (Tenkan < Kijun)"
+            else:
+                tendencia = "⚪ TENDENCIA NEUTRA"
+            
+            print(f"      Señal: {tendencia}")
+    
+    return df
+
+
+
+def calcular_williams_r(df, periodo=14, verbose=False, symbol=""):
+    """
+    Calcula el indicador Williams %R para un DataFrame de pandas.
+    
+    Basado en: Larry Williams - 'The Secret of Selecting Stocks'
+    Fórmula: %R = (Highest High - Close) / (Highest High - Lowest Low) * -100
+    
+    :param df: DataFrame con datos de mercado (debe tener High, Low, Close)
+    :param periodo: Período para el cálculo (por defecto 14)
+    :param verbose: Si es True, muestra detalles del cálculo
+    :param symbol: Símbolo del activo para mensajes debug
+    :return: DataFrame con columna adicional 'Williams_R'
+    """
+    if verbose:
+        print(f"\n📉 CÁLCULO WILLIAMS %R PARA {symbol}")
+        print(f"   Período: {periodo}")
+        print(f"   Fórmula: %R = (Highest High - Close) / (Highest High - Lowest Low) × -100")
+    
+    # Verificar que tenemos los datos necesarios
+    required_columns = ['High', 'Low', 'Close']
+    if not all(col in df.columns for col in required_columns):
+        if verbose:
+            print(f"   ❌ Datos insuficientes para calcular Williams %R. Se necesitan: {required_columns}")
+        return df
+    
+    # Paso 1: Calcular Highest High y Lowest Low del período
+    if verbose:
+        print(f"\n   📈 PASO 1 - Calcular máximos y mínimos del período {periodo}:")
+        print(f"      Highest High = max(High[{periodo}])")
+        print(f"      Lowest Low = min(Low[{periodo}])")
+    
+    highest_high = df['High'].rolling(window=periodo).max()
+    lowest_low = df['Low'].rolling(window=periodo).min()
+    
+    if verbose and len(df) >= periodo:
+        print(f"      Highest High: {highest_high.iloc[-1]:.2f}")
+        print(f"      Lowest Low: {lowest_low.iloc[-1]:.2f}")
+    
+    # Paso 2: Calcular Williams %R
+    if verbose:
+        print(f"\n   📊 PASO 2 - Calcular Williams %R:")
+        print(f"      %R = (Highest High - Close) / (Highest High - Lowest Low) × -100")
+    
+    williams_r = ((highest_high - df['Close']) / (highest_high - lowest_low)) * -100
+    
+    if verbose and len(df) >= periodo:
+        numerador = highest_high.iloc[-1] - df['Close'].iloc[-1]
+        denominador = highest_high.iloc[-1] - lowest_low.iloc[-1]
+        print(f"      %R = ({highest_high.iloc[-1]:.2f} - {df['Close'].iloc[-1]:.2f}) / ({highest_high.iloc[-1]:.2f} - {lowest_low.iloc[-1]:.2f}) × -100")
+        print(f"          = {numerador:.2f} / {denominador:.2f} × -100 = {williams_r.iloc[-1]:.2f}")
+    
+    df['Williams_R'] = williams_r
+    
+    if verbose and len(df) > 0:
+        print(f"\n   🎯 RESULTADO WILLIAMS %R:")
+        if not pd.isna(williams_r.iloc[-1]):
+            print(f"      Williams %R: {williams_r.iloc[-1]:.2f}")
+            
+            r_value = williams_r.iloc[-1]
+            if r_value <= -80:
+                señal = "🟢 SOBREVENTA EXTREMA (%R ≤ -80)"
+            elif r_value >= -20:
+                señal = "🔴 SOBRECOMPRA EXTREMA (%R ≥ -20)"
+            elif r_value <= -50:
+                señal = "🟢 POSIBLE REVERSIÓN ALCISTA (%R ≤ -50)"
+            elif r_value >= -50:
+                señal = "🔴 POSIBLE REVERSIÓN BAJISTA (%R ≥ -50)"
+            else:
+                señal = "⚪ ZONA NEUTRA"
+            
+            print(f"      Señal: {señal}")
+    
+    return df
+
+
+
+def calcular_adx(df, periodo=14, verbose=False, symbol=""):
+    """
+    Calcula el ADX (Average Directional Index) para un DataFrame de pandas.
+    
+    Basado en: J. Welles Wilder - 'New Concepts in Technical Trading Systems'
+    Componentes:
+    - +DI (Positive Directional Indicator)
+    - -DI (Negative Directional Indicator) 
+    - ADX (Average Directional Movement Index)
+    
+    :param df: DataFrame con datos de mercado (debe tener High, Low, Close)
+    :param periodo: Período para el cálculo (por defecto 14)
+    :param verbose: Si es True, muestra detalles del cálculo
+    :param symbol: Símbolo del activo para mensajes debug
+    :return: DataFrame con columnas adicionales 'ADX', 'DI_Plus', 'DI_Minus'
+    """
+    if verbose:
+        print(f"\n📏 CÁLCULO ADX (Average Directional Index) PARA {symbol}")
+        print(f"   Período: {periodo}")
+    
+    # Verificar que tenemos los datos necesarios
+    required_columns = ['High', 'Low', 'Close']
+    if not all(col in df.columns for col in required_columns):
+        if verbose:
+            print(f"   ❌ Datos insuficientes para calcular ADX. Se necesitan: {required_columns}")
+        return df
+    
+    # Paso 1: Calcular True Range (TR)
+    if verbose:
+        print(f"\n   🔄 PASO 1 - Calcular True Range (TR):")
+        print(f"      TR = max(High - Low, |High - Close_prev|, |Low - Close_prev|)")
+    
+    high_low = df['High'] - df['Low']
+    high_close_prev = abs(df['High'] - df['Close'].shift(1))
+    low_close_prev = abs(df['Low'] - df['Close'].shift(1))
+    
+    tr = pd.concat([high_low, high_close_prev, low_close_prev], axis=1).max(axis=1)
+    
+    if verbose and len(df) > 1:
+        print(f"      TR actual: {tr.iloc[-1]:.2f}")
+    
+    # Paso 2: Calcular Directional Movement (+DM y -DM)
+    if verbose:
+        print(f"\n   📈 PASO 2 - Calcular Directional Movement:")
+        print(f"      +DM = High - High_prev (si > 0 y > |Low - Low_prev|)")
+        print(f"      -DM = Low_prev - Low (si > 0 y > |High - High_prev|)")
+    
+    up_move = df['High'] - df['High'].shift(1)
+    down_move = df['Low'].shift(1) - df['Low']
+    
+    plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0)
+    minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0)
+    
+    # Convertir a Series de pandas
+    plus_dm = pd.Series(plus_dm, index=df.index)
+    minus_dm = pd.Series(minus_dm, index=df.index)
+    
+    if verbose and len(df) > 1:
+        print(f"      +DM: {plus_dm.iloc[-1]:.2f}")
+        print(f"      -DM: {minus_dm.iloc[-1]:.2f}")
+    
+    # Paso 3: Calcular smoothed averages usando el método de Wilder
+    if verbose:
+        print(f"\n   📊 PASO 3 - Calcular promedios suavizados (método Wilder):")
+        print(f"      Usando factor de suavizado: 1/{periodo}")
+    
+    # True Range smoothed
+    tr_smooth = tr.ewm(alpha=1/periodo, adjust=False).mean()
+    
+    # Directional Movement smoothed
+    plus_dm_smooth = plus_dm.ewm(alpha=1/periodo, adjust=False).mean()
+    minus_dm_smooth = minus_dm.ewm(alpha=1/periodo, adjust=False).mean()
+    
+    # Paso 4: Calcular +DI y -DI
+    if verbose:
+        print(f"\n   ⚖️  PASO 4 - Calcular +DI y -DI:")
+        print(f"      +DI = 100 × (+DM_smooth / TR_smooth)")
+        print(f"      -DI = 100 × (-DM_smooth / TR_smooth)")
+    
+    plus_di = 100 * (plus_dm_smooth / tr_smooth)
+    minus_di = 100 * (minus_dm_smooth / tr_smooth)
+    
+    if verbose and len(df) >= periodo:
+        print(f"      +DI = 100 × ({plus_dm_smooth.iloc[-1]:.2f} / {tr_smooth.iloc[-1]:.2f}) = {plus_di.iloc[-1]:.2f}")
+        print(f"      -DI = 100 × ({minus_dm_smooth.iloc[-1]:.2f} / {tr_smooth.iloc[-1]:.2f}) = {minus_di.iloc[-1]:.2f}")
+    
+    # Paso 5: Calcular DX y ADX
+    if verbose:
+        print(f"\n   📐 PASO 5 - Calcular DX y ADX:")
+        print(f"      DX = 100 × |(+DI - -DI)| / (+DI + -DI)")
+        print(f"      ADX = EMA({periodo}) de DX")
+    
+    dx = 100 * abs(plus_di - minus_di) / (plus_di + minus_di)
+    adx = dx.ewm(alpha=1/periodo, adjust=False).mean()
+    
+    if verbose and len(df) >= periodo:
+        print(f"      DX = 100 × |{plus_di.iloc[-1]:.2f} - {minus_di.iloc[-1]:.2f}| / ({plus_di.iloc[-1]:.2f} + {minus_di.iloc[-1]:.2f})")
+        print(f"          = {dx.iloc[-1]:.2f}")
+        print(f"      ADX = {adx.iloc[-1]:.2f}")
+    
+    df['ADX'] = adx
+    df['DI_Plus'] = plus_di
+    df['DI_Minus'] = minus_di
+    
+    if verbose and len(df) > 0:
+        print(f"\n   🎯 RESULTADOS ADX:")
+        if not pd.isna(adx.iloc[-1]):
+            print(f"      ADX: {adx.iloc[-1]:.2f} (Fuerza de tendencia)")
+            print(f"      +DI: {plus_di.iloc[-1]:.2f} (Tendencia alcista)")
+            print(f"      -DI: {minus_di.iloc[-1]:.2f} (Tendencia bajista)")
+            
+            # Interpretación
+            adx_value = adx.iloc[-1]
+            plus_di_value = plus_di.iloc[-1]
+            minus_di_value = minus_di.iloc[-1]
+            
+            if adx_value > 25:
+                fuerza = "FUERTE TENDENCIA"
+                if plus_di_value > minus_di_value:
+                    direccion = "🟢 ALCISTA (+DI > -DI)"
+                else:
+                    direccion = "🔴 BAJISTA (-DI > +DI)"
+            elif adx_value > 20:
+                fuerza = "TENDENCIA MODERADA"
+                direccion = "🟡 DIRECCIÓN INDEFINIDA"
+            else:
+                fuerza = "SIN TENDENCIA CLARA"
+                direccion = "⚪ MERCADO LATERAL"
+            
+            print(f"      Interpretación: {fuerza}, {direccion}")
+    
+    return df
+
+
+
+def calcular_parabolic_sar(df, acceleration=0.02, maximum=0.2, verbose=False, symbol=""):
+    """
+    Calcula el Parabolic SAR para un DataFrame de pandas.
+    
+    Basado en: J. Welles Wilder - 'The Parabolic Time/Price System'
+    Fórmula compleja que sigue la tendencia y se acelera con el tiempo
+    
+    :param df: DataFrame con datos de mercado (debe tener High, Low)
+    :param acceleration: Factor de aceleración inicial (por defecto 0.02)
+    :param maximum: Factor de aceleración máximo (por defecto 0.2)
+    :param verbose: Si es True, muestra detalles del cálculo
+    :param symbol: Símbolo del activo para mensajes debug
+    :return: DataFrame con columna adicional 'Parabolic_SAR'
+    """
+    if verbose:
+        print(f"\n🎯 CÁLCULO PARABOLIC SAR PARA {symbol}")
+        print(f"   Parámetros: Acceleration={acceleration}, Maximum={maximum}")
+        print(f"   Algoritmo: Sigue la tendencia y se acelera en dirección de la tendencia")
+    
+    # Verificar que tenemos los datos necesarios
+    required_columns = ['High', 'Low']
+    if not all(col in df.columns for col in required_columns):
+        if verbose:
+            print(f"   ❌ Datos insuficientes para calcular Parabolic SAR. Se necesitan: {required_columns}")
+        return df
+    
+    # Inicializar arrays para el cálculo
+    high = df['High'].values
+    low = df['Low'].values
+    sar = np.zeros(len(df))
+    trend = np.zeros(len(df))
+    ep = np.zeros(len(df))
+    af = np.zeros(len(df))
+    
+    # Inicializar primeros valores
+    sar[0] = low[0]  # SAR inicial
+    trend[0] = 1     # 1 = tendencia alcista, -1 = tendencia bajista
+    ep[0] = high[0]  # Extreme Point
+    af[0] = acceleration  # Acceleration Factor
+    
+    # Calcular Parabolic SAR para cada período
+    for i in range(1, len(df)):
+        # SAR anterior
+        sar_prev = sar[i-1]
+        trend_prev = trend[i-1]
+        ep_prev = ep[i-1]
+        af_prev = af[i-1]
+        
+        # Calcular SAR provisional
+        sar_provisional = sar_prev + af_prev * (ep_prev - sar_prev)
+        
+        if trend_prev == 1:  # Tendencias alcistas
+            sar[i] = min(sar_provisional, low[i-1], low[i-2] if i >= 2 else low[i-1])
+            
+            # Verificar reversión
+            if low[i] < sar[i]:
+                trend[i] = -1
+                sar[i] = max(high[i], high[i-1])
+                ep[i] = low[i]
+                af[i] = acceleration
+            else:
+                trend[i] = 1
+                if high[i] > ep_prev:
+                    ep[i] = high[i]
+                    af[i] = min(af_prev + acceleration, maximum)
+                else:
+                    ep[i] = ep_prev
+                    af[i] = af_prev
+                    
+        else:  # Tendencias bajistas
+            sar[i] = max(sar_provisional, high[i-1], high[i-2] if i >= 2 else high[i-1])
+            
+            # Verificar reversión
+            if high[i] > sar[i]:
+                trend[i] = 1
+                sar[i] = min(low[i], low[i-1])
+                ep[i] = high[i]
+                af[i] = acceleration
+            else:
+                trend[i] = -1
+                if low[i] < ep_prev:
+                    ep[i] = low[i]
+                    af[i] = min(af_prev + acceleration, maximum)
+                else:
+                    ep[i] = ep_prev
+                    af[i] = af_prev
+    
+    df['Parabolic_SAR'] = sar
+    
+    if verbose and len(df) > 0:
+        print(f"\n   🎯 RESULTADO PARABOLIC SAR:")
+        print(f"      Parabolic SAR actual: {sar[-1]:.2f}")
+        
+        # Interpretación
+        current_sar = sar[-1]
+        current_close = df['Close'].iloc[-1] if 'Close' in df.columns else (df['High'].iloc[-1] + df['Low'].iloc[-1]) / 2
+        
+        if current_close > current_sar:
+            señal = "🟢 TENDENCIA ALCISTA (Precio > SAR)"
+        else:
+            señal = "🔴 TENDENCIA BAJISTA (Precio < SAR)"
+        
+        print(f"      Precio: {current_close:.2f}")
+        print(f"      Señal: {señal}")
+        print(f"      Factor de Aceleración actual: {af[-1]:.3f}")
+    
+    return df
+
 
 '''
 # Ejemplo de uso

@@ -42,6 +42,10 @@ def cargar_configuracion(estrategia):
 
     if estrategia not in config:
         raise ValueError(f"Estrategia '{estrategia}' no encontrada en el archivo de propiedades.")
+    
+    # Cargar combinaciones estratégicas
+    combinacion_indicadores = config[estrategia].get('combinacion_indicadores', 'rsi, macd, media_movil, bollinger, estocastico, volatilidad')
+    combinacion_nombres = config[estrategia].get('combinacion_nombres', 'Default_Strategy')
 
     return {
         "rsi_under": float(config[estrategia]['rsi_under']),
@@ -57,6 +61,18 @@ def cargar_configuracion(estrategia):
         "bollinger_periodo": int(config[estrategia].get('bollinger_periodo', '20')),
         "bollinger_desviacion": float(config[estrategia].get('bollinger_desviacion', '2.0')),
         "estocastico_periodo": int(config[estrategia].get('estocastico_periodo', '14')),
+        # Nuevos parámetros para indicadores avanzados (valores por defecto)
+        "ichimoku_conversion": int(config[estrategia].get('ichimoku_conversion', '9')),
+        "ichimoku_base": int(config[estrategia].get('ichimoku_base', '26')),
+        "ichimoku_span_b": int(config[estrategia].get('ichimoku_span_b', '52')),
+        "ichimoku_displacement": int(config[estrategia].get('ichimoku_displacement', '26')),
+        "williams_periodo": int(config[estrategia].get('williams_periodo', '14')),
+        "adx_periodo": int(config[estrategia].get('adx_periodo', '14')),
+        "parabolic_acceleration": float(config[estrategia].get('parabolic_acceleration', '0.02')),
+        "parabolic_maximum": float(config[estrategia].get('parabolic_maximum', '0.2')),
+        # Combinaciones estratégicas
+        "combinacion_indicadores": [x.strip() for x in combinacion_indicadores.split(',')],
+        "combinacion_nombres": [x.strip() for x in combinacion_nombres.split(',')],
         # Rutas de archivos
         "ruta_archivo_temporal": ruta_archivo_temporal,
         "mobile_notification_list_file": mobile_notification_list_file,
@@ -131,8 +147,7 @@ def main():
 
 
     # Paso 0: Seleccionar estrategia
-    estrategia = "mediano_plazo"  # Puedes cambiar esto a "mediano_plazo", "largo_plazo", "agresivo", "conservador"
-
+    estrategia = "todos_los_indices"  # Puedes cambiar esto a "mediano_plazo", "largo_plazo", "agresivo", "conservador"
      
     # Mostrar título de la estrategia
     mostrar_titulo_estrategia(f"Estrategia: {estrategia}")
@@ -153,6 +168,18 @@ def main():
         bollinger_periodo = config["bollinger_periodo"]
         bollinger_desviacion = config["bollinger_desviacion"]
         estocastico_periodo = config["estocastico_periodo"]
+         # Nuevos parámetros para indicadores avanzados
+        ichimoku_conversion = config["ichimoku_conversion"]
+        ichimoku_base = config["ichimoku_base"]
+        ichimoku_span_b = config["ichimoku_span_b"]
+        ichimoku_displacement = config["ichimoku_displacement"]
+        williams_periodo = config["williams_periodo"]
+        adx_periodo = config["adx_periodo"]
+        parabolic_acceleration = config["parabolic_acceleration"]
+        parabolic_maximum = config["parabolic_maximum"]
+        # Combinaciones estratégicas
+        combinacion_indicadores = config["combinacion_indicadores"]
+        combinacion_nombres = config["combinacion_nombres"]
         # Rutas de archivos
         ruta_archivo_temporal = config["ruta_archivo_temporal"]
         mobile_notification_list_file = config["mobile_notification_list_file"]
@@ -172,6 +199,16 @@ def main():
             "bollinger_periodo": bollinger_periodo,
             "bollinger_desviacion": bollinger_desviacion,
             "estocastico_periodo": estocastico_periodo,
+            "ichimoku_conversion": ichimoku_conversion,
+            "ichimoku_base": ichimoku_base,
+            "ichimoku_span_b": ichimoku_span_b,
+            "ichimoku_displacement": ichimoku_displacement,
+            "williams_periodo": williams_periodo,
+            "adx_periodo": adx_periodo,
+            "parabolic_acceleration": parabolic_acceleration,
+            "parabolic_maximum": parabolic_maximum,
+            "combinacion_indicadores": combinacion_indicadores,
+            "combinacion_nombres": combinacion_nombres,
             "ruta_archivo_temporal": ruta_archivo_temporal,
             "ruta_archivo_temporal": ruta_archivo_temporal,
             "mobile_notification_list_file": mobile_notification_list_file,
@@ -222,6 +259,14 @@ def main():
         "bollinger_periodo": bollinger_periodo,
         "bollinger_desviacion": bollinger_desviacion,
         "estocastico_periodo": estocastico_periodo,
+        "ichimoku_conversion": ichimoku_conversion,
+        "ichimoku_base": ichimoku_base,
+        "ichimoku_span_b": ichimoku_span_b,
+        "ichimoku_displacement": ichimoku_displacement,
+        "williams_periodo": williams_periodo,
+        "adx_periodo": adx_periodo,
+        "parabolic_acceleration": parabolic_acceleration,
+        "parabolic_maximum": parabolic_maximum,
         "verbose": modo_debug
         })
     
@@ -255,6 +300,14 @@ def main():
         bollinger_periodo=bollinger_periodo,
         bollinger_desviacion=bollinger_desviacion,
         estocastico_periodo=estocastico_periodo,
+        ichimoku_conversion=ichimoku_conversion,
+        ichimoku_base=ichimoku_base,
+        ichimoku_span_b=ichimoku_span_b,
+        ichimoku_displacement=ichimoku_displacement,
+        williams_periodo=williams_periodo,
+        adx_periodo=adx_periodo,
+        parabolic_acceleration=parabolic_acceleration,
+        parabolic_maximum=parabolic_maximum,
         verbose=modo_debug
     )
     debug.escribir_paso(3, "procesar_dataframes", {}, respuesta="DataFrames procesados correctamente.")
@@ -273,6 +326,8 @@ def main():
     'bollinger_periodo': bollinger_periodo,
     'bollinger_desviacion': bollinger_desviacion,
     'estocastico_periodo': estocastico_periodo,
+    'combinacion_indicadores': combinacion_indicadores,
+    'combinacion_nombres': combinacion_nombres,
     'periodo_volatilidad': 20  # Puedes agregar esto a tu archivo de propiedades si quieres
     }
 
