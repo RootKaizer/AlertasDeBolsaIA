@@ -65,24 +65,24 @@ def cargar_configuracion(estrategia):
 
 
 
-def cargar_resultados_anteriores(resultados, ruta_archivo):
+def cargar_resultados_anteriores(resultados_actuales, ruta_archivo):
     """
     Carga los resultados anteriores desde archivo temporal si existe.
-    
-    Args:
-        estrategia: Nombre de la estrategia para el nombre del archivo
-        
-    Returns:
-        Diccionario con resultados anteriores o None si no existe el archivo
+    Ahora maneja el nuevo formato con timestamps.
     """
     try:
         ruta_archivo = Path(ruta_archivo)
     
         if not ruta_archivo.exists():
-            return resultados
+            print("No se encontraron resultados anteriores (primera ejecución)")
+            return None
     
         with open(ruta_archivo, 'r') as file:
-            return json.load(file)
+            resultados = json.load(file)
+            
+        print(f"Resultados anteriores cargados: {len(resultados)} símbolos")
+        return resultados
+        
     except Exception as e:
         print(f"Error al cargar resultados anteriores: {e}")
         return None
@@ -261,57 +261,81 @@ def main():
 
 
 
-    # Paso 4: Aplicar lógica de trading
-    debug.escribir_paso(4, "analizar_dataframes", {
-        "indicadores_de_bolsa_caldulados": indicadores_de_bolsa_caldulados, 
-        "rsi_under": rsi_under, 
-        "rsi_upper": rsi_upper
-        })
-    print("\nAplicando lógica de trading...")
-    resultados_trading = analizar_dataframes(indicadores_de_bolsa_caldulados, rsi_under, rsi_upper)
-    debug.escribir_paso(4, "analizar_dataframes", {}, respuesta="Lógica de trading aplicada correctamente.")
+    # En el Paso 4: Aplicar lógica de trading
+    parametros_analisis = {
+    'rsi_under': rsi_under,
+    'rsi_upper': rsi_upper,
+    'rsi_periodo': rsi_periodo,
+    'macd_periodo_corto': macd_periodo_corto,
+    'macd_periodo_largo': macd_periodo_largo,
+    'macd_periodo_senal': macd_periodo_senal,
+    'media_movil_periodo': media_movil_periodo,
+    'bollinger_periodo': bollinger_periodo,
+    'bollinger_desviacion': bollinger_desviacion,
+    'estocastico_periodo': estocastico_periodo,
+    'periodo_volatilidad': 20  # Puedes agregar esto a tu archivo de propiedades si quieres
+    }
+
+    resultados_trading = analizar_dataframes(
+        indicadores_de_bolsa_caldulados, 
+        verbose=modo_debug,
+        **parametros_analisis
+    )
 
     
+
+
 
     # Paso 5: Mostrar resultados
-    debug.escribir_paso(5, "mostrar_resultados_trading", {
-        "estrategia": estrategia,
-        "resultados_trading": resultados_trading
-        })
-    print("\nMostrar resultados...")
-    mostrar_resultados_trading(estrategia, resultados_trading, "actuales")
+    #debug.escribir_paso(5, "mostrar_resultados_trading", {
+    #    "estrategia": estrategia,
+    #    "resultados_trading": f"{len(resultados_trading)} símbolos"
+    #})
+    #print("\nMostrar resultados...")
+    #mostrar_resultados_trading(estrategia, resultados_trading, "actuales")
 
-    
-    
+
+'''
     # Paso 6: Comparar con resultados anteriores y notificar
-        # Variable para almacenar resultados anteriores
-    resultados_anteriores = cargar_resultados_anteriores(resultados_trading, ruta_archivo_temporal)
+    debug.escribir_paso(6, "comparar_y_notificar", {
+        "estrategia": estrategia,
+        "resultados_anteriores": "cargando...",
+        "resultados_actuales": f"{len(resultados_trading)} símbolos",
+        "verbose": modo_debug
+    })
+
     print("\nComparando con resultados anteriores...")
-    mostrar_resultados_trading(estrategia, resultados_anteriores, "anteriores")
-    
+
+    # Cargar resultados anteriores (ahora usando el último timestamp disponible)
+    resultados_anteriores = cargar_resultados_anteriores(resultados_trading, ruta_archivo_temporal)
+
+    if resultados_anteriores:
+        mostrar_resultados_trading(estrategia, resultados_anteriores, "anteriores")
+    else:
+        print("No hay resultados anteriores para comparar")
+
     try:
-        resultado_notificacion = comparar_y_notificar(resultados_anteriores, resultados_trading, estrategia, mobile_notification_list_file, whatsapp_message_log_file)
+        resultado_notificacion = comparar_y_notificar(
+        resultados_anteriores, 
+        resultados_trading, 
+        estrategia, 
+        mobile_notification_list_file, 
+        whatsapp_message_log_file,
+        verbose=modo_debug  # Agregar este parámetro
+        )
         
         if isinstance(resultado_notificacion, tuple):
             numeros, mensaje = resultado_notificacion
-            debug.escribir_paso(6, "comparar_y_notificar", {
-                                                    "estrategia": estrategia, 
-                                                    "resultados_anteriores": resultados_anteriores,
-                                                    "\nresultados_trading": resultados_trading
-                                                    }, 
-                               respuesta=f"Notificación para {len(numeros)} números")
+            debug.escribir_paso(6, "comparar_y_notificar", {}, 
+                            respuesta=f"Notificación preparada para {len(numeros)} números")
             print(f"\nPreparado para enviar a {len(numeros)} números:")
             print(mensaje)
         else:
-            debug.escribir_paso(6, "comparar_y_notificar", {
-                                                    "estrategia": estrategia, 
-                                                    "resultados_anteriores": resultados_anteriores,
-                                                    ".. ": "..",
-                                                    "resultados_trading": resultados_trading,
-                                                    "-- ": "--"
-                                                    }, 
-                              respuesta=resultado_notificacion)
+            debug.escribir_paso(6, "comparar_y_notificar", {}, 
+                            respuesta=resultado_notificacion)
             print(f"\n{resultado_notificacion}")
+    
+
             
     except Exception as e:
         error_msg = f"Error en comparación: {str(e)}"
@@ -322,7 +346,7 @@ def main():
     # Guardar resultados actuales como un temporal para que 
     # la próxima ejecución lo tome como valor anterior
     guardar_resultados_temporales(resultados_trading, ruta_archivo_temporal)
-
+'''
 
 
 if __name__ == "__main__":
