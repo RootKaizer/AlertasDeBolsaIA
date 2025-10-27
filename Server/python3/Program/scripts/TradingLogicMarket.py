@@ -50,6 +50,7 @@ def analizar_dataframes(dataframes, verbose=False, **kwargs):
         df_analizado = df.copy()
         
         # Aplicar estrategias según la combinación configurada
+        '''
         if 'rsi' in combinacion_indicadores:
             df_analizado = analizar_estrategia_rsi(df_analizado, rsi_under, rsi_upper, rsi_periodo, verbose)
         if 'macd' in combinacion_indicadores:
@@ -70,7 +71,18 @@ def analizar_dataframes(dataframes, verbose=False, **kwargs):
             df_analizado = analizar_estrategia_adx(df_analizado, 14, verbose)
         if 'parabolic_sar' in combinacion_indicadores:
             df_analizado = analizar_estrategia_parabolic_sar(df_analizado, verbose)
-
+        '''
+        # calcular analisis de todos los indices
+        df_analizado = analizar_estrategia_rsi(df_analizado, rsi_under, rsi_upper, rsi_periodo, verbose)
+        df_analizado = analizar_estrategia_macd(df_analizado, macd_periodo_corto, macd_periodo_largo, macd_periodo_senal, verbose)
+        df_analizado = analizar_estrategia_media_movil(df_analizado, media_movil_periodo, verbose)
+        df_analizado = analizar_estrategia_bollinger(df_analizado, bollinger_periodo, bollinger_desviacion, verbose)
+        df_analizado = analizar_estrategia_estocastico(df_analizado, estocastico_periodo, verbose)
+        df_analizado = analizar_estrategia_volatilidad(df_analizado, periodo_volatilidad, verbose)
+        df_analizado = analizar_estrategia_ichimoku(df_analizado, verbose)
+        df_analizado = analizar_estrategia_williams(df_analizado, estocastico_periodo, verbose)
+        df_analizado = analizar_estrategia_adx(df_analizado, 14, verbose)
+        df_analizado = analizar_estrategia_parabolic_sar(df_analizado, verbose)
 
         # Calcular Estrategia mayoritaria
         df_analizado = calcular_estrategia_mayoritaria(df_analizado, combinacion_indicadores)
