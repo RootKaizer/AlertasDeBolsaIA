@@ -4,7 +4,7 @@ from helpers.debug_file import escribir_log, limpiar_log
 from styles.debug_file import titulo_log, separador_log, formato_paso, formato_parametros, formato_respuesta
 
 class DebugMotorBolsaIA:
-    def __init__(self, log_file="../logs/00_MotorBolsaIA.log"):
+    def __init__(self, log_file="/app/logs/00_MotorBolsaIA.log"):
         # Obtener ruta absoluta y mostrarla
         self.log_file = os.path.abspath(log_file)
         print(f"Ruta del archivo de log: {self.log_file}")  # <-- Nueva línea para debug
@@ -42,3 +42,30 @@ class DebugMotorBolsaIA:
             escribir_log(self.log_file, f"  Valores: {calculo['valores']}")
             escribir_log(self.log_file, f"  Resultado: {calculo['resultado']}")
         escribir_log(self.log_file, separador_log())
+    
+
+    
+    def escribir_error(self, contexto, mensaje_error):
+        """
+        Escribe un error en el archivo de log.
+        
+        :param contexto: Contexto donde ocurrió el error
+        :param mensaje_error: Mensaje de error
+        """
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        entrada_error = {
+            "timestamp": timestamp,
+            "tipo": "ERROR",
+            "contexto": contexto,
+            "mensaje_error": mensaje_error
+        }
+        
+        # Asegurarse de que el directorio de logs existe
+        os.makedirs(os.path.dirname(self.archivo_log), exist_ok=True)
+        
+        try:
+            with open(self.archivo_log, 'a', encoding='utf-8') as file:
+                file.write(json.dumps(entrada_error, ensure_ascii=False) + '\n')
+        except Exception as e:
+            print(f"Error al escribir en log: {e}")

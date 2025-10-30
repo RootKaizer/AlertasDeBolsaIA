@@ -14,3 +14,4 @@ services:
       - ../Program/conf/:/app/conf/
       - ../Program/logs/:/app/logs/
       - ../Program/tmp/:/app/tmp/
+      - ../Program/Start.py:/app/Start.py

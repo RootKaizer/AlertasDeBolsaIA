@@ -18,8 +18,7 @@ Finalmente, ejecuta el script:
 
 # $1 = habilitar/deshabilitar modo_debug por función
 ``` sh
-cd /scripts
-python3 00_MotorBolsaIA.py True/False
+python3 Start.py mediano_plazo true
 ```
 
 Leer el log a nivel de servidor en la ruta :
