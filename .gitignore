@@ -24,3 +24,6 @@ __pycache__/
 
 # depuración de graficos
 *.png
+*.csv
+*.html
+*.xlsx
