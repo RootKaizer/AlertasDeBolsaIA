@@ -14,7 +14,7 @@ PROCEDIMIENTO GENERAL:
 ===============================================================
 ¡Entendido! Lo que estás buscando es un motor de análisis de datos en tiempo real que compare múltiples mercados, aplique técnicas profesionales de trading, y genere alertas cuando un umbral de coincidencia (70% o más) indique una acción específica (compra, venta, hold). Este enfoque es más factible que crear un broker completo, ya que te enfocas en el análisis y no en la infraestructura de trading.
 
-
+0. TODOS LOS DETALLES Y LOGS SE ACTIVAN CON EL MODO DEBUG
 
 Aquí te explico cómo podrías desarrollar este sistema:
 
@@ -23,29 +23,41 @@ Aquí te explico cómo podrías desarrollar este sistema:
 ===============================================================
 Entrada de datos:
 
-Obtener datos en tiempo real de 10 mercados diversos (acciones, índices, criptomonedas, etc.).
+estrategia: estrategia a evaluar, debe estar registrada en el TradingLogicMarket.properties
+debug: habilitar modo debug
 
 Técnicas de análisis:
 
-Media móvil (MA).
+OK >> Media móvil (MA).
 
-RSI (Relative Strength Index).
+OK >> RSI (Relative Strength Index).
 
-MACD (Moving Average Convergence Divergence).
+OK >> MACD (Moving Average Convergence Divergence).
 
-Bandas de Bollinger.
+OK >> Bandas de Bollinger.
 
-Fibonacci retracement.
+OK >> Fibonacci retracement.
+
+OK >> Estocástico
+
+OK >> Ichimoku
+
+OK >> Williams %R
+
+OK >> ADX
+
+OK >> Parabolic SAR
 
 Análisis de volumen.
 
-Lógica de alertas:
+OK >> Combinación
 
-Cuando el 70% o más de las técnicas coincidan en una acción (compra, venta, hold), enviar una alerta.
+Lógica de los diagnosticos de compra/venta/mantener:
+
 
 Salida:
 
-Alertas por correo, SMS, o notificaciones push.
+Matriz de datos
 
 
 2. Tecnologías a Usar
@@ -54,11 +66,13 @@ Lenguaje de programación: Python (ideal para análisis de datos y machine learn
 
 Librerías clave:
 
-Pandas y NumPy: Para manipulación de datos.
+OK >> Pandas y NumPy: Para manipulación de datos.
 
 backtrader: Para indicadores técnicos (RSI, MACD, etc.).
 
 Matplotlib/Plotly: Para visualización de datos.
+
+LangChain: para conectarse a la IA y consultar información actual de gente importante que tiene grandes inversiones en la industria consultada.
 
 Scikit-learn: Para modelos de machine learning (opcional).
 
@@ -72,7 +86,8 @@ Binance API o Coinbase API para criptomonedas.
 
 Almacenamiento:
 
-PostgreSQL o MongoDB para almacenar datos históricos.
+PostgreSQL o MongoDB para almacenar datos históricos, realizar simulaciónes y tener % de eficiencia de alertas indicadas,
+    con este valor de porcentaje retroalimentamos a la IA para que re-calcule con el mas eficiente.
 
 
 3. Arquitectura del Sistema
@@ -89,11 +104,94 @@ Calcular indicadores técnicos para cada mercado.
 
 Análisis:
 
-Aplicar las técnicas de trading y determinar la acción recomendada.
+Aplicar las técnicas de trading
+
+Consultar a 2 IA información del mercado actual
+    - literatura academica y actualizada de los mejores trader bursatiles como warrent buffet, etc (es lateral, tendencia, alguna repetición de ciclo)
+        * estudiar todos los tipos de graficos.
+            > el contexto en que se presenta estos graficos
+            > que estrategias son mas eficientes para esas formas o ciclos.
+            > combinaciones de indicadores para potenciar estrategias.
+        * obtener estrategias dependiendo comportamientos de graficos.
+        * las estrategias tendran mas valor ponderado de 100 los graficos de las recomendaciones del autor
+        * las estrategias tendran valor variable entre 0 y 80% los mas repetidos en toda la literatura.
+    - analizar los datos y graficos de las acciones que le pasamos de los calculos de pandas, para obtener:
+        * del grafico de los datos de pandas, comparar con todos los graficos de la literatura y seleccionar el tipo de grafico 
+            que cumple con el comportamiento del grafico de pandas.
+        * dependiendo del comportamiento del grafico debe buscar:
+            > obtener la estrategia recomendada por la literatura academica de todos comportamientos que se encuentren las estrategias que
+                    su ponderación sea mayor al 50% [valor controlado por variable.]
+            > obtener los parametros de entrada que los libros de los grandes inversores indiquen para el estilo de grafico que 
+    - enviar estos parametros para pasarlos por ObtenerIndicesDelMercado.
+        * la función arroja los calculos, se debe pasar por otros script aparte que haga los graficos.
+        * obtener graficos para el informe de recomendación por literatura.
+    - los datos obtenidos por los parametros de la literatura se vuelven a compara con todos los estilos graficos de literatura.
+        * objetivo: del grafico de los datos de la literartua, comparar con todos los graficos de la literatura y seleccionar el tipo de grafico
+            que cumple con el comportamiento del grafico de los datos enviados.
+        * si hay cambios de los graficos del usuario vs la literatura:
+            > agregar los nuevos graficos de literatura
+            > quitar de los tipos de graficos del usuario que cumplieron con la literatura en el primer calculo,
+                pero No esten en el segundo calculo de tipos de graficos con los parametros de literatura.
+
+    - los tipos de graficos que cumplan con el filtrado del anterior requerimiento pasaran a la siguiente fase.
+        * se calculara un porcentaje de fuerza a la estrategia con condiciones:
+            > las estrategias tendran mas valor ponderado de 100 los graficos de las recomendaciones del autor
+            > las estrategias tendran valor variable entre 0 y 80% los mas repetidos en toda la literatura.
+
+        * las estrategias que su % de fuerza sea mayor al 50% [valor controlado por variable.] seran las ******* ESTRATEGIAS IA USER *******.
+        * de las estrategias a IA-user obtendremos:
+            > parametros de entrada para función ObtenerIndicesDelMercado.py, encontrando:
+                indicadores:
+                decision_bursatil: COMPRAR, VENDER, MANTENER
+            > todos los indicadores del punto 1 [RSI, MACD, etc] que corresponden a cada estrategia que supera el umbral.
+            > todos los tipos de graficos que cumplen con esa estrategia y el filtrado del anterior requerimiento
+            > este dato acompaña la notificación, con una descripción muy breve y consisa de como se encuentra. (el detalle se activa con modo debug)
+            
+    -todos los indicadores obtenidos se agrupan por su estrategia IA-user (algunas combinan indicadores con valores especificos.):
+        * aqui obtenemos decision_bursatil de la estrategia calculada por IA y Usuario
+        * el % de fuerza decision_bursatil_IA_Usuario sera:
+            > 100% si todas las estrategias a IA-user tienen la misma decision bursatil.
+            > el % se pondera usando % de la fuerza
+            > este dato acompaña la notificación, con una descripción muy breve y consisa de como se encuentra. (el detalle se activa con modo debug)
+    
+
+    - información de grandes traders del indicadores ******* ESTRATEGIAS TRAIDERS DE LA INDUSTRIA *******
+        * el objetivo es obtener una decision bursatil, con % de fuerza dependiendo de:
+            > entre mas acciones tenga del indice evaluado, mas % de fuerza tiene.
+            > entre mas tiempo lleve operando, mas % de fuerza tiene.
+            > % de exito de sus ultimas transacciones en el indice.
+    
+    - desiciones politicas ******* ESTRATEGIAS A POLITICAS DE LA INDUSTRIA *******
+        * el objetivo es obtener una decision bursatil, con % de fuerza dependiendo de:
+            > decisiones comerciales del indice entre paises que lo consuman o produzcan.
+            > decisiones del pais donde cotiza en bolsa el indice.
+            > sanciones judiciales y economicas hacia el indice, sus dueños y directivos.
+
+
+
+    - comparar las decisiones buratiles de las estrategias generales (IA USER, TRAIDERS DE LA INDUSTRIA, OLITICAS DE LA INDUSTRIA)
+        * ponderar por IA que le de mayor peso y relevancia a las noticias y:
+            > notificar por las que mayor % de ponderación tenga COMPRAR y VENDER
+            > notificar por alguna estrategia general.
+            > notificar por cualquier estrategia.
+            > notificar por el cambio de decision bursatil en alguna estrategia general.
+    
+
 
 Alertas:
 
-Enviar alertas cuando el 70% de las técnicas coincidan.
+La conclusion del anterior analisis al numero de WP registrados
+Informe debe contener:
+    - un maximo de 3 acciones a compar y 3 a vender
+    - de todas las ESTRATEGIAS IA USER que cumplieron con su umbral se debe realizar 1 grafico con:
+        * 1 grafico para la ESTRATEGIAS IA USER GENERAL donde se vea la decision bursatil ponderada en el tiempo (semaforo y con % de fuerza)
+        * de velas japonesas del indice para cada estrategia IA User.
+        * los indicadores correspondientes a cada estrategia.
+        * la decision bursatil de la estrategia en cada marca de tiempo. (semaforo y con % de fuerza)
+        * el nombre del tipo de comportamiento de grafico de literatura para la estratigas que fueron filtradas para los datos IA user
+        * cada grafico de estrategia IA User lleva el titulo y la información relevante de cuando y como usar la estrategia en negrilla. segun la información de la literatura.
+        * graficos para el maximo de indices de compa y venta
+        * todos estos datos deben estar en una infografia completa y legible, con colores.
 
 Visualización (opcional):
 
@@ -102,15 +200,44 @@ Mostrar gráficos y resultados en una interfaz simple.
 
 4. Desarrollo del Motor de Análisis
 ===============================================================
-Paso 1: Obtener datos en tiempo real, debe estar dentro del contendor motor_alertas_de_bolsa
-********
->>/app/scripts/# python3 GetDataTwelveView.py 1h 1day
 
-Respuesta(datos_historicos):  
-            consulta en twelvedata el listado de los mercados registrados en twelvedata.info
-            trae los siguientes datos [Fecha, Apertura, Alto, Bajo, Cierre, Volumen]
-            en intervalos de tiempo definidos al ejecutar el comando [1h]
-            tiempo en el pasado hasta donde se consultara: [1day]
+Arquitectura Modular del Sistema
+********
+Start.py (Coordinador Principal)
+├── ObtenerIndicesDelMercado.py (Orquestador de Estrategias)
+│   ├── GetDataTwelveView.py (Obtención de datos)
+│   ├── ConverterDataToPandasData.py (Conversión a DataFrames)
+│   ├── GetDataPandas.py (Cálculo de indicadores técnicos)
+│   └── TradingLogicMarket.py (Lógica de trading)
+├── DebugMotorBolsaIA.py (Sistema de logging)
+├── NotificationLogicSender.py (Sistema de notificaciones)
+└── ProcesingDataPandas.py (Cálculos técnicos individuales)
+
+
+Paso 1: Inicio del Sistema
+********
+>>/app/# python3 Start.py <estrategia> [debug]
+
+input:
+    $1 >> Estrategias disponibles: corto_plazo, mediano_plazo, largo_plazo, agresivo, conservador
+    $2 >> Modo debug: Activa logging detallado
+output:
+    mensaje de whatsapp, con soportes de graficos e información recolectada.
+
+
+Paso 2: Obtención de Datos Históricos
+********
+# Llamada interna desde ObtenerIndicesDelMercado.py
+datos_historicos = obtener_datos_historicos(intervalo, periodo, verbose=modo_debug, symbols=symbols)
+
+Parámetros:
+intervalo: Desde properties (ej: "1h")
+periodo: Desde properties (ej: "1day")
+verbose: modo_debug del usuario
+symbols: Lista desde configuración de estrategia
+
+Proceso en GetDataTwelveView.py
+
             
 
 Paso 2: Convirtiendo datos a DataFrames...
@@ -121,73 +248,301 @@ Respuesta (dataframes):
             con la estructura de pandas y se captrua en la variable dataframes
 
 
-Paso 3: Procesando datos por pandas...
+Paso 3: Conversión a DataFrames
 ********
->>/app/scripts/# python3 GetDataPandas.py {dataframes}
-Respuesta (dataframes_procesados):
-            Se le ingresan los dataframes y trae los datos calculados por todas las
-            funciones registradas en ProcesingDataPandas.py del paso 3.1 y retorna
-            todos los datos del mercado y le agrega en cada registro de tiempo 
-            los valores calculados por las multiple funcionees.
+# Llamada interna
+dataframes = convertir_a_dataframe(datos_historicos, modo_debug)
 
-    Paso 3.1: Calcular valores técnicos usando Pandas y NumPy
-    ********
-    >>/app/scripts/# python3 ProcesingDataPandas.py {dataframes}
-    Respuesta (funciones): se ingresan los datos ordenados para panda y
-                dependiendo de la función usada obtienes una el valor, las funciones
-                habilitadas son: calcular_rsi, calcular_macd, calcular_media_movil,
-                calcular_bandas_bollinger y calcular_estocastico
+Parámetros:
+
+datos_historicos: Output del paso anterior
+verbose: modo_debug para mostrar detalles de conversión
+
+Proceso en ConverterDataToPandasData.py:
 
 
-Paso 4: Ejecutar logica de estrategia
+
+Paso 4: Cálculo de Indicadores Técnicos
 ********
->>/app/scripts/# python3 TradingLogicMarket.py {dataframes_procesados, rsi_under, rsi_upper}
-Respuesta (resultados_trading): se ingresan los dataframes_procesados con los calculos
-                de todas las funciones del script GetDataPandas.py y junto con los datos de
-                la estrategia seleccionada para procesar si se debe comprar, vender o mantener
-                con la descrición del la tecnica aplicada.
+# Llamada interna con TODOS los parámetros necesarios
+indicadores_de_bolsa_calculados = procesar_dataframes(
+    dataframes, 
+    verbose=modo_debug,
+    # Parámetros técnicos desde properties
+    rsi_periodo=rsi_periodo,
+    macd_periodo_corto=macd_periodo_corto,
+    macd_periodo_largo=macd_periodo_largo,
+    macd_periodo_senal=macd_periodo_senal,
+    media_movil_periodo=media_movil_periodo,
+    bollinger_periodo=bollinger_periodo,
+    bollinger_desviacion=bollinger_desviacion,
+    estocastico_periodo=estocastico_periodo,
+    ichimoku_conversion=ichimoku_conversion,
+    ichimoku_base=ichimoku_base,
+    ichimoku_span_b=ichimoku_span_b,
+    ichimoku_displacement=ichimoku_displacement,
+    williams_periodo=williams_periodo,
+    adx_periodo=adx_periodo,
+    parabolic_acceleration=parabolic_acceleration,
+    parabolic_maximum=parabolic_maximum
+)
+
+Proceso en GetDataPandas.py:
 
 
-Paso 5: Enviar alertas
+Paso 5: Análisis de Estrategias de Trading
 ********
-python
-Copy
-import smtplib
+# Llamada interna con parámetros COMPLETOS
+resultados_trading = analizar_dataframes(
+    indicadores_de_bolsa_calculados, 
+    verbose=modo_debug,
+    # Parámetros de análisis desde properties
+    rsi_under=rsi_under,
+    rsi_upper=rsi_upper,
+    rsi_periodo=rsi_periodo,
+    macd_periodo_corto=macd_periodo_corto,
+    macd_periodo_largo=macd_periodo_largo,
+    macd_periodo_senal=macd_periodo_senal,
+    media_movil_periodo=media_movil_periodo,
+    bollinger_periodo=bollinger_periodo,
+    bollinger_desviacion=bollinger_desviacion,
+    estocastico_periodo=estocastico_periodo,
+    combinacion_indicadores=combinacion_indicadores,
+    combinacion_nombres=combinacion_nombres,
+    periodo_volatilidad=20
+)
 
-def enviar_alerta(mensaje):
-    servidor = smtplib.SMTP("smtp.gmail.com", 587)
-    servidor.starttls()
-    servidor.login("tu_correo@gmail.com", "tu_contraseña")
-    servidor.sendmail("tu_correo@gmail.com", "destinatario@gmail.com", mensaje)
-    servidor.quit()
-
-if acciones.count("comprar") / len(acciones) >= 0.7:
-    enviar_alerta("Alerta: 70% de las técnicas recomiendan COMPRAR.")
-elif acciones.count("vender") / len(acciones) >= 0.7:
-    enviar_alerta("Alerta: 70% de las técnicas recomiendan VENDER.")
+Proceso en TradingLogicMarket.py
 
 
-5. Ejecución en Tiempo Real
+
+Paso 6: Consulta a 2 IA - Análisis de Mercado Avanzado
+********
+# NUEVO SCRIPT a implementar
+>>/app/scripts/# python3 ConsultarIAmercado.py {resultados_trading} {estrategia} [debug]
+
+def consultar_ia_mercado(resultados_trading, estrategia, verbose=False):
+    """
+    Consulta a 2 IA para análisis avanzado
+    """
+    if verbose:
+        print(f"\n🤖 CONSULTANDO IA PARA ESTRATEGIA: {estrategia}")
+    
+    # IA 1: Análisis de Literatura y Patrones
+    if verbose:
+        print(f"   📚 IA 1 - Análisis de literatura técnica...")
+    
+    analisis_literatura = analizar_patrones_literatura(resultados_trading, verbose)
+    
+    # IA 2: Análisis de Contexto de Mercado  
+    if verbose:
+        print(f"   🌍 IA 2 - Análisis de contexto de mercado...")
+    
+    analisis_contexto = analizar_contexto_mercado(resultados_trading, verbose)
+    
+    return {
+        'analisis_literatura': analisis_literatura,
+        'analisis_contexto': analisis_contexto
+    }
+
+
+def analizar_patrones_literatura(resultados_trading, verbose=False):
+    """IA 1: Análisis basado en literatura de trading"""
+    analisis = {}
+    
+    for symbol, df in resultados_trading.items():
+        if verbose:
+            print(f"      🔍 Analizando patrones para {symbol}...")
+        
+        # Análisis de patrones de velas
+        patrones = identificar_patrones_velas(df, verbose)
+        
+        # Consultar estrategias de literatura
+        estrategias = consultar_estrategias_literatura(patrones, symbol, verbose)
+        
+        analisis[symbol] = {
+            'patrones_detectados': patrones,
+            'estrategias_literatura': estrategias,
+            'timestamp': datetime.now()
+        }
+    
+    return analisis
+
+def identificar_patrones_velas(df, verbose=False):
+    """Identifica patrones de velas japonesas"""
+    patrones = []
+    
+    # Implementar detección de patrones
+    if len(df) >= 3:
+        # Ejemplo: Patrón martillo
+        ultimo = df.iloc[-1]
+        penultimo = df.iloc[-2] if len(df) >= 2 else None
+        
+        if (ultimo['Low'] < penultimo['Low'] and 
+            ultimo['Close'] > ultimo['Open'] and
+            (ultimo['High'] - ultimo['Low']) > (ultimo['Open'] - ultimo['Close']) * 2):
+            patrones.append("MARTILLO")
+            if verbose:
+                print(f"        ✅ Patrón MARTILLO detectado")
+    
+    return patrones
+
+
+
+
+
+Paso 7: Generación de Gráficos y Reportes
 ===============================================================
-Usa un bucle infinito para monitorear los mercados continuamente:
+# NUEVO SCRIPT a implementar  
+>>/app/scripts/# python3 GenerarReportesVisuales.py {resultados_integrados} {estrategia} [debug]
 
-python
-Copy
-import time
+def generar_reportes_visuales(resultados_integrados, estrategia, verbose=False):
+    """
+    Genera gráficos y reportes visuales
+    """
+    if verbose:
+        print(f"\n📊 GENERANDO REPORTES VISUALES PARA: {estrategia}")
+    
+    archivos_generados = []
+    
+    for symbol, datos in resultados_integrados.items():
+        if verbose:
+            print(f"   📈 Generando gráficos para {symbol}...")
+        
+        # Gráfico de velas con indicadores
+        archivo_velas = generar_grafico_velas(datos, symbol, estrategia, verbose)
+        
+        # Gráfico de señales
+        archivo_señales = generar_grafico_señales(datos, symbol, estrategia, verbose)
+        
+        archivos_generados.extend([archivo_velas, archivo_señales])
+    
+    # Gráfico resumen de portfolio
+    if verbose:
+        print(f"   🎯 Generando resumen de portfolio...")
+    
+    archivo_resumen = generar_resumen_portfolio(resultados_integrados, estrategia, verbose)
+    archivos_generados.append(archivo_resumen)
+    
+    return archivos_generados
 
-while True:
-    for symbol in ["AAPL", "TSLA", "BTCUSD", ...]:  # Lista de mercados
-        precio = obtener_datos_en_tiempo_real(symbol, api_key)
-        rsi, macd = calcular_indicadores(precio)
-        acciones = determinar_accion(rsi, macd, precio, precio_anterior)
-        if acciones.count("comprar") / len(acciones) >= 0.7:
-            enviar_alerta(f"Alerta: COMPRAR {symbol}.")
-        elif acciones.count("vender") / len(acciones) >= 0.7:
-            enviar_alerta(f"Alerta: VENDER {symbol}.")
-    time.sleep(60)  # Esperar 1 minuto antes de la siguiente iteración
+def generar_grafico_velas(datos, symbol, estrategia, verbose=False):
+    """Genera gráfico de velas con indicadores"""
+    if verbose:
+        print(f"        🕯️ Creando gráfico de velas para {symbol}")
+    
+    # Implementar generación de gráfico
+    # usar matplotlib/plotly
+    
+    archivo = f"/app/tmp/grafico_velas_{symbol}_{estrategia}.png"
+    
+    if verbose:
+        print(f"        ✅ Gráfico guardado: {archivo}")
+    
+    return archivo
 
 
-6. Mejoras y Escalabilidad
+
+Paso 8: Sistema de Alertas y Notificaciones
+===============================================================
+# Usando script existente con parámetros corregidos
+
+>>/app/scripts/# python3 NotificationLogicSender.py {resultados_anteriores} {resultados_actuales} {estrategia} {mobile_list} {log_file} [debug]
+def comparar_y_notificar(
+    resultados_anteriores: Dict,
+    resultados_actuales: Dict, 
+    estrategia: str,
+    mobile_list_notification: str,
+    log_whatsapp_message: str,
+    verbose: bool = False
+) -> Union[str, Tuple[List[str], str]]:
+    
+    if verbose:
+        print(f"\n🔍 COMPARANDO RESULTADOS - Estrategia: {estrategia}")
+        print(f"   📊 Resultados anteriores: {len(resultados_anteriores) if resultados_anteriores else 0} símbolos")
+        print(f"   📈 Resultados actuales: {len(resultados_actuales)} símbolos")
+
+
+
+Flujo final integrado en Start.py:
+===============================================================
+def ejecutar_analisis_completo(estrategia, modo_debug=False):
+    try:
+        # PASO 1-5: Análisis Técnico (existente)
+        if modo_debug:
+            print(f"🎯 INICIANDO ANÁLISIS PARA ESTRATEGIA: {estrategia}")
+        
+        resultados_trading = obtener_indices_mercado(estrategia, modo_debug)
+        
+        if not resultados_trading:
+            if modo_debug:
+                print("❌ No se obtuvieron resultados del análisis técnico")
+            return None
+
+        # PASO 6: Consulta a IA (NUEVO)
+        if modo_debug:
+            print(f"🤖 CONSULTANDO SISTEMAS IA...")
+        
+        analisis_ia = consultar_ia_mercado(resultados_trading, estrategia, modo_debug)
+        
+        # Integrar resultados
+        resultados_integrados = integrar_resultados_ia(
+            resultados_trading, analisis_ia, modo_debug
+        )
+
+        # PASO 7: Generar reportes visuales (NUEVO)
+        if modo_debug:
+            print(f"📊 GENERANDO REPORTES VISUALES...")
+        
+        archivos_graficos = generar_reportes_visuales(
+            resultados_integrados, estrategia, modo_debug
+        )
+
+        # PASO 8: Notificaciones (existente con mejoras)
+        if modo_debug:
+            print(f"📨 PROCESANDO NOTIFICACIONES...")
+        
+        # Cargar resultados anteriores para comparación
+        resultados_anteriores = cargar_resultados_anteriores(estrategia)
+        
+        # Configuración de notificaciones
+        mobile_list = "/app/conf/whatsappNotificationListNumber.info"
+        log_file = "/app/logs/.SenderWhatsappMessage.log"
+        
+        resultado_notificacion = comparar_y_notificar(
+            resultados_anteriores,
+            resultados_integrados,  # Ahora con datos de IA
+            estrategia,
+            mobile_list,
+            log_file,
+            verbose=modo_debug
+        )
+        
+        # Guardar resultados actuales para próxima comparación
+        guardar_resultados_actuales(resultados_integrados, estrategia)
+        
+        if modo_debug:
+            print(f"✅ ANÁLISIS COMPLETADO EXITOSAMENTE")
+        
+        return resultados_integrados
+        
+    except Exception as e:
+        if modo_debug:
+            print(f"❌ ERROR EN ANÁLISIS: {e}")
+        return None
+
+
+'''
+Output Final:
+    Mensajes WhatsApp con análisis técnico + IA
+    Gráficos generados con patrones detectados
+    Log detallado si verbose=True
+    Archivos temporales con resultados para siguiente ejecución
+'''
+
+
+
+Paso 9: Mejoras y Escalabilidad
 ===============================================================
 Optimización:
 
@@ -202,7 +557,7 @@ Machine Learning:
 Entrena modelos predictivos para mejorar la precisión de las alertas.
 
 
-7. Despliegue
+Paso 10: Despliegue
 ===============================================================
 Control de version:
     git hub repository: https://github.com/RootKaizer/AlertasDeBolsaIA.git
@@ -227,7 +582,7 @@ Notificaciones push:
     Integra Firebase Cloud Messaging para notificaciones en dispositivos móviles.
 
 
-8. Ejemplo de Salida
+Paso 11: Ejemplo de Salida
 ===============================================================
 Alertas:
 
