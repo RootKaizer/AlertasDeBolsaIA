@@ -20,3 +20,6 @@ __pycache__/
 ./Server/python3/Program/logs/.SenderWhatsappMessage.log
 ./Server/python3/Program/logs/00_MotorBolsaIA.log
 ./Server/python3/Program/tmp/resultados_anteriores_trading*
+
+# depuración de graficos
+*.png
