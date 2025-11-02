@@ -1,7 +1,3 @@
 [TwelveData]
 url_base_path = https://api.twelvedata.com
-# valores permitidos VAL1,VAL2,VAL3, ... ,VALn
-#symbols = AAPL,TSLA,BTC/USD,510050,7272
-#symbols = AAPL,TSLA,BTC/USD,510050,7272,usd/cny
-symbols = AAPL,TSLA
 
