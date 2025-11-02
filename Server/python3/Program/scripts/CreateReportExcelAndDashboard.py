@@ -240,9 +240,14 @@ def generar_archivos_csv(resultados_trading, user_name, timestamp, verbose=False
             print(f"      ❌ Error generando CSVs: {e}")
         return []
 
-def generar_grafico_interactivo_individual(symbol, df, estrategia, user_name, timestamp, verbose=False):
+# =============================================================================
+# PRIMERA PARTE: CONFIGURACIÓN DE PANELES
+# =============================================================================
+
+def configurar_paneles_graficos(symbol, df, estrategia, verbose=False):
     """
-    Genera gráfico interactivo individual para cada símbolo con Plotly.
+    Primera parte: Configura todos los paneles del gráfico con títulos, descripciones y métricas.
+    Retorna una estructura con la configuración de cada panel.
     """
     try:
         if len(df) < 5:
@@ -255,59 +260,209 @@ def generar_grafico_interactivo_individual(symbol, df, estrategia, user_name, ti
         if 'datetime' in df_plot.columns:
             df_plot = df_plot.sort_values('datetime', ascending=True)
         
-        # Crear figura con subplots - más filas para los nuevos indicadores
+        # Configuración de cada panel
+        paneles_config = {
+            'titulo_principal': f'Análisis Completo - {symbol} | Estrategia: {estrategia}',
+            'paneles': [
+                {
+                    'id': 'velas',
+                    'titulo': f'Velas Japonesas - {symbol}',
+                    'descripcion': 'Gráfico principal de precios con velas japonesas, incluyendo indicadores de tendencia como Bandas Bollinger, Ichimoku Cloud y Parabolic SAR',
+                    'tipo': 'velas_japonesas',
+                    'metricas': [
+                        'Open', 'High', 'Low', 'Close', 
+                        'Bollinger_Upper', 'Bollinger_Lower',
+                        'SAR', 'Ichimoku_Base', 'Ichimoku_Conversion', 
+                        'Ichimoku_A', 'Ichimoku_B'
+                    ],
+                    'datos': df_plot,
+                    'señales': True
+                },
+                {
+                    'id': 'volumen',
+                    'titulo': 'Volumen',
+                    'descripcion': 'Volumen de trading con colores que indican tendencia alcista (verde) o bajista (roja)',
+                    'tipo': 'volumen',
+                    'metricas': ['Volume', 'Open', 'Close'],
+                    'datos': df_plot
+                },
+                {
+                    'id': 'momento',
+                    'titulo': 'Indicadores de Momento (RSI, Estocástico, Williams %R)',
+                    'descripcion': 'Indicadores de momentum que miden la velocidad y cambio de movimientos de precios',
+                    'tipo': 'indicadores_momento',
+                    'metricas': ['RSI', 'Stochastic_K', 'Stochastic_D', 'Williams_R'],
+                    'datos': df_plot,
+                    'lineas_referencia': [
+                        {'y': 70, 'color': 'red', 'estilo': 'dash', 'descripcion': 'Sobrecompra RSI'},
+                        {'y': 30, 'color': 'green', 'estilo': 'dash', 'descripcion': 'Sobreventa RSI'},
+                        {'y': 80, 'color': 'red', 'estilo': 'dot', 'descripcion': 'Sobrecompra Estocástico'},
+                        {'y': 20, 'color': 'green', 'estilo': 'dot', 'descripcion': 'Sobreventa Estocástico'}
+                    ]
+                },
+                {
+                    'id': 'macd',
+                    'titulo': 'MACD',
+                    'descripcion': 'Indicador de tendencia que muestra la relación entre dos medias móviles del precio',
+                    'tipo': 'macd',
+                    'metricas': ['MACD', 'MACD_signal', 'MACD_hist'],
+                    'datos': df_plot
+                },
+                {
+                    'id': 'tendencia',
+                    'titulo': 'Indicadores de Tendencia (ADX, Fibonacci)',
+                    'descripcion': 'Indicadores que miden la fuerza y dirección de la tendencia del mercado',
+                    'tipo': 'indicadores_tendencia',
+                    'metricas': ['ADX', 'Fibonacci_0', 'Fibonacci_23.6', 'Fibonacci_38.2', 'Fibonacci_61.8', 'Fibonacci_100'],
+                    'datos': df_plot,
+                    'lineas_referencia': [
+                        {'y': 25, 'color': 'orange', 'estilo': 'dash', 'descripcion': 'Fuerza de tendencia ADX'}
+                    ]
+                },
+                {
+                    'id': 'fuerza',
+                    'titulo': 'Fuerza de Señal',
+                    'descripcion': 'Fuerza consolidada de todas las señales de trading, donde valores positivos indican tendencia alcista y negativos tendencia bajista',
+                    'tipo': 'fuerza_señal',
+                    'metricas': ['fuerza_señal'],
+                    'datos': df_plot,
+                    'lineas_referencia': [
+                        {'y': 0.7, 'color': 'green', 'estilo': 'dash', 'descripcion': 'Compra Fuerte'},
+                        {'y': 0.3, 'color': 'lightgreen', 'estilo': 'dash', 'descripcion': 'Compra'},
+                        {'y': -0.3, 'color': 'lightcoral', 'estilo': 'dash', 'descripcion': 'Venta'},
+                        {'y': -0.7, 'color': 'red', 'estilo': 'dash', 'descripcion': 'Venta Fuerte'},
+                        {'y': 0, 'color': 'black', 'estilo': 'solid', 'descripcion': 'Neutral'}
+                    ]
+                }
+            ],
+            'filtros_comunes': {
+                'rango_fechas': {
+                    'desde': df_plot['datetime'].min() if 'datetime' in df_plot.columns else None,
+                    'hasta': df_plot['datetime'].max() if 'datetime' in df_plot.columns else None
+                },
+                'indicadores_disponibles': list(df_plot.columns),
+                'señales_disponibles': [col for col in df_plot.columns if col.startswith('estrategia_')]
+            }
+        }
+        
+        return paneles_config
+        
+    except Exception as e:
+        if verbose:
+            print(f"        ❌ Error configurando paneles para {symbol}: {e}")
+        return None
+
+# =============================================================================
+# SEGUNDA PARTE: ARMADO DEL GRÁFICO CON DISTRIBUCIÓN DE PANELES
+# =============================================================================
+
+def armar_grafico_con_paneles(paneles_config, symbol, user_name, estrategia, timestamp, verbose=False):
+    """
+    Segunda parte: Arma el gráfico completo con la configuración de paneles,
+    distribuyendo el espacio y agregando filtros agrupados.
+    """
+    try:
+        if not paneles_config:
+            return None
+            
+        # Crear figura con subplots usando la configuración
+        num_paneles = len(paneles_config['paneles'])
+        
+        # Configurar alturas de paneles (en porcentaje)
+        alturas_paneles = [0.4, 0.1, 0.15, 0.15, 0.1, 0.1]  # Mantener proporciones originales
+        
+        # Crear subplots
         fig = make_subplots(
-            rows=6, cols=1,
+            rows=num_paneles, cols=1,
             shared_xaxes=True,
             vertical_spacing=0.03,
-            subplot_titles=(
-                f'Velas Japonesas - {symbol}',
-                'Volumen',
-                'Indicadores de Momento (RSI, Estocástico, Williams %R)',
-                'MACD',
-                'Indicadores de Tendencia (ADX, Bandas Bollinger)',
-                'Fuerza de Señal'
-            ),
-            row_heights=[0.4, 0.1, 0.15, 0.15, 0.1, 0.1]
+            subplot_titles=[panel['titulo'] for panel in paneles_config['paneles']],
+            row_heights=alturas_paneles
         )
         
-        # 1. Gráfico de velas japonesas con señales
-        agregar_velas_japonesas(fig, df_plot, symbol, verbose)
+        # Procesar cada panel según su configuración
+        for idx, panel in enumerate(paneles_config['paneles']):
+            fila = idx + 1
+            
+            # Agregar el tipo de gráfico correspondiente
+            if panel['tipo'] == 'velas_japonesas':
+                agregar_velas_japonesas(fig, panel['datos'], symbol, verbose)
+                if panel.get('señales', False):
+                    agregar_señales_trading_mejoradas(fig, panel['datos'], verbose)
+                    
+            elif panel['tipo'] == 'volumen':
+                agregar_volumen(fig, panel['datos'], verbose)
+                
+            elif panel['tipo'] == 'indicadores_momento':
+                agregar_indicadores_momento(fig, panel['datos'], verbose)
+                # Agregar líneas de referencia si existen
+                for linea in panel.get('lineas_referencia', []):
+                    fig.add_hline(
+                        y=linea['y'], 
+                        line_dash=linea['estilo'], 
+                        line_color=linea['color'], 
+                        row=fila, col=1
+                    )
+                    
+            elif panel['tipo'] == 'macd':
+                agregar_macd(fig, panel['datos'], verbose)
+                
+            elif panel['tipo'] == 'indicadores_tendencia':
+                agregar_indicadores_tendencia(fig, panel['datos'], verbose)
+                # Agregar líneas de referencia si existen
+                for linea in panel.get('lineas_referencia', []):
+                    fig.add_hline(
+                        y=linea['y'], 
+                        line_dash=linea['estilo'], 
+                        line_color=linea['color'], 
+                        row=fila, col=1
+                    )
+                    
+            elif panel['tipo'] == 'fuerza_señal':
+                agregar_fuerza_señal(fig, panel['datos'], verbose)
+                # Agregar líneas de referencia si existen
+                for linea in panel.get('lineas_referencia', []):
+                    fig.add_hline(
+                        y=linea['y'], 
+                        line_dash=linea['estilo'], 
+                        line_color=linea['color'], 
+                        row=fila, col=1
+                    )
         
-        # 2. Gráfico de volumen
-        agregar_volumen(fig, df_plot, verbose)
+        # AGREGAR PANEL DE FILTROS
+        agregar_panel_filtros(fig, paneles_config['filtros_comunes'], num_paneles + 1)
         
-        # 3. Indicadores de momento
-        agregar_indicadores_momento(fig, df_plot, verbose)
-        
-        # 4. MACD
-        agregar_macd(fig, df_plot, verbose)
-        
-        # 5. Indicadores de tendencia
-        agregar_indicadores_tendencia(fig, df_plot, verbose)
-        
-        # 6. Fuerza de señal
-        agregar_fuerza_señal(fig, df_plot, verbose)
-        
-        # 7. Señales de trading sobre el gráfico de velas (MEJORADO)
-        agregar_señales_trading_mejoradas(fig, df_plot, verbose)
-        
-        # Actualizar layout
+        # Actualizar layout con márgenes del 2%
         fig.update_layout(
-            title=f'Análisis Completo - {symbol} | Estrategia: {estrategia}',
-            height=1400,
+            title=paneles_config['titulo_principal'],
+            height=1600,  # Aumentar altura para incluir filtros
             showlegend=True,
-            xaxis_rangeslider_visible=False
+            xaxis_rangeslider_visible=False,
+            margin=dict(l=20, r=20, t=80, b=100),  # 2% de margen aproximado
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
         )
         
-        # Configurar ejes
-        fig.update_xaxes(title_text='Fecha y Hora', row=6, col=1)
-        fig.update_yaxes(title_text='Precio', row=1, col=1)
-        fig.update_yaxes(title_text='Volumen', row=2, col=1)
-        fig.update_yaxes(title_text='Momento', row=3, col=1)
-        fig.update_yaxes(title_text='MACD', row=4, col=1)
-        fig.update_yaxes(title_text='Tendencia', row=5, col=1)
-        fig.update_yaxes(title_text='Fuerza', row=6, col=1, range=[-1, 1])
+        # Configurar ejes para cada panel
+        configuraciones_ejes = {
+            1: {'titulo_y': 'Precio'},
+            2: {'titulo_y': 'Volumen'},
+            3: {'titulo_y': 'Momento'},
+            4: {'titulo_y': 'MACD'},
+            5: {'titulo_y': 'Tendencia'},
+            6: {'titulo_y': 'Fuerza'}
+        }
+        
+        for fila, config in configuraciones_ejes.items():
+            fig.update_yaxes(title_text=config['titulo_y'], row=fila, col=1)
+        
+        # Eje X solo en el último panel
+        fig.update_xaxes(title_text='Fecha y Hora', row=num_paneles, col=1)
         
         nombre_archivo = f"{user_name}_grafico_interactivo_{symbol}_{estrategia}_{timestamp}.html"
         ruta_archivo = f"/app/tmp/{nombre_archivo}"
@@ -320,8 +475,101 @@ def generar_grafico_interactivo_individual(symbol, df, estrategia, user_name, ti
         
     except Exception as e:
         if verbose:
-            print(f"        ❌ Error generando gráfico interactivo {symbol}: {e}")
+            print(f"        ❌ Error armando gráfico {symbol}: {e}")
         return None
+
+def agregar_panel_filtros(fig, filtros_comunes, fila_filtros):
+    """
+    Agrega un panel unificado de filtros para todos los gráficos.
+    """
+    try:
+        # Información de filtros disponibles
+        desde = filtros_comunes['rango_fechas']['desde']
+        hasta = filtros_comunes['rango_fechas']['hasta']
+        
+        # Formatear fechas para mostrar
+        if desde and hasta:
+            if hasattr(desde, 'strftime'):
+                desde_str = desde.strftime('%Y-%m-%d %H:%M')
+                hasta_str = hasta.strftime('%Y-%m-%d %H:%M')
+            else:
+                desde_str = str(desde)[:16]
+                hasta_str = str(hasta)[:16]
+        else:
+            desde_str = "N/A"
+            hasta_str = "N/A"
+        
+        # Agregar información de filtros como trazas invisibles para la leyenda
+        fig.add_trace(
+            go.Scatter(
+                x=[None], y=[None],
+                mode='markers',
+                marker=dict(size=0),
+                name='🎛️ PANEL DE FILTROS',
+                showlegend=True,
+                legendgroup='filtros'
+            ),
+            row=fila_filtros, col=1
+        )
+        
+        fig.add_trace(
+            go.Scatter(
+                x=[None], y=[None],
+                mode='markers',
+                marker=dict(size=0),
+                name=f'📅 Rango: {desde_str} a {hasta_str}',
+                showlegend=True,
+                legendgroup='filtros'
+            ),
+            row=fila_filtros, col=1
+        )
+        
+        fig.add_trace(
+            go.Scatter(
+                x=[None], y=[None],
+                mode='markers',
+                marker=dict(size=0),
+                name=f'📊 Indicadores: {len(filtros_comunes["indicadores_disponibles"])} disponibles',
+                showlegend=True,
+                legendgroup='filtros'
+            ),
+            row=fila_filtros, col=1
+        )
+        
+        fig.add_trace(
+            go.Scatter(
+                x=[None], y=[None],
+                mode='markers',
+                marker=dict(size=0),
+                name=f'⚡ Señales: {len(filtros_comunes["señales_disponibles"])} estrategias',
+                showlegend=True,
+                legendgroup='filtros'
+            ),
+            row=fila_filtros, col=1
+        )
+        
+        # Configurar el panel de filtros
+        fig.update_xaxes(
+            showticklabels=False, 
+            showgrid=False, 
+            zeroline=False,
+            row=fila_filtros, 
+            col=1
+        )
+        fig.update_yaxes(
+            showticklabels=False, 
+            showgrid=False, 
+            zeroline=False,
+            row=fila_filtros, 
+            col=1
+        )
+        
+    except Exception as e:
+        print(f"Error agregando panel de filtros: {e}")
+
+# =============================================================================
+# FUNCIONES DE AGREGADO DE GRÁFICOS (MANTENIDAS)
+# =============================================================================
 
 def agregar_velas_japonesas(fig, df, symbol, verbose=False):
     """Agrega gráfico de velas japonesas al subplot."""
@@ -704,8 +952,39 @@ def agregar_señales_trading_mejoradas(fig, df, verbose=False):
         if verbose:
             print(f"          ❌ Error agregando señales trading mejoradas: {e}")
 
+# =============================================================================
+# FUNCIÓN PRINCIPAL MODIFICADA
+# =============================================================================
 
+def generar_grafico_interactivo_individual(symbol, df, estrategia, user_name, timestamp, verbose=False):
+    """
+    Función principal modificada que utiliza las dos nuevas partes.
+    """
+    try:
+        if len(df) < 5:
+            if verbose:
+                print(f"        ⚠️ Datos insuficientes para {symbol}")
+            return None
+        
+        # PRIMERA PARTE: Configurar paneles
+        paneles_config = configurar_paneles_graficos(symbol, df, estrategia, verbose)
+        
+        if not paneles_config:
+            return None
+        
+        # SEGUNDA PARTE: Armar gráfico con paneles
+        archivo = armar_grafico_con_paneles(paneles_config, symbol, user_name, estrategia, timestamp, verbose)
+        
+        return archivo
+        
+    except Exception as e:
+        if verbose:
+            print(f"        ❌ Error generando gráfico interactivo {symbol}: {e}")
+        return None
 
+# =============================================================================
+# FUNCIÓN MAIN (OPCIONAL)
+# =============================================================================
 
 """
 # Función principal para uso externo
