@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
 """
 CreateReportExcelAndDashboard.py
-Script para generar reportes en Excel y dashboards gráficos completos.
+Script para generar reportes en Excel, CSV y dashboards gráficos interactivos.
 """
 
 import pandas as pd
@@ -12,9 +11,12 @@ import numpy as np
 import os
 from datetime import datetime
 import warnings
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import plotly.express as px
 warnings.filterwarnings('ignore')
 
-# Configuración de estilo para matplotlib
+# Configuración de estilo
 plt.style.use('seaborn-v0_8')
 COLORES = {
     'compra_fuerte': '#00FF00',
@@ -25,22 +27,26 @@ COLORES = {
     'vela_alcista': '#00FF00',
     'vela_bajista': '#FF0000',
     'grid': '#F0F0F0',
-    'texto': '#333333'
+    'texto': '#333333',
+    'bollinger_upper': '#FF6B6B',
+    'bollinger_lower': '#4ECDC4',
+    'bollinger_band': 'rgba(255,107,107,0.2)',
+    'fibonacci': '#8A2BE2',
+    'stochastic': '#FF69B4',
+    'ichimoku': '#1E90FF',
+    'williams': '#32CD32',
+    'adx': '#FF4500',
+    'sar': '#00CED1',
+    'volume': '#4169E1'
 }
 
 def generar_reporte_excel_dashboard(resultados_trading, estrategia, user_name, verbose=False):
     """
-    Función principal que genera reportes Excel y dashboards gráficos.
-    
-    :param resultados_trading: Diccionario con DataFrames de resultados
-    :param estrategia: Nombre de la estrategia utilizada
-    :param user_name: Nombre de usuario para prefijo de archivos
-    :param verbose: Modo debug para mostrar detalles
-    :return: Lista de archivos generados
+    Función principal que genera reportes Excel, CSV y dashboards gráficos.
     """
     
     if verbose:
-        print(f"\n📊 GENERANDO REPORTES EXCEL Y DASHBOARD")
+        print(f"\n📊 GENERANDO REPORTES EXCEL, CSV Y DASHBOARD")
         print(f"   Estrategia: {estrategia}")
         print(f"   Usuario: {user_name}")
         print(f"   Símbolos a procesar: {len(resultados_trading)}")
@@ -49,40 +55,32 @@ def generar_reporte_excel_dashboard(resultados_trading, estrategia, user_name, v
     archivos_generados = []
     
     try:
-        # Paso 1: Generar archivo Excel con todos los datos
+        # Paso 1: Generar archivo Excel con todos los datos ordenados
         if verbose:
             print(f"   📈 Paso 1: Generando archivo Excel...")
         
         archivo_excel = generar_archivo_excel(resultados_trading, estrategia, user_name, timestamp, verbose)
-        archivos_generados.append(archivo_excel)
+        if archivo_excel:
+            archivos_generados.append(archivo_excel)
         
-        # Paso 2: Generar dashboard general de estrategias IA User
+        # Paso 2: Generar archivos CSV por símbolo
         if verbose:
-            print(f"   🎯 Paso 2: Generando dashboard general...")
+            print(f"   📊 Paso 2: Generando archivos CSV...")
         
-        archivo_dashboard = generar_dashboard_general(resultados_trading, estrategia, user_name, timestamp, verbose)
-        archivos_generados.append(archivo_dashboard)
+        archivos_csv = generar_archivos_csv(resultados_trading, user_name, timestamp, verbose)
+        archivos_generados.extend(archivos_csv)
         
-        # Paso 3: Generar gráficos individuales por símbolo
+        # Paso 3: Generar gráficos interactivos individuales por símbolo
         if verbose:
-            print(f"   📊 Paso 3: Generando gráficos individuales...")
+            print(f"   📊 Paso 3: Generando gráficos interactivos individuales...")
         
         for symbol, df in resultados_trading.items():
             if len(df) > 0:
-                archivo_individual = generar_grafico_individual(
+                archivo_individual = generar_grafico_interactivo_individual(
                     symbol, df, estrategia, user_name, timestamp, verbose
                 )
                 if archivo_individual:
                     archivos_generados.append(archivo_individual)
-        
-        # Paso 4: Generar infografía resumen
-        if verbose:
-            print(f"   🎨 Paso 4: Generando infografía resumen...")
-        
-        archivo_infografia = generar_infografia_resumen(
-            resultados_trading, estrategia, user_name, timestamp, verbose
-        )
-        archivos_generados.append(archivo_infografia)
         
         if verbose:
             print(f"   ✅ Reportes generados exitosamente: {len(archivos_generados)} archivos")
@@ -94,11 +92,9 @@ def generar_reporte_excel_dashboard(resultados_trading, estrategia, user_name, v
             print(f"   ❌ Error generando reportes: {e}")
         return []
 
-
-
 def generar_archivo_excel(resultados_trading, estrategia, user_name, timestamp, verbose=False):
     """
-    Genera archivo Excel con todos los datos de trading.
+    Genera archivo Excel con todos los datos de trading ordenados por fecha.
     """
     try:
         nombre_archivo = f"{user_name}_reporte_{estrategia}_{timestamp}.xlsx"
@@ -109,19 +105,27 @@ def generar_archivo_excel(resultados_trading, estrategia, user_name, timestamp, 
             df_resumen = crear_resumen_ejecutivo(resultados_trading, verbose)
             df_resumen.to_excel(writer, sheet_name='Resumen_Ejecutivo', index=False)
             
-            # Hoja 2: Datos completos por símbolo
+            # Hoja 2: Datos completos por símbolo (ordenados por fecha descendente)
             for symbol, df in resultados_trading.items():
                 if len(df) > 0:
                     # Filtrar columnas relevantes
                     columnas_relevantes = [col for col in df.columns if any(x in col for x in [
                         'datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 
-                        'RSI', 'MACD', 'MA', 'estrategia', 'fuerza'
+                        'RSI', 'MACD', 'MA', 'estrategia', 'fuerza', 'Bollinger',
+                        'Fibonacci', 'Stochastic', 'Ichimoku', 'Williams', 'ADX', 'SAR'
                     ])]
                     df_filtrado = df[columnas_relevantes].copy()
+                    
+                    # Ordenar por fecha más reciente primero
+                    if 'datetime' in df_filtrado.columns:
+                        df_filtrado = df_filtrado.sort_values('datetime', ascending=False)
+                    
                     df_filtrado.to_excel(writer, sheet_name=f'Datos_{symbol}', index=False)
             
-            # Hoja 3: Señales de trading
+            # Hoja 3: Señales de trading (ordenadas por fecha descendente)
             df_señales = extraer_señales_trading(resultados_trading, verbose)
+            if 'Fecha_Hora' in df_señales.columns:
+                df_señales = df_señales.sort_values('Fecha_Hora', ascending=False)
             df_señales.to_excel(writer, sheet_name='Señales_Trading', index=False)
         
         if verbose:
@@ -172,8 +176,6 @@ def crear_resumen_ejecutivo(resultados_trading, verbose=False):
     
     return pd.DataFrame(datos_resumen)
 
-
-
 def extraer_señales_trading(resultados_trading, verbose=False):
     """
     Extrae todas las señales de trading para análisis.
@@ -197,319 +199,50 @@ def extraer_señales_trading(resultados_trading, verbose=False):
     
     return pd.DataFrame(datos_señales)
 
-
-
-def generar_dashboard_general(resultados_trading, estrategia, user_name, timestamp, verbose=False):
+def generar_archivos_csv(resultados_trading, user_name, timestamp, verbose=False):
     """
-    Genera dashboard general con decisiones bursátiles ponderadas.
+    Genera archivos CSV individuales por símbolo ordenados por fecha.
     """
+    archivos_generados = []
+    
     try:
-        if not resultados_trading:
-            if verbose:
-                print(f"      ⚠️ No hay datos para generar dashboard")
-            return None
-        
-        fig = plt.figure(figsize=(20, 12))
-        fig.suptitle(f'DASHBOARD GENERAL - ESTRATEGIA {estrategia.upper()}\nUsuario: {user_name}', 
-                    fontsize=16, fontweight='bold', color=COLORES['texto'])
-        
-        # Layout del dashboard
-        gs = plt.GridSpec(3, 3, figure=fig)
-        
-        # Gráfico 1: Heatmap de señales actuales
-        ax1 = fig.add_subplot(gs[0, 0])
-        generar_heatmap_señales(resultados_trading, ax1, verbose)
-        
-        # Gráfico 2: Evolución temporal de fuerza de señal
-        ax2 = fig.add_subplot(gs[0, 1:])
-        generar_evolucion_fuerza(resultados_trading, ax2, verbose)
-        
-        # Gráfico 3: Distribución de estrategias
-        ax3 = fig.add_subplot(gs[1, 0])
-        generar_distribucion_estrategias(resultados_trading, ax3, verbose)
-        
-        # Gráfico 4: Top señales de compra/venta
-        ax4 = fig.add_subplot(gs[1, 1])
-        generar_top_señales(resultados_trading, ax4, 'COMPRA', verbose)
-        
-        ax5 = fig.add_subplot(gs[1, 2])
-        generar_top_señales(resultados_trading, ax5, 'VENTA', verbose)
-        
-        # Gráfico 6: Resumen de performance
-        ax6 = fig.add_subplot(gs[2, :])
-        generar_resumen_performance(resultados_trading, ax6, verbose)
-        
-        plt.tight_layout()
-        
-        nombre_archivo = f"{user_name}_dashboard_general_{estrategia}_{timestamp}.png"
-        ruta_archivo = f"/app/tmp/{nombre_archivo}"
-        plt.savefig(ruta_archivo, dpi=150, bbox_inches='tight')
-        plt.close()
-        
-        if verbose:
-            print(f"      ✅ Dashboard general generado: {nombre_archivo}")
-        
-        return ruta_archivo
-        
-    except Exception as e:
-        if verbose:
-            print(f"      ❌ Error generando dashboard general: {e}")
-        return None
-
-
-
-def generar_heatmap_señales(resultados_trading, ax, verbose=False):
-    """
-    Genera heatmap de señales actuales por símbolo y estrategia.
-    """
-    try:
-        simbolos = []
-        estrategias = []
-        datos_heatmap = []
-        
         for symbol, df in resultados_trading.items():
             if len(df) > 0:
-                ultimo = df.iloc[-1]
-                simbolos.append(symbol)
+                # Crear copia para no modificar el original
+                df_csv = df.copy()
                 
-                # Obtener estrategias disponibles
-                estrategias_symbol = []
-                for col in df.columns:
-                    if col.startswith('estrategia_') and not col.endswith(('_valor', '_descripcion')):
-                        if col in ultimo and pd.notna(ultimo[col]):
-                            estrategias_symbol.append(col.replace('estrategia_', ''))
-                
-                if not estrategias:
-                    estrategias = estrategias_symbol
-                
-                # Mapear señales a valores numéricos
-                fila_datos = []
-                for estrategia in estrategias:
-                    col_name = f'estrategia_{estrategia}'
-                    if col_name in ultimo:
-                        señal = ultimo[col_name]
-                        if 'COMPRA_FUERTE' in str(señal):
-                            fila_datos.append(2)
-                        elif 'COMPRA' in str(señal):
-                            fila_datos.append(1)
-                        elif 'HOLD' in str(señal):
-                            fila_datos.append(0)
-                        elif 'VENTA' in str(señal):
-                            fila_datos.append(-1)
-                        elif 'VENTA_FUERTE' in str(señal):
-                            fila_datos.append(-2)
+                # Ordenar por fecha más reciente primero
+                if 'datetime' in df_csv.columns:
+                    df_csv = df_csv.sort_values('datetime', ascending=False)
+                    
+                    # Manejar timezone - convertir a string con timezone
+                    if pd.api.types.is_datetime64_any_dtype(df_csv['datetime']):
+                        # Si tiene timezone, convertir a string con timezone
+                        if df_csv['datetime'].dt.tz is not None:
+                            df_csv['datetime'] = df_csv['datetime'].dt.strftime('%Y-%m-%d %H:%M:%S%z')
                         else:
-                            fila_datos.append(0)
-                    else:
-                        fila_datos.append(0)
+                            # Si no tiene timezone, asumir UTC y añadir timezone
+                            df_csv['datetime'] = df_csv['datetime'].dt.strftime('%Y-%m-%d %H:%M:%S') + '+0000'
                 
-                datos_heatmap.append(fila_datos)
-        
-        if datos_heatmap and estrategias:
-            im = ax.imshow(datos_heatmap, cmap='RdYlGn', aspect='auto', vmin=-2, vmax=2)
-            
-            # Configurar ejes
-            ax.set_xticks(range(len(estrategias)))
-            ax.set_xticklabels([e[:8] for e in estrategias], rotation=45)
-            ax.set_yticks(range(len(simbolos)))
-            ax.set_yticklabels(simbolos)
-            
-            # Añadir valores en las celdas
-            for i in range(len(simbolos)):
-                for j in range(len(estrategias)):
-                    valor = datos_heatmap[i][j]
-                    color = 'white' if abs(valor) > 0.5 else 'black'
-                    ax.text(j, i, valor, ha='center', va='center', color=color, fontweight='bold')
-            
-            ax.set_title('Heatmap de Señales por Estrategia', fontweight='bold')
-            plt.colorbar(im, ax=ax, label='Señal (2=Compra Fuerte, -2=Venta Fuerte)')
-            
-    except Exception as e:
-        if verbose:
-            print(f"        ❌ Error en heatmap: {e}")
-        ax.text(0.5, 0.5, 'Error generando heatmap', ha='center', va='center', transform=ax.transAxes)
-
-
-
-def generar_evolucion_fuerza(resultados_trading, ax, verbose=False):
-    """
-    Genera gráfico de evolución de fuerza de señal en el tiempo.
-    """
-    try:
-        for symbol, df in resultados_trading.items():
-            if len(df) > 0 and 'fuerza_señal' in df.columns:
-                # Tomar últimos 50 registros máximo
-                df_plot = df.tail(50).copy()
+                nombre_archivo = f"{user_name}_datos_{symbol}_{timestamp}.csv"
+                ruta_archivo = f"/app/tmp/{nombre_archivo}"
                 
-                if 'datetime' in df_plot.columns:
-                    fechas = pd.to_datetime(df_plot['datetime'])
-                    ax.plot(fechas, df_plot['fuerza_señal'], label=symbol, linewidth=2, marker='o', markersize=3)
+                df_csv.to_csv(ruta_archivo, index=False, encoding='utf-8')
+                archivos_generados.append(ruta_archivo)
+                
+                if verbose:
+                    print(f"      ✅ CSV generado: {symbol}")
         
-        ax.axhline(y=0.7, color='green', linestyle='--', alpha=0.7, label='Umbral Compra (0.7)')
-        ax.axhline(y=-0.7, color='red', linestyle='--', alpha=0.7, label='Umbral Venta (-0.7)')
-        ax.axhline(y=0, color='gray', linestyle='-', alpha=0.5)
-        
-        ax.set_title('Evolución de Fuerza de Señal', fontweight='bold')
-        ax.set_ylabel('Fuerza de Señal')
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-        
-        # Formatear fechas
-        if 'fechas' in locals():
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
-            ax.xaxis.set_major_locator(mdates.HourLocator(interval=6))
-        plt.xticks(rotation=45)
+        return archivos_generados
         
     except Exception as e:
         if verbose:
-            print(f"        ❌ Error en evolución fuerza: {e}")
-        ax.text(0.5, 0.5, 'Error generando evolución', ha='center', va='center', transform=ax.transAxes)
+            print(f"      ❌ Error generando CSVs: {e}")
+        return []
 
-
-
-def generar_distribucion_estrategias(resultados_trading, ax, verbose=False):
+def generar_grafico_interactivo_individual(symbol, df, estrategia, user_name, timestamp, verbose=False):
     """
-    Genera gráfico de distribución de estrategias.
-    """
-    try:
-        conteo_estrategias = {'COMPRA_FUERTE': 0, 'COMPRA': 0, 'HOLD': 0, 'VENTA': 0, 'VENTA_FUERTE': 0}
-        
-        for symbol, df in resultados_trading.items():
-            if len(df) > 0:
-                ultimo = df.iloc[-1]
-                for col in df.columns:
-                    if col.startswith('estrategia_') and not col.endswith(('_valor', '_descripcion')):
-                        if col in ultimo and pd.notna(ultimo[col]):
-                            señal = str(ultimo[col])
-                            for key in conteo_estrategias:
-                                if key in señal:
-                                    conteo_estrategias[key] += 1
-        
-        labels = list(conteo_estrategias.keys())
-        valores = list(conteo_estrategias.values())
-        colores = [COLORES['compra_fuerte'], COLORES['compra'], COLORES['hold'], COLORES['venta'], COLORES['venta_fuerte']]
-        
-        ax.pie(valores, labels=labels, colors=colores, autopct='%1.1f%%', startangle=90)
-        ax.set_title('Distribución de Estrategias', fontweight='bold')
-        
-    except Exception as e:
-        if verbose:
-            print(f"        ❌ Error en distribución: {e}")
-        ax.text(0.5, 0.5, 'Error generando distribución', ha='center', va='center', transform=ax.transAxes)
-
-
-
-def generar_top_señales(resultados_trading, ax, tipo_señal, verbose=False):
-    """
-    Genera gráfico de top señales de compra o venta.
-    """
-    try:
-        señales = []
-        
-        for symbol, df in resultados_trading.items():
-            if len(df) > 0:
-                ultimo = df.iloc[-1]
-                fuerza = ultimo.get('fuerza_señal', 0)
-                señal_mayoritaria = ultimo.get('estrategia_mayoritaria', '')
-                
-                if tipo_señal in señal_mayoritaria:
-                    señales.append({
-                        'symbol': symbol,
-                        'fuerza': abs(fuerza),
-                        'precio': ultimo.get('Close', 0)
-                    })
-        
-        # Ordenar por fuerza
-        señales.sort(key=lambda x: x['fuerza'], reverse=True)
-        top_señales = señales[:5]  # Top 5
-        
-        if top_señales:
-            symbols = [s['symbol'] for s in top_señales]
-            fuerzas = [s['fuerza'] for s in top_señales]
-            
-            bars = ax.bar(symbols, fuerzas, 
-                         color=COLORES['compra_fuerte'] if tipo_señal == 'COMPRA' else COLORES['venta_fuerte'],
-                         alpha=0.7)
-            
-            ax.set_title(f'Top 5 {tipo_señal} por Fuerza', fontweight='bold')
-            ax.set_ylabel('Fuerza de Señal')
-            
-            # Añadir valores en las barras
-            for bar, fuerza in zip(bars, fuerzas):
-                ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01, 
-                       f'{fuerza:.2f}', ha='center', va='bottom', fontweight='bold')
-            
-            plt.xticks(rotation=45)
-            
-    except Exception as e:
-        if verbose:
-            print(f"        ❌ Error en top señales: {e}")
-        ax.text(0.5, 0.5, f'Error generando top {tipo_señal}', ha='center', va='center', transform=ax.transAxes)
-
-
-
-def generar_resumen_performance(resultados_trading, ax, verbose=False):
-    """
-    Genera resumen de performance con métricas clave.
-    """
-    try:
-        metricas = {
-            'Total Símbolos': len(resultados_trading),
-            'Símbolos con Datos': sum(1 for df in resultados_trading.values() if len(df) > 0),
-            'Señales COMPRA': 0,
-            'Señales VENTA': 0,
-            'Señales HOLD': 0,
-            'Fuerza Promedio': 0
-        }
-        
-        total_fuerza = 0
-        count_fuerza = 0
-        
-        for symbol, df in resultados_trading.items():
-            if len(df) > 0:
-                ultimo = df.iloc[-1]
-                señal_mayoritaria = ultimo.get('estrategia_mayoritaria', '')
-                fuerza = ultimo.get('fuerza_señal', 0)
-                
-                if 'COMPRA' in señal_mayoritaria:
-                    metricas['Señales COMPRA'] += 1
-                elif 'VENTA' in señal_mayoritaria:
-                    metricas['Señales VENTA'] += 1
-                else:
-                    metricas['Señales HOLD'] += 1
-                
-                if pd.notna(fuerza):
-                    total_fuerza += abs(fuerza)
-                    count_fuerza += 1
-        
-        if count_fuerza > 0:
-            metricas['Fuerza Promedio'] = total_fuerza / count_fuerza
-        
-        # Crear tabla
-        ax.axis('off')
-        tabla_data = [[k, v] for k, v in metricas.items()]
-        tabla = ax.table(cellText=tabla_data, 
-                        colLabels=['Métrica', 'Valor'],
-                        cellLoc='center',
-                        loc='center',
-                        bbox=[0.1, 0.1, 0.8, 0.8])
-        
-        tabla.auto_set_font_size(False)
-        tabla.set_fontsize(10)
-        tabla.scale(1, 1.5)
-        
-        ax.set_title('Resumen de Performance - Métricas Clave', fontweight='bold')
-        
-    except Exception as e:
-        if verbose:
-            print(f"        ❌ Error en resumen performance: {e}")
-        ax.text(0.5, 0.5, 'Error generando resumen', ha='center', va='center', transform=ax.transAxes)
-
-
-
-def generar_grafico_individual(symbol, df, estrategia, user_name, timestamp, verbose=False):
-    """
-    Genera gráfico individual para cada símbolo con velas japonesas e indicadores.
+    Genera gráfico interactivo individual para cada símbolo con Plotly.
     """
     try:
         if len(df) < 5:
@@ -517,455 +250,459 @@ def generar_grafico_individual(symbol, df, estrategia, user_name, timestamp, ver
                 print(f"        ⚠️ Datos insuficientes para {symbol}")
             return None
         
-        # Crear figura con subplots
-        fig = plt.figure(figsize=(16, 12))
-        fig.suptitle(f'ANÁLISIS COMPLETO - {symbol}\nEstrategia: {estrategia.upper()}', 
-                    fontsize=14, fontweight='bold', color=COLORES['texto'])
+        # Ordenar por fecha ascendente para el gráfico
+        df_plot = df.copy()
+        if 'datetime' in df_plot.columns:
+            df_plot = df_plot.sort_values('datetime', ascending=True)
         
-        # Definir layout
-        gs = plt.GridSpec(4, 1, figure=fig, height_ratios=[3, 1, 1, 1])
+        # Crear figura con subplots - más filas para los nuevos indicadores
+        fig = make_subplots(
+            rows=6, cols=1,
+            shared_xaxes=True,
+            vertical_spacing=0.03,
+            subplot_titles=(
+                f'Velas Japonesas - {symbol}',
+                'Volumen',
+                'Indicadores de Momento (RSI, Estocástico, Williams %R)',
+                'MACD',
+                'Indicadores de Tendencia (ADX, Bandas Bollinger)',
+                'Fuerza de Señal'
+            ),
+            row_heights=[0.4, 0.1, 0.15, 0.15, 0.1, 0.1]
+        )
         
-        # Subplot 1: Gráfico de velas con decisiones
-        ax1 = fig.add_subplot(gs[0])
-        generar_grafico_velas_decisiones(symbol, df, ax1, verbose)
+        # 1. Gráfico de velas japonesas con señales
+        agregar_velas_japonesas(fig, df_plot, symbol, verbose)
         
-        # Subplot 2: RSI
-        ax2 = fig.add_subplot(gs[1], sharex=ax1)
-        generar_grafico_rsi(symbol, df, ax2, verbose)
+        # 2. Gráfico de volumen
+        agregar_volumen(fig, df_plot, verbose)
         
-        # Subplot 3: MACD
-        ax3 = fig.add_subplot(gs[2], sharex=ax1)
-        generar_grafico_macd(symbol, df, ax3, verbose)
+        # 3. Indicadores de momento
+        agregar_indicadores_momento(fig, df_plot, verbose)
         
-        # Subplot 4: Fuerza de señal
-        ax4 = fig.add_subplot(gs[3], sharex=ax1)
-        generar_grafico_fuerza_señal(symbol, df, ax4, verbose)
+        # 4. MACD
+        agregar_macd(fig, df_plot, verbose)
         
-        plt.tight_layout()
+        # 5. Indicadores de tendencia
+        agregar_indicadores_tendencia(fig, df_plot, verbose)
         
-        nombre_archivo = f"{user_name}_grafico_{symbol}_{estrategia}_{timestamp}.png"
+        # 6. Fuerza de señal
+        agregar_fuerza_señal(fig, df_plot, verbose)
+        
+        # 7. Señales de trading sobre el gráfico de velas (MEJORADO)
+        agregar_señales_trading_mejoradas(fig, df_plot, verbose)
+        
+        # Actualizar layout
+        fig.update_layout(
+            title=f'Análisis Completo - {symbol} | Estrategia: {estrategia}',
+            height=1400,
+            showlegend=True,
+            xaxis_rangeslider_visible=False
+        )
+        
+        # Configurar ejes
+        fig.update_xaxes(title_text='Fecha y Hora', row=6, col=1)
+        fig.update_yaxes(title_text='Precio', row=1, col=1)
+        fig.update_yaxes(title_text='Volumen', row=2, col=1)
+        fig.update_yaxes(title_text='Momento', row=3, col=1)
+        fig.update_yaxes(title_text='MACD', row=4, col=1)
+        fig.update_yaxes(title_text='Tendencia', row=5, col=1)
+        fig.update_yaxes(title_text='Fuerza', row=6, col=1, range=[-1, 1])
+        
+        nombre_archivo = f"{user_name}_grafico_interactivo_{symbol}_{estrategia}_{timestamp}.html"
         ruta_archivo = f"/app/tmp/{nombre_archivo}"
-        plt.savefig(ruta_archivo, dpi=150, bbox_inches='tight')
-        plt.close()
+        fig.write_html(ruta_archivo)
         
         if verbose:
-            print(f"        ✅ Gráfico individual generado: {symbol}")
+            print(f"        ✅ Gráfico interactivo generado: {symbol}")
         
         return ruta_archivo
         
     except Exception as e:
         if verbose:
-            print(f"        ❌ Error generando gráfico individual {symbol}: {e}")
+            print(f"        ❌ Error generando gráfico interactivo {symbol}: {e}")
         return None
 
-
-
-def generar_grafico_velas_decisiones(symbol, df, ax, verbose=False):
-    """
-    Genera gráfico de velas japonesas con decisiones de trading.
-    """
+def agregar_velas_japonesas(fig, df, symbol, verbose=False):
+    """Agrega gráfico de velas japonesas al subplot."""
     try:
-        # Tomar últimos 50 registros para mejor visualización
-        df_plot = df.tail(50).copy()
+        # Gráfico de velas
+        fig.add_trace(
+            go.Candlestick(
+                x=df['datetime'],
+                open=df['Open'],
+                high=df['High'],
+                low=df['Low'],
+                close=df['Close'],
+                name=f'Velas {symbol}'
+            ),
+            row=1, col=1
+        )
         
-        # Convertir datetime si es necesario
-        if 'datetime' in df_plot.columns:
-            fechas = pd.to_datetime(df_plot['datetime'])
+        # Agregar Bandas de Bollinger si existen
+        if all(col in df.columns for col in ['Bollinger_Upper', 'Bollinger_Lower']):
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['Bollinger_Upper'],
+                    name='Bollinger Upper',
+                    line=dict(color=COLORES['bollinger_upper'], width=1)
+                ),
+                row=1, col=1
+            )
+            
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['Bollinger_Lower'],
+                    name='Bollinger Lower',
+                    line=dict(color=COLORES['bollinger_lower'], width=1),
+                    fill='tonexty',
+                    fillcolor=COLORES['bollinger_band']
+                ),
+                row=1, col=1
+            )
+        elif verbose:
+            print(f"          ⚠️ Bandas de Bollinger no encontradas para {symbol}")
+            
+        # Agregar Parabolic SAR si existe
+        if 'SAR' in df.columns:
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['SAR'],
+                    name='Parabolic SAR',
+                    mode='markers',
+                    marker=dict(
+                        size=4,
+                        color=COLORES['sar'],
+                        symbol='circle'
+                    )
+                ),
+                row=1, col=1
+            )
+        elif verbose:
+            print(f"          ⚠️ Parabolic SAR no encontrado para {symbol}")
+            
+        # Agregar Ichimoku Cloud si existe
+        if all(col in df.columns for col in ['Ichimoku_Base', 'Ichimoku_Conversion', 'Ichimoku_A', 'Ichimoku_B']):
+            # Líneas de conversión y base
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['Ichimoku_Conversion'],
+                    name='Ichimoku Conversion',
+                    line=dict(color=COLORES['ichimoku'], width=1, dash='dot')
+                ),
+                row=1, col=1
+            )
+            
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['Ichimoku_Base'],
+                    name='Ichimoku Base',
+                    line=dict(color=COLORES['ichimoku'], width=1, dash='dash')
+                ),
+                row=1, col=1
+            )
+            
+            # Nube Ichimoku
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['Ichimoku_A'],
+                    name='Ichimoku A',
+                    line=dict(color='rgba(0,0,0,0)')
+                ),
+                row=1, col=1
+            )
+            
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['Ichimoku_B'],
+                    name='Ichimoku B',
+                    line=dict(color='rgba(0,0,0,0)'),
+                    fill='tonexty',
+                    fillcolor='rgba(30, 144, 255, 0.2)'
+                ),
+                row=1, col=1
+            )
+        elif verbose:
+            print(f"          ⚠️ Ichimoku Cloud no encontrado para {symbol}")
+            
+    except Exception as e:
+        if verbose:
+            print(f"          ❌ Error agregando velas: {e}")
+
+def agregar_volumen(fig, df, verbose=False):
+    """Agrega gráfico de volumen al subplot."""
+    try:
+        if 'Volume' in df.columns:
+            # Crear colores para el volumen (verde para subida, rojo para bajada)
+            colors = ['green' if close >= open_ else 'red' 
+                     for close, open_ in zip(df['Close'], df['Open'])]
+            
+            fig.add_trace(
+                go.Bar(
+                    x=df['datetime'],
+                    y=df['Volume'],
+                    name='Volumen',
+                    marker_color=colors,
+                    opacity=0.7
+                ),
+                row=2, col=1
+            )
+            
         else:
-            fechas = df_plot.index
-        
-        # Preparar datos para velas
-        opens = df_plot['Open'].values
-        highs = df_plot['High'].values
-        lows = df_plot['Low'].values
-        closes = df_plot['Close'].values
-        
-        # Crear gráfico de velas básico
-        for i in range(len(df_plot)):
-            color = COLORES['vela_alcista'] if closes[i] >= opens[i] else COLORES['vela_bajista']
-            
-            # Línea vertical (alto-bajo)
-            ax.plot([fechas[i], fechas[i]], [lows[i], highs[i]], color='black', linewidth=1)
-            
-            # Cuerpo de la vela
-            body_bottom = min(opens[i], closes[i])
-            body_top = max(opens[i], closes[i])
-            body_height = body_top - body_bottom
-            
-            if body_height > 0:
-                rect = Rectangle((fechas[i] - pd.Timedelta(hours=2), body_bottom), 
-                               pd.Timedelta(hours=4), body_height, 
-                               facecolor=color, edgecolor='black')
-                ax.add_patch(rect)
-        
-        # Añadir decisiones de trading
-        if 'estrategia_mayoritaria' in df_plot.columns:
-            for i in range(len(df_plot)):
-                decision = df_plot.iloc[i]['estrategia_mayoritaria']
-                precio = df_plot.iloc[i]['Close']
+            if verbose:
+                print(f"          ⚠️ Volumen no encontrado")
                 
-                if 'COMPRA_FUERTE' in str(decision):
-                    ax.plot(fechas[i], precio, '^', markersize=8, color='green', label='Compra Fuerte' if i == 0 else "")
-                elif 'COMPRA' in str(decision):
-                    ax.plot(fechas[i], precio, '^', markersize=6, color='lightgreen', label='Compra' if i == 0 else "")
-                elif 'VENTA_FUERTE' in str(decision):
-                    ax.plot(fechas[i], precio, 'v', markersize=8, color='red', label='Venta Fuerte' if i == 0 else "")
-                elif 'VENTA' in str(decision):
-                    ax.plot(fechas[i], precio, 'v', markersize=6, color='lightcoral', label='Venta' if i == 0 else "")
-        
-        ax.set_title(f'Velas Japonesas - {symbol} con Decisiones de Trading', fontweight='bold')
-        ax.set_ylabel('Precio')
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-        
-        # Formatear fechas
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
-        ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
-        plt.xticks(rotation=45)
-        
     except Exception as e:
         if verbose:
-            print(f"          ❌ Error en gráfico velas: {e}")
-        ax.text(0.5, 0.5, 'Error generando velas', ha='center', va='center', transform=ax.transAxes)
+            print(f"          ❌ Error agregando volumen: {e}")
 
-
-
-def generar_grafico_rsi(symbol, df, ax, verbose=False):
-    """
-    Genera gráfico de RSI.
-    """
+def agregar_indicadores_momento(fig, df, verbose=False):
+    """Agrega indicadores de momento al subplot."""
     try:
-        df_plot = df.tail(50).copy()
+        # RSI
+        if 'RSI' in df.columns:
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['RSI'],
+                    name='RSI',
+                    line=dict(color='purple', width=1)
+                ),
+                row=3, col=1
+            )
+            
+            # Líneas de sobrecompra y sobreventa
+            fig.add_hline(y=70, line_dash="dash", line_color="red", row=3, col=1)
+            fig.add_hline(y=30, line_dash="dash", line_color="green", row=3, col=1)
+        elif verbose:
+            print(f"          ⚠️ RSI no encontrado")
         
-        if 'datetime' in df_plot.columns:
-            fechas = pd.to_datetime(df_plot['datetime'])
-        else:
-            fechas = df_plot.index
+        # Estocástico
+        if all(col in df.columns for col in ['Stochastic_K', 'Stochastic_D']):
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['Stochastic_K'],
+                    name='Stochastic %K',
+                    line=dict(color=COLORES['stochastic'], width=1)
+                ),
+                row=3, col=1
+            )
+            
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['Stochastic_D'],
+                    name='Stochastic %D',
+                    line=dict(color=COLORES['stochastic'], width=1, dash='dash')
+                ),
+                row=3, col=1
+            )
+            
+            # Líneas de sobrecompra y sobreventa para Estocástico
+            fig.add_hline(y=80, line_dash="dot", line_color="red", row=3, col=1)
+            fig.add_hline(y=20, line_dash="dot", line_color="green", row=3, col=1)
+        elif verbose:
+            print(f"          ⚠️ Estocástico no encontrado")
         
-        if 'RSI' in df_plot.columns:
-            ax.plot(fechas, df_plot['RSI'], color='purple', linewidth=2, label='RSI')
-            ax.axhline(y=70, color='red', linestyle='--', alpha=0.7, label='Sobrecopra (70)')
-            ax.axhline(y=30, color='green', linestyle='--', alpha=0.7, label='Sobreventa (30)')
-            ax.fill_between(fechas, 70, df_plot['RSI'], where=(df_plot['RSI'] >= 70), 
-                          color='red', alpha=0.3)
-            ax.fill_between(fechas, 30, df_plot['RSI'], where=(df_plot['RSI'] <= 30), 
-                          color='green', alpha=0.3)
-        
-        ax.set_title('RSI - Relative Strength Index', fontweight='bold')
-        ax.set_ylabel('RSI')
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-        ax.set_ylim(0, 100)
-        
+        # Williams %R
+        if 'Williams_R' in df.columns:
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['Williams_R'],
+                    name='Williams %R',
+                    line=dict(color=COLORES['williams'], width=1)
+                ),
+                row=3, col=1
+            )
+        elif verbose:
+            print(f"          ⚠️ Williams %R no encontrado")
+            
     except Exception as e:
         if verbose:
-            print(f"          ❌ Error en gráfico RSI: {e}")
-        ax.text(0.5, 0.5, 'Error generando RSI', ha='center', va='center', transform=ax.transAxes)
+            print(f"          ❌ Error agregando indicadores de momento: {e}")
 
-
-
-def generar_grafico_macd(symbol, df, ax, verbose=False):
-    """
-    Genera gráfico de MACD.
-    """
+def agregar_macd(fig, df, verbose=False):
+    """Agrega MACD al subplot."""
     try:
-        df_plot = df.tail(50).copy()
-        
-        if 'datetime' in df_plot.columns:
-            fechas = pd.to_datetime(df_plot['datetime'])
-        else:
-            fechas = df_plot.index
-        
-        if all(col in df_plot.columns for col in ['MACD', 'MACD_signal']):
-            ax.plot(fechas, df_plot['MACD'], color='blue', linewidth=2, label='MACD')
-            ax.plot(fechas, df_plot['MACD_signal'], color='red', linewidth=2, label='Señal MACD')
+        if all(col in df.columns for col in ['MACD', 'MACD_signal']):
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['MACD'],
+                    name='MACD',
+                    line=dict(color='blue', width=1)
+                ),
+                row=4, col=1
+            )
+            
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['MACD_signal'],
+                    name='Señal MACD',
+                    line=dict(color='red', width=1)
+                ),
+                row=4, col=1
+            )
             
             # Histograma MACD
-            if 'MACD_hist' in df_plot.columns:
-                colors_hist = ['green' if x >= 0 else 'red' for x in df_plot['MACD_hist']]
-                ax.bar(fechas, df_plot['MACD_hist'], color=colors_hist, alpha=0.3, label='Histograma MACD')
-        
-        ax.set_title('MACD - Moving Average Convergence Divergence', fontweight='bold')
-        ax.set_ylabel('MACD')
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-        ax.axhline(y=0, color='black', linestyle='-', alpha=0.5)
-        
+            if 'MACD_hist' in df.columns:
+                colors_hist = ['green' if x >= 0 else 'red' for x in df['MACD_hist']]
+                fig.add_trace(
+                    go.Bar(
+                        x=df['datetime'],
+                        y=df['MACD_hist'],
+                        name='Histograma MACD',
+                        marker_color=colors_hist,
+                        opacity=0.5
+                    ),
+                    row=4, col=1
+                )
+        elif verbose:
+            print(f"          ⚠️ MACD no encontrado")
+                
     except Exception as e:
         if verbose:
-            print(f"          ❌ Error en gráfico MACD: {e}")
-        ax.text(0.5, 0.5, 'Error generando MACD', ha='center', va='center', transform=ax.transAxes)
+            print(f"          ❌ Error agregando MACD: {e}")
 
-
-
-def generar_grafico_fuerza_señal(symbol, df, ax, verbose=False):
-    """
-    Genera gráfico de fuerza de señal con semáforo.
-    """
+def agregar_indicadores_tendencia(fig, df, verbose=False):
+    """Agrega indicadores de tendencia al subplot."""
     try:
-        df_plot = df.tail(50).copy()
-        
-        if 'datetime' in df_plot.columns:
-            fechas = pd.to_datetime(df_plot['datetime'])
-        else:
-            fechas = df_plot.index
-        
-        if 'fuerza_señal' in df_plot.columns:
-            # Gráfico de línea de fuerza
-            ax.plot(fechas, df_plot['fuerza_señal'], color='orange', linewidth=2, label='Fuerza de Señal')
+        # ADX
+        if 'ADX' in df.columns:
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['ADX'],
+                    name='ADX',
+                    line=dict(color=COLORES['adx'], width=2)
+                ),
+                row=5, col=1
+            )
             
-            # Áreas de semáforo
-            ax.fill_between(fechas, 0.7, 1, where=(df_plot['fuerza_señal'] >= 0.7), 
-                          color='green', alpha=0.3, label='Compra Fuerte')
-            ax.fill_between(fechas, 0.3, 0.7, where=(df_plot['fuerza_señal'] >= 0.3), 
-                          color='lightgreen', alpha=0.3, label='Compra')
-            ax.fill_between(fechas, -0.3, 0.3, where=(abs(df_plot['fuerza_señal']) <= 0.3), 
-                          color='yellow', alpha=0.3, label='Hold')
-            ax.fill_between(fechas, -0.7, -0.3, where=(df_plot['fuerza_señal'] <= -0.3), 
-                          color='lightcoral', alpha=0.3, label='Venta')
-            ax.fill_between(fechas, -1, -0.7, where=(df_plot['fuerza_señal'] <= -0.7), 
-                          color='red', alpha=0.3, label='Venta Fuerte')
-        
-        ax.set_title('Fuerza de Señal - Semáforo de Trading', fontweight='bold')
-        ax.set_ylabel('Fuerza')
-        ax.set_xlabel('Fecha y Hora')
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-        ax.axhline(y=0, color='black', linestyle='-', alpha=0.5)
-        ax.set_ylim(-1, 1)
-        
+            # Línea de referencia para ADX (25 típicamente)
+            fig.add_hline(y=25, line_dash="dash", line_color="orange", row=5, col=1)
+        elif verbose:
+            print(f"          ⚠️ ADX no encontrado")
+            
+        # Fibonacci Retracement (simplificado - mostramos niveles clave)
+        if all(col in df.columns for col in ['Fibonacci_0', 'Fibonacci_23.6', 'Fibonacci_38.2', 'Fibonacci_61.8', 'Fibonacci_100']):
+            niveles_fib = ['0', '23.6', '38.2', '61.8', '100']
+            for nivel in niveles_fib:
+                col_name = f'Fibonacci_{nivel}'
+                if col_name in df.columns:
+                    fig.add_trace(
+                        go.Scatter(
+                            x=df['datetime'],
+                            y=df[col_name],
+                            name=f'Fib {nivel}%',
+                            line=dict(color=COLORES['fibonacci'], width=1, dash='dot'),
+                            opacity=0.7
+                        ),
+                        row=5, col=1
+                    )
+        elif verbose:
+            print(f"          ⚠️ Fibonacci Retracement no encontrado")
+            
     except Exception as e:
         if verbose:
-            print(f"          ❌ Error en gráfico fuerza señal: {e}")
-        ax.text(0.5, 0.5, 'Error generando fuerza señal', ha='center', va='center', transform=ax.transAxes)
+            print(f"          ❌ Error agregando indicadores de tendencia: {e}")
 
-
-
-def generar_infografia_resumen(resultados_trading, estrategia, user_name, timestamp, verbose=False):
-    """
-    Genera infografía completa con resumen ejecutivo.
-    """
+def agregar_fuerza_señal(fig, df, verbose=False):
+    """Agrega gráfico de fuerza de señal al subplot."""
     try:
-        fig = plt.figure(figsize=(20, 15))
-        fig.suptitle(f'INFOGRAFÍA COMPLETA - SISTEMA DE TRADING IA\n'
-                    f'Usuario: {user_name} | Estrategia: {estrategia.upper()} | Fecha: {timestamp}', 
-                    fontsize=18, fontweight='bold', color=COLORES['texto'])
-        
-        # Layout de infografía
-        gs = plt.GridSpec(4, 4, figure=fig)
-        
-        # Título principal
-        ax_title = fig.add_subplot(gs[0, :])
-        ax_title.axis('off')
-        ax_title.text(0.5, 0.5, 'REPORTE DE ANÁLISIS TÉCNICO AVANZADO', 
-                     fontsize=24, fontweight='bold', ha='center', va='center', 
-                     color=COLORES['texto'])
-        
-        # Métricas principales
-        ax_metricas = fig.add_subplot(gs[1, :2])
-        generar_metricas_principales(resultados_trading, ax_metricas, verbose)
-        
-        # Recomendaciones
-        ax_recomendaciones = fig.add_subplot(gs[1, 2:])
-        generar_recomendaciones_estrategia(resultados_trading, ax_recomendaciones, verbose)
-        
-        # Heatmap de señales
-        ax_heatmap = fig.add_subplot(gs[2, :])
-        generar_heatmap_señales(resultados_trading, ax_heatmap, verbose)
-        
-        # Performance temporal
-        ax_performance = fig.add_subplot(gs[3, :2])
-        generar_performance_temporal(resultados_trading, ax_performance, verbose)
-        
-        # Leyenda y explicación
-        ax_leyenda = fig.add_subplot(gs[3, 2:])
-        generar_leyenda_explicacion(ax_leyenda, verbose)
-        
-        plt.tight_layout()
-        
-        nombre_archivo = f"{user_name}_infografia_{estrategia}_{timestamp}.png"
-        ruta_archivo = f"/app/tmp/{nombre_archivo}"
-        plt.savefig(ruta_archivo, dpi=150, bbox_inches='tight')
-        plt.close()
-        
-        if verbose:
-            print(f"      ✅ Infografía generada: {nombre_archivo}")
-        
-        return ruta_archivo
-        
+        if 'fuerza_señal' in df.columns:
+            fig.add_trace(
+                go.Scatter(
+                    x=df['datetime'],
+                    y=df['fuerza_señal'],
+                    name='Fuerza Señal',
+                    line=dict(color='orange', width=2),
+                    fill='tozeroy',
+                    fillcolor='rgba(255,165,0,0.1)'
+                ),
+                row=6, col=1
+            )
+            
+            # Líneas de referencia
+            fig.add_hline(y=0.7, line_dash="dash", line_color="green", row=6, col=1)
+            fig.add_hline(y=0.3, line_dash="dash", line_color="lightgreen", row=6, col=1)
+            fig.add_hline(y=-0.3, line_dash="dash", line_color="lightcoral", row=6, col=1)
+            fig.add_hline(y=-0.7, line_dash="dash", line_color="red", row=6, col=1)
+            fig.add_hline(y=0, line_color="black", row=6, col=1)
+            
+        else:
+            if verbose:
+                print(f"          ⚠️ Fuerza de señal no encontrada")
+            
     except Exception as e:
         if verbose:
-            print(f"      ❌ Error generando infografía: {e}")
-        return None
+            print(f"          ❌ Error agregando fuerza señal: {e}")
 
-
-
-def generar_metricas_principales(resultados_trading, ax, verbose=False):
-    """
-    Genera panel de métricas principales.
-    """
+def agregar_señales_trading_mejoradas(fig, df, verbose=False):
+    """Agrega señales de trading mejoradas con flechas y triángulos."""
     try:
-        ax.axis('off')
-        
-        # Calcular métricas
-        total_symbols = len(resultados_trading)
-        symbols_con_datos = sum(1 for df in resultados_trading.values() if len(df) > 0)
-        
-        señales_compra = 0
-        señales_venta = 0
-        fuerza_promedio = 0
-        count_fuerza = 0
-        
-        for symbol, df in resultados_trading.items():
-            if len(df) > 0:
-                ultimo = df.iloc[-1]
-                señal = ultimo.get('estrategia_mayoritaria', '')
-                fuerza = ultimo.get('fuerza_señal', 0)
+        if 'estrategia_mayoritaria' in df.columns:
+            # Filtrar solo las filas con señales relevantes
+            señales_df = df[df['estrategia_mayoritaria'].notna()].copy()
+            
+            for _, row in señales_df.iterrows():
+                señal = str(row['estrategia_mayoritaria'])
+                fuerza = row.get('fuerza_señal', 0)
+                precio = row['High'] * 1.02  # Mostrar ligeramente arriba del high
                 
-                if 'COMPRA' in señal:
-                    señales_compra += 1
-                elif 'VENTA' in señal:
-                    señales_venta += 1
+                # Determinar símbolo y tamaño basado en la fuerza
+                if 'COMPRA_FUERTE' in señal or 'VENTA_FUERTE' in señal:
+                    # Usar flechas para señales fuertes
+                    simbolo = 'arrow-up' if 'COMPRA' in señal else 'arrow-down'
+                    # Tamaño basado en fuerza (3x el tamaño base para 100% de fuerza)
+                    tamaño_base = 15
+                    tamaño = tamaño_base + (abs(fuerza) * 2 * tamaño_base) if pd.notna(fuerza) else tamaño_base * 2
+                    color = 'green' if 'COMPRA' in señal else 'red'
+                    texto = f"{señal}<br>Fuerza: {fuerza:.2f}"
+                else:
+                    # Usar triángulos para señales normales
+                    simbolo = 'triangle-up' if 'COMPRA' in señal else 'triangle-down'
+                    tamaño = 12
+                    color = 'lightgreen' if 'COMPRA' in señal else 'lightcoral'
+                    texto = f"{señal}<br>Fuerza: {fuerza:.2f}" if pd.notna(fuerza) else señal
                 
-                if pd.notna(fuerza):
-                    fuerza_promedio += abs(fuerza)
-                    count_fuerza += 1
-        
-        if count_fuerza > 0:
-            fuerza_promedio /= count_fuerza
-        
-        # Crear texto con métricas
-        texto_metricas = f"""
-        📊 MÉTRICAS PRINCIPALES
-        
-        • Total Símbolos Analizados: {total_symbols}
-        • Símbolos con Datos: {symbols_con_datos}
-        • Señales COMPRA: {señales_compra}
-        • Señales VENTA: {señales_venta}
-        • Señales HOLD: {symbols_con_datos - señales_compra - señales_venta}
-        • Fuerza Promedio: {fuerza_promedio:.2f}
-        • Confianza del Sistema: {(symbols_con_datos/total_symbols*100 if total_symbols>0 else 0):.1f}%
-        
-        🎯 EFICACIA ESTIMADA
-        • Precisión Histórica: 72.3%
-        • Risk/Reward Ratio: 1:2.5
-        • Win Rate: 68.5%
-        """
-        
-        ax.text(0.1, 0.9, texto_metricas, fontsize=12, fontweight='bold', 
-               va='top', ha='left', linespacing=1.5,
-               bbox=dict(boxstyle="round,pad=1", facecolor='lightblue', alpha=0.7))
-        
-    except Exception as e:
-        if verbose:
-            print(f"        ❌ Error en métricas principales: {e}")
-
-
-
-def generar_recomendaciones_estrategia(resultados_trading, ax, verbose=False):
-    """
-    Genera panel de recomendaciones de estrategia.
-    """
-    try:
-        ax.axis('off')
-        
-        # Obtener top recomendaciones
-        top_compras = []
-        top_ventas = []
-        
-        for symbol, df in resultados_trading.items():
-            if len(df) > 0:
-                ultimo = df.iloc[-1]
-                señal = ultimo.get('estrategia_mayoritaria', '')
-                fuerza = ultimo.get('fuerza_señal', 0)
-                precio = ultimo.get('Close', 0)
+                fig.add_trace(
+                    go.Scatter(
+                        x=[row['datetime']],
+                        y=[precio],
+                        mode='markers+text',
+                        marker=dict(
+                            symbol=simbolo,
+                            size=tamaño,
+                            color=color,
+                            line=dict(width=2, color='black')
+                        ),
+                        text=[f" {señal.split('_')[0]}"],
+                        textposition="top center",
+                        name=señal,
+                        hovertemplate=texto,
+                        showlegend=False
+                    ),
+                    row=1, col=1
+                )
                 
-                if 'COMPRA' in señal and fuerza > 0.5:
-                    top_compras.append((symbol, fuerza, precio))
-                elif 'VENTA' in señal and fuerza < -0.5:
-                    top_ventas.append((symbol, abs(fuerza), precio))
-        
-        # Ordenar y tomar top 3
-        top_compras.sort(key=lambda x: x[1], reverse=True)
-        top_ventas.sort(key=lambda x: x[1], reverse=True)
-        
-        texto_recomendaciones = "🎯 RECOMENDACIONES PRINCIPALES\n\n"
-        texto_recomendaciones += "🟢 TOP COMPRAS:\n"
-        
-        for i, (symbol, fuerza, precio) in enumerate(top_compras[:3]):
-            texto_recomendaciones += f"{i+1}. {symbol}: Fuerza {fuerza:.2f} | Precio ${precio:.2f}\n"
-        
-        texto_recomendaciones += "\n🔴 TOP VENTAS:\n"
-        for i, (symbol, fuerza, precio) in enumerate(top_ventas[:3]):
-            texto_recomendaciones += f"{i+1}. {symbol}: Fuerza {fuerza:.2f} | Precio ${precio:.2f}\n"
-        
-        texto_recomendaciones += f"\n⏰ Hora de generación: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-        
-        ax.text(0.1, 0.9, texto_recomendaciones, fontsize=11, fontweight='bold',
-               va='top', ha='left', linespacing=1.4,
-               bbox=dict(boxstyle="round,pad=1", facecolor='lightgreen', alpha=0.7))
-        
+        else:
+            if verbose:
+                print(f"          ⚠️ No se encontraron señales de trading")
+                
     except Exception as e:
         if verbose:
-            print(f"        ❌ Error en recomendaciones: {e}")
-
-
-
-def generar_performance_temporal(resultados_trading, ax, verbose=False):
-    """
-    Genera gráfico de performance temporal.
-    """
-    try:
-        # Aquí se podría implementar tracking de performance histórica
-        # Por ahora mostramos un placeholder
-        
-        ax.axis('off')
-        ax.text(0.5, 0.5, 'TRACKING DE PERFORMANCE\n\n(En desarrollo)\n\n'
-               '• Performance histórica\n• Drawdown analysis\n• Sharpe ratio\n• Volatilidad',
-               fontsize=14, fontweight='bold', ha='center', va='center',
-               bbox=dict(boxstyle="round,pad=1", facecolor='lightyellow', alpha=0.7))
-        
-    except Exception as e:
-        if verbose:
-            print(f"        ❌ Error en performance temporal: {e}")
-
-
-
-def generar_leyenda_explicacion(ax, verbose=False):
-    """
-    Genera leyenda y explicación del sistema.
-    """
-    try:
-        ax.axis('off')
-        
-        texto_leyenda = """
-        📖 LEYENDA DEL SISTEMA
-        
-        🟢 COMPRA_FUERTE: Múltiples indicadores coinciden en compra
-        🟢 COMPRA: Señal de compra con buena confirmación
-        🟡 HOLD: Esperar mejores condiciones de entrada
-        🔴 VENTA: Señal de venta con confirmación
-        🔴 VENTA_FUERTE: Múltiples indicadores coinciden en venta
-        
-        📈 FUERZA DE SEÑAL:
-        • 0.7-1.0: Señal muy fuerte
-        • 0.3-0.7: Señal fuerte  
-        • -0.3-0.3: Señal débil
-        • -0.7-0.3: Señal fuerte (venta)
-        • -1.0-0.7: Señal muy fuerte (venta)
-        
-        ⚠️ ADVERTENCIA: Este es un sistema de apoyo
-        a la decisión. Verificar siempre con análisis
-        fundamental y condiciones de mercado.
-        """
-        
-        ax.text(0.1, 0.9, texto_leyenda, fontsize=10, 
-               va='top', ha='left', linespacing=1.4,
-               bbox=dict(boxstyle="round,pad=1", facecolor='lightgray', alpha=0.7))
-        
-    except Exception as e:
-        if verbose:
-            print(f"        ❌ Error en leyenda: {e}")
+            print(f"          ❌ Error agregando señales trading mejoradas: {e}")
 
 
 
@@ -973,9 +710,7 @@ def generar_leyenda_explicacion(ax, verbose=False):
 """
 # Función principal para uso externo
 def main():
-    
-    # Función principal para ejecución independiente.
-    
+    #Función principal para ejecución independiente.
     import sys
     
     if len(sys.argv) < 4:
@@ -995,5 +730,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 """
