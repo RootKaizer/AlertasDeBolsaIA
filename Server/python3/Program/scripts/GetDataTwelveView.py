@@ -70,6 +70,7 @@ def obtener_datos_historicos(intervalo, tiempo_atras, verbose=False, symbols=Non
 
     # Obtener datos históricos
     historico_mercados_hasta_hoy = {}
+    simbolos_fallidos = []
     
     for symbol in symbols:
         if verbose:
@@ -82,22 +83,24 @@ def obtener_datos_historicos(intervalo, tiempo_atras, verbose=False, symbols=Non
             end_date=end_date,
             verbose=verbose
         )
-        historico_mercados_hasta_hoy[symbol] = datos_symbol
         
-        if verbose:
-            if datos_symbol is not None:
-                if "values" in datos_symbol:
-                    print(f"      ✅ Datos obtenidos para {symbol}: {len(datos_symbol['values'])} registros")
-                else:
-                    print(f"      ✅ Datos obtenidos para {symbol} (formato diferente)")
-            else:
-                print(f"      ❌ No se pudieron obtener datos para {symbol}")
+        # SOLO agregar símbolos que tengan datos válidos
+        if datos_symbol is not None and 'values' in datos_symbol and datos_symbol['values']:
+            historico_mercados_hasta_hoy[symbol] = datos_symbol
+            if verbose:
+                print(f"      ✅ Datos obtenidos para {symbol}: {len(datos_symbol['values'])} registros")
+        else:
+            simbolos_fallidos.append(symbol)
+            if verbose:
+                print(f"      ❌ No se pudieron obtener datos válidos para {symbol}")
 
     # Verificar si al menos algunos símbolos obtuvieron datos
-    simbolos_con_datos = [sym for sym, data in historico_mercados_hasta_hoy.items() if data is not None]
+    simbolos_con_datos = list(historico_mercados_hasta_hoy.keys())
     
     if verbose:
         print(f"    ✅ Se obtuvieron datos para {len(simbolos_con_datos)} de {len(symbols)} símbolos")
+        if simbolos_fallidos:
+            print(f"    ❌ Símbolos fallidos: {simbolos_fallidos}")
     
     if not simbolos_con_datos:
         error_msg = "No se pudieron obtener datos para ningún símbolo"
@@ -106,6 +109,9 @@ def obtener_datos_historicos(intervalo, tiempo_atras, verbose=False, symbols=Non
         else:
             print(f"❌ {error_msg}")
         return None
+    
+    if verbose:
+        print(f"    🎯 Símbolos exitosos para análisis: {simbolos_con_datos}")
     
     return historico_mercados_hasta_hoy
 
