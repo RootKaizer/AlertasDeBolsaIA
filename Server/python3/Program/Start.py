@@ -104,6 +104,7 @@ def main():
         debug.escribir_paso(1, "obtener_indices_mercado", {}, 
                           respuesta=f"Índices obtenidos: {len(resultados_trading)} símbolos")
 
+
         # Paso 2: Mostrar resultados
         debug.escribir_paso(2, "mostrar_resultados", {
             "estrategia": estrategia,
@@ -113,13 +114,38 @@ def main():
         print(f"\n📈 PASO 2: Mostrando resultados para {len(resultados_trading)} símbolos...")
         mostrar_resultados_trading(estrategia, resultados_trading, "actuales")
 
+
+        # Paso 3: Generación de Reportes Excel y Dashboard
+        debug.escribir_paso(3, "generar_reportes_excel_dashboard", {
+            "estrategia": estrategia,
+            "user_name": "Sistema_IA",  # o obtener de configuración
+            "resultados_count": len(resultados_trading)
+        })
+
+        print(f"\n📊 PASO 3: Generando reportes Excel y dashboard...")
+        from scripts.CreateReportExcelAndDashboard import generar_reporte_excel_dashboard
+
+        archivos_reportes = generar_reporte_excel_dashboard(
+            resultados_trading, 
+            estrategia, 
+            "Sistema_IA",  # username
+            modo_debug
+        )
+
+        if archivos_reportes:
+            debug.escribir_paso(3, "generar_reportes_excel_dashboard", {}, 
+                            respuesta=f"Reportes generados: {len(archivos_reportes)} archivos")
+            print(f"✅ Reportes generados: {len(archivos_reportes)} archivos")
+        else:
+            print("❌ Error generando reportes")
+
         '''
-        # Paso 3: Notificaciones (opcional - puedes comentar si no quieres notificaciones)
+        # Paso 4: Notificaciones (opcional - puedes comentar si no quieres notificaciones)
         debug.escribir_paso(3, "procesar_notificaciones", {
             "estrategia": estrategia
         })
         
-        print(f"\n🔔 PASO 3: Procesando notificaciones...")
+        print(f"\n🔔 PASO 4: P  rocesando notificaciones...")
         # Aquí puedes agregar la lógica de notificaciones si la necesitas
         # resultado_notificacion = comparar_y_notificar(...)
         
