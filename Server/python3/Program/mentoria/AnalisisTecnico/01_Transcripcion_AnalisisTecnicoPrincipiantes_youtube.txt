@@ -1,0 +1,1146 @@
+Introducción
+0:00
+bienvenido a este curso de análisis técnico de day trading para principiantes en el que aprenderás cómo
+0:06
+analizar un gráfico siguiendo los conceptos más importantes del Análisis técnico en este curso encontrarás todo
+0:13
+lo que necesitas saber para saber analizar un gráfico y hacer day trading
+0:18
+de forma rentable empezando desde lo más básico Como por ejemplo Qué es el análisis técnico Cómo se mueve el
+0:26
+mercado Qué tipos de gráficos hay hasta lo más avanzado ciclos de Mercado Cómo
+0:32
+saber la dirección que se irá el precio y mejores indicadores para hacer trading En definitiva una vez hayas visto este
+0:39
+curso sabrás paso a paso cómo analizar un gráfico para hacer day trading en
+0:45
+forex acciones o criptomonedas Además mi canal está lleno de cursos completos que
+0:51
+complementarán todos y cada uno de los apartados que verás a continuación Así que si te quedas con las dudas respecto
+0:59
+a algo o quieres ampliar la información ves al primer comentario fijado o a la descripción de este vídeo y encontrarás
+1:06
+diferentes listas de seguimiento en las cuales podrás visualizar todos los cursos de trading gratis que tengo en mi
+1:18
+canal Empezando por lo más básico es decir qué es el análisis técnico el
+Qué es el Análisis Técnico
+1:24
+análisis técnico se podría definir como el conjunto de herramientas que utilizamos para analizar un un gráfico y
+1:31
+predecir la dirección futura de un activo da igual si la temporalidad del
+1:36
+gráfico es de un mes una hora o un minuto y da igual si el activo es una
+1:41
+acción una criptomoneda o una divisa el análisis técnico sabe que el precio de los activos financieros sigue
+1:48
+movimientos que se repiten en el tiempo así que a través de un conjunto de herramientas estudia el comportamiento
+1:55
+pasado del gráfico y Espera que esos movimientos sigan repitiendo en el presente y el futuro y cuando
+2:02
+hablamos de herramientas me refiero a dos tipos de herramientas concretas herramientas de acción del precio y
+2:08
+herramientas de indicadores Así que a continuación lo que vamos a hacer es definir el conjunto de elementos que
+2:16
+componen las herramientas de la acción del precio y las herramientas de los indicadores empezaremos definiendo Qué
+2:22
+es la acción del precio y empezaré por la acción del precio Simplemente porque es la parte más importante del Análisis
+Qué es la Acción del Precio
+2:28
+técnico y el hecho de dominar correctamente el conjunto de elementos que forman parte de las herramientas de
+2:35
+acción del precio permite que cualquier persona sepa Cómo analizar un gráfico y
+2:40
+pueda ser rentable haciendo trading y ganar dinero con ello sin embargo es cierto que en muchas ocasiones la acción
+2:47
+del precio necesita complementar o puede complementar con ciertos indicadores
+2:52
+pero eso es algo que veremos más adelante y sobre todo en la parte final del curso cuando hablemos del conjunto
+2:58
+de herramientas de indicadores la acción del precio es una técnica de análisis que se centra exclusivamente en los
+3:06
+movimientos del precio dejando de lado cualquier otro elemento que no sea nativo del propio precio entendiendo que
+3:13
+todo lo que necesitas saber y contemplar para predecir qué es lo que va a hacer a
+3:19
+continuación el mercado ya está descontado en el precio con lo que lo único que tienes que hacer es saber
+3:25
+analizar muy bien los movimientos que forma constantemente ese precio cuando
+3:30
+hablamos de precios Estamos hablando de gráficos un gráfico es la representación
+Qué es un Gráfico
+3:36
+visual del precio que vale un activo cuando un activo sube mucho lo que está
+3:41
+pasando Es que el precio del valor de ese activo está incrementando cuando un
+3:46
+activo cae mucho lo que está pasando Es que el precio del valor de ese activo se está reduciendo y en realidad si vamos
+3:54
+directamente a la pantalla hay muchos tipos de gráficos si venimos por aquí y
+4:00
+clicamos en trading View tenemos gráfico de barras que simplemente pues representa la información del precio que
+4:07
+vale un activo de este modo tenemos gráfico de velas de volumen tenemos
+4:14
+gráfico de líneas tenemos gráfico de
+4:20
+área tenemos gráfico de columnas tenemos gráfico de velas heikinchi tenemos
+4:28
+gráfico de renco es decir hay muchos tipos de gráficos sin embargo lo normal
+4:34
+es que cuando tú veas un gráfico lo veas de este modo con velas velas japonesas o
+4:40
+candlestick por qué Pues porque es la forma más precisa de y más eficiente de
+4:46
+representar la información del precio de un activo esto es una vela cada uno de
+4:53
+estos recuadros son velas las velas representan la información de un
+4:59
+conjunto de datos específico si tú pones velas de 4 horas Aquí tienes diferentes
+5:05
+temporalidades lo que ocurre es que cada vela representa la información que ha
+5:10
+ocurrido durante 4 horas Si tú pones velas de una hora cada vela es una hora
+5:16
+si las pones de un minuto cada vela es un minuto y si las pones semanales cada vela simplemente es una semana Entonces
+5:24
+el conjunto de velas interrelacionado entre sí nos da la información necesaria
+5:29
+para poder llevar a cabo el análisis técnico el gráfico de velas se origina en Japón de hecho los gráficos de velas
+5:36
+no han existido siempre fue en el siglo XVII cuando uno de los mejores analistas
+5:41
+técnicos de la historia Steve nisson descubre las velas japonesas mientras
+5:47
+investigaba y estudiaba los métodos de análisis que se utilizaban en el mercado de futuros del arroz evidentemente en
+5:54
+Japón Oye y cuál es toda esa información que nos dan las velas japonesas para que sea mucho mucho mejor que cualquier otra
+Qué son las Velas Japonesas
+6:01
+forma de análisis Bueno pues lo vamos a comentar rápidamente sin embargo recordar que abajo en el primer
+6:07
+comentario fijado uno de los cursos gratis que tengo es un curso de trading con velas japonesas o candlestick en el
+6:15
+cual desarrollo de forma más específica toda la información que vamos a comentar a partir de ahora entonces una vela
+6:22
+japonesa vela japonesa la podéis encontrar como vela
+6:28
+japonesa o como candlestick candlestick Vale entonces tiene como dos
+6:36
+partes principales parte número uno el cuerpo y parte número dos La Sombra cada
+6:44
+una de estas dos partes tiene una información distinta Qué significa cuerpo o sombra y ahora veremos
+6:50
+diferentes ejemplos de velas Eh pues esto de aquí es una vela y esto
+6:56
+es la vela como tal no esto de aquí lo más grueso esto es el
+7:02
+cuerpo y la parte superior y la parte inferior es la
+7:07
+sombra Entonces cuál es la información que nos da el cuerpo el cuerpo nos da el
+7:13
+punto de apertura más el cierre es decir en esta vela de aquí si
+7:21
+el mercado está yendo de abajo para arriba esto es el punto en el cual abre la vela y esto es el punto en el cual
+7:26
+cierra la vela ya está el cuerpo nos dice cuá abre y Cuándo cierra A qué precio y la sombra qué es lo que nos
+7:33
+dice el máximo y el mínimo Esto es lo que nos dice la sombra
+7:40
+Cómo se marca esto Pues aquí tenemos el punto máximo y aquí tenemos el punto mínimo durante un momento determinado lo
+7:47
+que ocurrió con esta vela es lo siguiente el precio Abre se va para arriba se va para arriba se va un
+7:53
+poquito para abajo y termina cerrando aquí y esto lo que genera es que Pues
+7:59
+mira la apertura es esta de aquí y el cierre es este de aquí perfecto pero luego tenemos de la apertura para abajo
+8:06
+una sombra y del cierre para arriba otra sombra Y esto es lo que forma una vela
+8:14
+qué es lo que ocurre siempre se tiene que ver así la vela no La respuesta es no lo que ocurre Es que la combinación
+8:21
+de diferentes formas en cuanto a cuerpo y en cuanto a sombra genera los
+8:27
+diferentes tipos de velas si tú tienes un cuerpo así no es lo mismo que si tú tienes un cuerpo así por qué hombre esta
+8:35
+vela es más alcista o más bajista si tú tienes una vela así no es lo mismo que
+8:41
+si tú tienes una vela con esta sombra aquí Qué significa esta vela significa
+8:47
+que el precio ha abierto ha ido muy para arriba y han terminado ganando los bajistas porque todo esto es sombra
+8:55
+Entonces si venimos por aquí esto es simplemente un PDF de formaciones de
+9:00
+velas que tenemos en trading lab pues puedes ver que la combinación de diferentes elementos fijaros aquí
+9:07
+tenemos un cuerpo muy pequeñito y mucha sombra por arriba y mucha sombra por abajo pues esto es una vela doji que
+9:14
+tiene unas características concretas de falta de fuerza falta de dirección en
+9:20
+cambio compara esta vela de aquí la doji con la vela envolvente alcista la cual
+9:26
+forma una vela de cuerpo muy grande de muy pocas sombras que además se come a la vela anterior demostrando Clara
+9:33
+dirección esto es una vela fuerte alcista con dirección entonces las
+9:38
+diferentes formaciones o las diferentes formas que tengan las velas y cómo se combinen entre sí determinan si es una
+9:46
+vela alcista si es una vela bajista o si es una vela de desaceleración Y esto es uno de los puntos más importantes de el
+9:52
+análisis técnico y concretamente de el análisis de la acción del precio sin embargo hay otro concepto muy importante
+9:59
+que es el concepto de fractalidad un concepto que ocurre en todos y cada uno de los elementos propios del análisis de
+10:07
+la acción del precio y que evidentemente también hay que tenerlo en cuenta en las velas japonesas o candlestick Y es que
+10:13
+por ejemplo lo que ocurra en las diferentes temporalidades en las cuales
+10:19
+tú puedas determinar la vela es importante Por ejemplo en una vela
+10:27
+mensual tendremos 30 velas diarias Entonces es muy importante entender esto
+10:34
+porque lo que puede parecer una vela mensual muy fuerte por ejemplo esta vela mensual de
+10:41
+aquí la vela mensual de el mes anterior de este activo es una vela mensual muy
+10:46
+fuerte pero esta vela mensual está compuesta de diferentes velas diarias en
+10:53
+criptomonedas serían 30 o 31 porque no cierra en ningún momento de todo el año
+10:59
+en forex pues hay que tener en cuenta que cierra los fines de semana con lo que hay que sumar los 30 31 días y
+11:06
+restar los 2 días por cuatro es decir los 8 días de fines de semana con lo
+11:11
+cual más o menos habría unas 22 23 velas aproximadamente diarias por cada una de
+11:18
+las de una vela mensual no Entonces es importante tenerlo en cuenta porque si bajamos de temporalidad en este caso qué
+11:26
+es lo que vemos dentro de esta vela mensual pues no quiero anticipar conceptos pero vemos movimientos
+11:32
+impulsivos correctivos impulsivos correctivos es decir tendencia ahora bien una vela mensual puede
+11:38
+interpretarse de muchas formas diferentes dentro de una de 30 o de 23
+11:44
+velas diarias y esto es algo que vamos a tener que tener muy presente y que poco a poco vamos a ir detallando durante el
+11:50
+curso pero quiero ya o quería ya de alguna forma ir marcando ciertas pinceladas ya que la interrelación entre
+11:58
+la la vela grande y el conjunto de velas inferior es clave y hemos hablado de una
+12:04
+vela mensual 23 velas diarias pero una vela diaria Cuántas velas horarias son
+12:11
+24 y una vela horaria Cuántas velas de un minuto son 60 y así sucesivamente y
+12:18
+el hecho de tú elegir en qué temporalidad quieres analizar en temporalidad de un minuto en
+12:23
+temporalidad de una hora en temporalidad de un día en qué temporalidad quieres tú analizar ese gráfico termina las
+12:30
+diferentes formas de análisis o mejor dicho las diferentes formas de hacer trading day trading swing trading o
+12:37
+scalping en base a simplemente que tú definas en qué temporalidad quieres analizar las velas y qué ocurre cuando
+12:44
+juntas un conjunto de velas japonesas que se forman patrones técnicos los patrones técnicos simplemente son
+Qué son los Patrones Técnicos
+12:50
+formaciones gráficas que se repiten como cualquier elemento del Análisis técnico en el tiempo y que nos dan la dirección
+12:58
+aur de un activo en un momento determinado hay diferentes tipos de patrones técnicos Y de nuevo pues lo que
+13:05
+voy a hacer es animarte a que vayas a ver el curso gratis de trading con patrones técnicos que tengo pero
+13:12
+podríamos catalogarlos en patrones de
+13:18
+continuación y patrones de reversión Qué significa esto Pues un patrón de
+13:24
+continuación significará que el precio está subiendo tiene lugar el patrón y el precio continúa subiendo En cambio un
+13:31
+patrón de reversión subiendo o bajando da igual significa que el precio está subiendo tiene lugar ese patrón y de
+13:38
+repente se forma en la dirección contraria Entonces como ya sabemos qué
+13:44
+patrón concreto es de reversión Y qué patrón concreto es de continuación en el
+13:49
+momento en el cual tú estás viendo que ese conjunto de velas forma un patrón determinado que la
+13:56
+forma de ese patrón ya es de continuación o de reversión vas hacia esa dirección o
+14:02
+hacia otra es decir compras o vendes luego es cierto que hay patrones que pueden ser tanto de continuación como de
+14:08
+reversión Pero esto ya son especificaciones concretas y del mismo modo las velas japonesas hay decenas y
+14:15
+decenas y centenares de velas japonesas los patrones hay centenares de patrones técnicos tenemos que conocerlos todas
+14:22
+las velas y todos los patrones no son los más importantes Entonces en este caso pues tengo otro PDF de los que
+14:29
+utilizamos en trading lab y aquí puedes ver pues diferentes tipos de patrones por ejemplo cuña ascendente es un
+14:35
+movimiento en el cual el precio vamos a hacer un poquito de zoom fíjate como está subiendo hace un pullback sigue
+14:42
+subiendo hace un pullback sigue subiendo y forma un patrón de tres toques en la parte superior y Pam se da la vuelta
+14:47
+pues esto es un patrón de reversión la cuña descendente es lo mismo pero al revés el doble techo Qué es pues un
+14:54
+patrón en el cual el precio está subiendo y cuando quiere volver a subir
+14:59
+no puede forma un doble techo y se da la vuelta pues esto es un patrón de reversión del mismo modo que el hombro
+15:06
+cabeza hombro y demás luego tenemos por ejemplo los triángulos el Triángulo puede ser tanto de continuación como de
+15:14
+reversión por eso comento aquí no voy a entrar a definir Cómo saber si un triángulo es de continuación o es de
+15:19
+reversión eso lo comento en el curso gratis de trading con patrones técnicos pero cuando tú estás viendo un doble
+15:26
+techo Por ejemplo tú ya sabes que esto es un patrón de reversión y que si tú vendes aquí lo más probable es que pues
+15:33
+puedas obtener una ganancia no y cuando digo lo más probable es que de operar 10
+15:38
+dobles techos igual no ganas dinero pero de operar 1000 sí que vas a ganar dinero porque ahí está un poco la ventaja
+15:44
+matemática ganadora a largo plazo sin embargo el Triángulo de reversión
+15:50
+empieza igual que el Triángulo de continuación el Triángulo de continuación también está cayendo y tú
+15:56
+hay un momento en el cual no sabes si va a ser de continuación o si va a ser de
+16:02
+reversión pues Hay ciertos tipos de patrones en los cuales no solamente con
+16:07
+el propio patrón ya puedes saber si va a ser un patrón de continuación o de reversión sino que lo que vas a tener
+16:14
+que hacer es Añadir y combinar otros elementos propios del análisis de la
+16:19
+acción del precio como por ejemplo velas japonesas como por ejemplo la fractalidad Y como por ejemplo otros
+16:26
+elementos que comentaremos más adelante para saber si ese patrón será de continuación o si será de reversión Y si
+Distintos Ciclos de Mercado
+16:33
+bien un conjunto de velas forma un patrón un conjunto de patrones forma un ciclo y el mercado Está compuesto por
+16:40
+cuatro tipologías de ciclos distintas ciclos alcistas ciclos bajistas
+16:46
+acumulaciones y distribuciones yendo rápidamente y para simplemente ubicar
+16:51
+gráficamente a lo que me refiero y luego ya iremos definiendo específicamente Qué es un ciclo alcista uno bajista una
+16:58
+acumulación de distribución aquí pues tenemos ejemplos bastante evidentes muchas veces Verás que el precio está o
+17:04
+subiendo o está cayendo o está moviéndose de forma horizontal Pues bien
+17:10
+un ciclo bajista es un momento en el cual el precio Lo que está haciendo es caer una acumulación es un ciclo en el
+17:18
+cual el precio se mueve de forma horizontal después de haber caído un ciclo alcista es un ciclo en el cual el
+17:25
+precio está subiendo y una es un momento en el cual el ciclo se mueve de forma
+17:31
+horizontal después de haber subido Esas son las cuatro tipologías de ciclos que
+17:37
+tenemos que se forman a través de un conjunto de patrones es decir las velas
+17:42
+forman patrones los patrones forman ciclos y los ciclos es lo que generan ese movimiento alcista bajista o en
+17:50
+Rango del propio Mercado o del gráfico en como tal empezando primero por las acumulaciones y las distribuciones se
+17:58
+tratan de momentos en los cuales el precio no encuentra una dirección concreta es decir una acumulación es un
+18:05
+movimiento en el cual el precio viene de estar cayendo y le cuesta continuar con ese movimiento de caída muchas veces
+18:11
+terminando en un movimiento opuesto es decir una subida una distribución es un movimiento en el cual el precio viene de
+18:18
+una subida y le está costando seguir subiendo y normalmente termina dentro de
+18:23
+un movimiento bajista y vamos a poner un ejemplo de cada tipo y recomiendo
+18:29
+evidentemente que cada uno pues vaya al gráfico en todas y cada una de las temporalidades que encuentre y que
+18:34
+busque este tipo de movimientos es decir aquí tenemos una tendencia o un ciclo bajista Y qué es lo que ocurre a
+18:41
+continuación el precio le cuesta seguir cayendo qué es lo que forma una especie de movimiento horizontal en forma de
+18:48
+acumulación que termina formando una tendencia alcista viene de caer acumula
+18:54
+tendencia alcista Y qué es lo que ocurre después de esa tendencia o ciclo alcista que el precio vuelve a tener
+19:01
+dificultades A la hora de seguir subiendo distribuye e inicia una tendencia o ciclo bajista con lo cual
+19:08
+terminamos haciendo así ciclo bajista acumulación ciclo alcista distribución y
+19:17
+vuelta a empezar y ahora iremos a por los ciclos alcistas y los ciclos bajistas ya que son los ciclos o los
+19:24
+momentos de Mercado en los cuales pues podemos entre comillas ganar más dinero pero Qué diferencia a los ciclos
+19:30
+alcistas y bajistas de las acumulaciones Pues que los ciclos alcistas y o los ciclos bajistas no
+19:40
+tienen ningún nivel que les impida subir o bajar y en cambio las acumulaciones y
+19:45
+O distribuciones sí lo tienen es decir los ciclos alcistas o bajistas no tienen
+19:52
+ningún nivel que les impida subir o caer y si lo tienen lo rompen las
+19:57
+acumulaciones O distribuciones sí que tienen esos niveles y cuáles son esos niveles niveles de soporte o niveles de
+20:05
+resistencia es decir esta zona de aquí Superior y esta zona de aquí
+20:11
+inferior evita que el precio siga cayendo el precio está cayendo pero se
+20:17
+forman dos niveles uno Superior y uno inferior que evita que el precio siga cayendo hasta que termina dándose la
+20:23
+vuelta como detalle fíjate rompe el nivel y lo testea para seguir subiendo
+20:29
+de esto hablaremos más adelante y luego llegamos después de una tendencia alcista a una distribución la cual
+20:35
+también vuelve a formar una zona Superior y una zona inferior como
+20:41
+detalle lo rompe lo testea y sigue cayendo Pues bien Esto es lo que
+20:46
+diferencia el ciclo alcista y bajista de la acumulación y distribución que la acumulación y la distribución tienen
+20:53
+niveles de soporte y de resistencia que no les permite seguir subiendo o seguir
+20:58
+cayendo una resistencia es un nivel que está por encima del precio pero este no es capaz de romperlo al alza un soporte
+Zonas de Soporte y Resistencia
+21:06
+es un nivel que está por debajo del precio pero este no es capaz de romperlo
+21:11
+a la baja en cada uno de los movimientos de acumulación o de distribución veremos
+21:16
+tanto un nivel de soporte que evita que el precio siga cayendo como un nivel de resistencia que evita que el precio siga
+21:23
+subiendo y antes de hablar de Cuáles son los tipos de soporte y de resistencia que tenemos quiero hacer una pequeña
+21:30
+especificación a ciertos detalles que tenemos que tener en cuenta a la hora de marcar niveles de soporte y de
+21:36
+resistencia Así que yendo directamente al gráfico lo primero de ellos es que hablamos de zonas es decir no hablamos
+21:43
+de el nivel de pues qué s yo 1,734 36 Hablamos de una zona Porque
+21:51
+primero cada uno utiliza un broker distinto para operar con lo cual los datos y los pips es decir los números de
+21:59
+los precios van a variar mínimamente Y en segundo lugar Nosotros igual tenemos
+22:04
+la zona de resistencia aquí pero otro igual la tiene un poquito más abajo pero otro igual la tiene un poquito más
+22:10
+arriba con lo cual hablamos primero de zonas no de niveles exactos en segundo
+22:15
+lugar para tú poder verificar que se rompe un nivel de soporte o de resistencia en este caso esta parte de
+22:23
+aquí que tengo marcada es la resistencia y esta parte de aquí que tengo marcada
+22:28
+sería el soporte pues para tú esperar a que se rompa realmente ese nivel tienes
+22:34
+que confirmarlo en tres pasos Qué significa esto primero es la ruptura del
+22:39
+nivel segundo es el cierre tercero es la
+22:45
+confirmación esto significa que si miramos los anteriores momentos en los
+22:51
+cuales el precio ha intentado romper con el nivel de resistencia hasta que finalmente lo ha roto qué es lo que
+22:57
+encontramos aquí ha roto sí ha cerrado No no está
+23:03
+confirmado aquí ha roto sí ha cerrado sí ha confirmado no Por qué Porque la
+23:09
+siguiente Vela A la ruptura ha sido bajista aquí ha roto sí ha confirmado o
+23:16
+sea ha cerrado no ha confirmado no finalmente aquí ha roto sí ha cerrado sí
+23:24
+ha confirmado también por qué Porque la vela después de la ruptura y el cierre
+23:29
+es decir esta vela de aquí rompe y cierra perfecto qué es lo que ocurre con la vela siguiente que rompe cierra y
+23:38
+confirma porque es una vela que va en la misma dirección con lo cual para tú
+23:44
+poder aceptar que se rompe realmente con contundencia con dirección un nivel de
+23:49
+soporte o de resistencia tienes que llevar a cabo esa confirmación en tres
+23:55
+pasos la cual necesita una ruptura un cierre y una confirmación si no se
+24:01
+dan cada uno de estos tres pasos puede ser una falsa ruptura En tercer lugar si
+24:06
+el nivel de resistencia es en gráfico diario tenemos que esperar a la ruptura
+24:12
+al cierre y a la confirmación en gráfico diario en este caso esto es un gráfico
+24:17
+horario de una hora perfecto fijaros eh este momento de aquí por ejemplo que el
+24:23
+precio ha roto Sí pero no ha llegado ni a cerrar si echamos para
+24:30
+atrás y nos ponemos aquí hay un momento que si utilizamos el gráfico de 5
+24:35
+minutos vemos que el precio incluso rompe y llega a cerrar incluso por
+24:42
+encima si ponemos el gráfico de dos minutos rompe cierra y
+24:47
+confirma pero en realidad era una falsa ruptura Por qué Porque estamos hablando de un nivel de resistencia horario con
+24:55
+lo cual lo que tenemos que hacer es esperar a esa confirmación horaria no a la confirmación de 2 minutos No a la
+25:02
+confirmación de un minuto no a la de 5 minutos ni a la de 15 a la confirmación
+25:08
+horaria porque si no volvemos a caer en la misma estructura de falsas rupturas en cuarto lugar necesitamos dos toques
+25:14
+mínimo hasta que no se han formado dos toques en una zona de resistencia o de soporte no hay nivel si el precio toca
+25:21
+Una vez necesita tocar otra vez para que nosotros marquemos una línea porque
+25:26
+tenemos que unir dos niveles el primero y el segundo Y a partir de ahí ya hay una zona de resistencia y en último
+25:33
+lugar quinto punto como más veces se toca ese nivel más importante es creo que cae de cajón Simplemente porque se
+25:40
+toca Una vez no es nada se toca dos veces esto ya es un nivel a la tercera
+25:45
+yo ya estoy pendiente de esto para qué Para ponerme corto y a la cuarta como he ganado
+25:53
+dinero con la primera me voy a volver a poner corto y así hasta que el precio deje de tocar esos
+26:00
+niveles sexto punto y con este ya terminamos después de formar una ruptura
+26:05
+lo que normalmente hace el precio es venir a confirmar como lo opuesto es
+26:11
+decir lo que primero es soporte cuando se rompe luego pasa a ser resistencia
+26:16
+porque el Trader el inversor quiere comprobar y dejar atrás ese nivel con lo cual lo que primero es resistencia luego
+26:24
+es soporte y lo que primero es soporte al romperse luego se estea como resistencia entonces antes de pasar al
+26:31
+siguiente punto vamos a hablar de Cuáles son los tipos de soporte y de
+26:37
+resistencia que tenemos Y tenemos tres tipos concretos niveles de soporte y de resistencia horizontales es decir son
+26:46
+meramente horizontales segundo niveles de soporte y de resistencia diagonales
+26:51
+esto significa que tú pues a través de una diagonal por ejemplo podemos marcar
+26:57
+esta de aquí tú marcas ese ese punto no tenemos un toque aquí un segundo toque un tercer
+27:04
+toque y fijaros qué es lo que ocurre cuando rompes la diagonal Primero era soporte y ahora es resistencia y luego
+27:12
+incluso volvemos a tocarla como resistencia Entonces tenemos los horizontales tenemos los niveles
+27:18
+diagonales y finalmente tendríamos los niveles dinámicos a través de medias
+27:23
+móviles fíjate como pues la media móvil durante cualquier movimient
+27:29
+alcista se apoya o sea el precio se apoya en una media móvil en cualquier movimiento
+27:35
+alcista pam pam pam soporte Dinámico y cuando hay un movimiento bajista pues
+27:41
+ocurre lo mismo pero con resistencia dinámica Pero esto independientemente de
+27:47
+todo es algo que trataremos más adelante porque una media móvil es un indicador y
+27:52
+los indicadores forman parte del segundo grupo de elementos propios del Análisis técnico así que ahora mismo No es el
+27:59
+momento de tratarlo recientemente también se ha añadido una nueva forma de soporte o de resistencia una forma que
+Qué son los Fair Value Gap (FVG)
+28:05
+lleva décadas y décadas existiendo pero ahora se ha puesto bastante más de moda y es un fire value Gap un fire value Gap
+28:13
+es un espacio que se deja entre un conjunto de tres velas por ejemplo tienes una primera vela ascendente
+28:19
+tienes una segunda vela y tienes una tercera vela Pues el espacio entre el máximo de la primera vela y entre el
+28:26
+mínimo de la tercera es es un fire value Gap si en contraposición no hubiera
+28:31
+ningún espacio sin rellenar como puedes ver a continuación no habría fire value Gap y lo mismo ocurre a la baja tienes
+28:39
+una primera vela descendente una segunda vela descendente y una tercera vela descendente Pues el espacio entre el
+28:46
+mínimo de la primera y el máximo de la tercera es el fire value Gap si por contraposición no hubiera ningún tipo de
+28:53
+espacio no habría fire value Gap pues tanto el Fire value alcista como el fire
+28:59
+value Gap bajista son niveles de soporte y de resistencia que se utilizan para
+29:05
+ejecutar diferentes tipos de posiciones pero como he comentado anteriormente los ciclos volviendo a esa parte de ciclos
+Tendencias Alcistas y Bajistas
+29:12
+también pueden estar en tendencia alcista o en tendencia bajista en la acumulación o distribución hay una zona
+29:18
+de resistencia y una zona de soporte que evita que el precio siga cayendo o siga subiendo sin embargo en tendencias
+29:26
+alcistas o tendencias bajistas no hay ni soportes ni resistencias Y si los hay el
+29:31
+precio los rompe consecutivamente con lo cual forma esa tendencia para verlo
+29:36
+gráficamente y antes de entrar a especificar puntos muy importantes de la tendencia alcista y la tendencia bajista
+29:42
+Pues fíjate en la acumulación tenemos esa zona de resistencia Y esa zona de
+29:49
+soporte que evitan que el precio siga cayendo esto Qué significa falta de consenso falta de
+29:55
+Claridad falta de dirección hay mucha gente comprando y mucha gente vendiendo lo que ocurre empate qué Qué significa
+30:04
+esto lo mismo pero al revés dentro de una estructura de distribución ahora bien Hay momentos en los que el precio
+30:11
+toma una dirección Clara limpia evidente a la baja o a la alza tendencia o ciclo
+30:18
+bajista tendencia o ciclo alcista Qué significa Claridad en la
+30:24
+dirección unidireccionalidad la gente sabe y quiere seguir subiendo y seguir
+30:29
+impulsando el precio hay ganas a seguir comprando o hay ganas a seguir vendiendo por eso el precio tiende al alza o
+30:35
+tiende a la baja en una tendencia ciclo alcista y una tendencia ciclo bajista
+30:40
+esto tiene teoría detrás Y es que está impulsado por la ley de la oferta y la
+30:46
+demanda la oferta la tenemos por aquí y la demanda la tenemos por aquí Qué
+30:52
+significa demanda el número de compradores que quieren comprar algo
+30:58
+Qué significa oferta el número de vendedores que quieren vender algo si
+31:06
+algo quiere o algo es querido por muchas personas hay mucho comprador con lo cual
+31:13
+la demanda muchas veces supera la oferta y esto provoca que los compradores estén
+31:18
+dispuestos a comprar un poquito más un poquito más un poquito más es decir Imagínate que en su momento cuando
+31:25
+sacaron la Play 5 No creo que que no había stock para todo el mundo pues si la Play tiene un valor de 500 y a uno le
+31:33
+dicen Oye no no hay Plays no la puedes comprar pero yo por 510 te la vendo tú
+31:38
+hubieras pagado 510 hubieras estado dispuesto a pagar un poquito más por lo mismo o 520 o 30 o 40 o 50 o 60 no sé
+31:46
+cuánto vale pero me da igual esto qué genera que el precio de la Play 5 haga esto y vaya subiendo tendencia alcista
+31:54
+Por qué Porque la demanda es mayor que la oferta la gente está dispuesta a
+32:02
+comprar o a pagar más por lo mismo pero que es lo que ocurre si de repente se
+32:08
+están vendiendo las Plays 5 a 550 por esto que ha ocurrido y viene
+32:16
+PlayStation y saca 10 millones de Plays y las pone en todas las tiendas que igual no es que solo bajemos a 500 que
+32:23
+es su precio original sino que igual la gente dice oye Esto está lleno de Plays
+32:29
+para qué voy a tener que pagar si esta tienda está viendo que la de al lado y la de al lado tienen Plays y esta me
+32:35
+dice que la deja 490 pues yo voy a la de 490 igual la de
+32:41
+al lado dice Oye el vecino la está poniendo 490 yo la pongo a 470 y esto
+32:46
+Qué provoca que la tendencia de la Play 5 vaya a la baja Por qué Porque la
+32:53
+oferta supera a la demanda y la gente está dispuesta a pagar menos
+32:58
+por lo mismo Pues esto es la teoría que hay detrás de el ciclo alcista o el ciclo bajista no es solo que no haya un
+33:05
+soporte o no haya una resistencia no es Solo que si los hay se rompen sino que
+33:10
+la gente está dispuesta a pagar más por lo mismo en ciclos alcistas y por eso el precio sube y la gente está dispuesta a
+33:16
+pagar menos por lo mismo en ciclos bajistas y por eso el precio cae ahora bien del mismo modo que también hay
+33:22
+teoría dentro de lo que es una tendencia alcista o una tendencia bajista también
+33:27
+hay práctica y es mucho más importante la práctica que la teoría porque la práctica la puedes aplicar en este caso
+33:33
+en el caso del trading sin conocer la teoría que hay detrás pero por mucho que
+33:39
+conozcas la teoría si no sabes cómo aplicarla de forma práctica nunca vas a poder ser rentable y en este caso lo que
+33:46
+voy a hacer es explicar toda la práctica que hay detrás de la teoría de la
+33:51
+tendencia entonces todo empieza y lo voy a hacer de forma muy rápida porque como siempre tenemos la parte de cursos de
+33:58
+trading gratis abajo en el primer comentario fijado en la descripción pero todo empieza con esto Esto es la
+34:06
+Pauta básica la Pauta básica es la regla o el
+34:12
+ABC o la parte más reducida de cómo se mueve el mercado impulso y pullback la
+34:18
+Pauta básica la Define muy bien la teoría de da de O puedes ir a buscar
+34:24
+información sobre la misma en mi canal está lleno de vídeos referentes a esto esto no Qué dice la teoría de dao que el
+34:30
+mercado se mueve a través de impulsos y pullbacks Y estos impulsos y pullbacks
+34:36
+pueden formar o tendencias alcistas o tendencias bajistas o movimientos de
+34:42
+Rango tendencias alcistas son un conjunto de impulsos y pullbacks que forman máximos y mínimos crecientes
+34:48
+tendencias bajistas son un conjunto de impulsos y pullbacks que forman máximos y mínimos decrecientes rangos son momentos de
+34:56
+mercado donde el precio está encallado es decir un Rango es una acumulación o
+35:01
+una distribución una tendencia bajista es una Pauta
+35:08
+básica Pero invertida y escalada con un conjunto de
+35:14
+pautas básicas mayor o sea tienes una luego añades otra luego añades otra y así y una tendencia alcista es una Pauta
+35:21
+básica pero escalada con un conjunto de pautas básicas mayor así Cómo se mueve
+35:28
+el mercado a través de impulsos y pullbacks cuando no está formando impulsos y pullbacks está formando un
+35:34
+Rango Pues bien un conjunto de impulsos y pullbacks ascendentes forma una
+35:39
+tendencia alcista la cual forma máximos y mínimos de crecientes perdón
+35:46
+máximos y mínimos crecientes perdonad por la letra una
+35:52
+tendencia bajista forma un conjunto de impulsos y pullbacks que forma máximos y mínimos
+36:01
+decrecientes perfecto esto ya lo entendemos Cómo pasa el mercado de una tendencia alcista a una bajista o al
+36:08
+revés Pues hay un momento determinado en el cual el precio está formando máximos y mínimos crecientes y de repente cuando
+36:16
+todo parece que el precio va a seguir subiendo por ejemplo deja de subir e
+36:22
+inicia un movimiento al revés Es decir para que pasemos de una tendencia
+36:28
+alcista a una tendencia bajista tenemos que dejar de hacer esos máximos y mínimos crecientes pero no solo eso sino
+36:35
+empezar a hacer máximos y mínimos decrecientes por qué porque muchas veces nos encontraremos con lo siguiente
+36:40
+estamos en tendencia alcista y el precio hace así hemos
+36:45
+dejado de hacer máximos y mínimos crecientes Sí sí evidentemente estamos así pero
+36:52
+hemos empezado a hacer máximos y mínimos decrecientes no con lo cual para pasar
+36:59
+de una a la otra tenemos que empezar a hacer máximos y mínimos decrecientes y
+37:04
+en el momento en el cual los máximos son menores y los mínimos son menores ya estamos en tendencia bajista y lo
+37:12
+opuesto ocurre con la tendencia alcista por eso en los ejemplos anteriores
+37:17
+cuando hablábamos de la tendencia bajista en la que estábamos la
+37:22
+estructura de acumulación la tendencia alcista y la distribución veíamos lo
+37:28
+siguiente veíamos que la tendencia bajista no era así era así vete atrás en
+37:35
+el vídeo y mira el ejemplo qué ocurría con la acumulación que ni subía ni caía
+37:40
+estaba entre una resistencia y un soporte esto es un Rango Y qué ocurría
+37:46
+con la tendencia alcista era así no formaba De hecho qué es lo que ocurría
+37:52
+nada más romper la resistencia Veníamos a testear
+37:58
+la resistencia como soporte y entonces empezamos con los
+38:03
+máximos y los mínimos crecientes hasta que de repente se frenaba distribuía y
+38:08
+se daba completamente la vuelta con lo cual como digo esto es explicado de
+38:14
+forma muy resumida podría tirarme horas y horas hablando de esto pero estos son las pautas y los elementos básicos que
+38:20
+tienes que tener en cuenta para entender una tendencia alcista o una tendencia bajista y en cuanto a tendencia y ciclos
+Teoría de las Ondas de Elliot
+38:28
+hemos comentado que es una tendencia o ciclo alcista que es una tendencia o ciclo bajista hemos comentado pues esos
+38:34
+máximos y mínimos crecientes máximos y mínimos decrecientes etcétera etcétera etcétera Pero cómo sabemos hasta dónde
+38:42
+llega el máximo o hasta dónde llega el mínimo o hasta dónde puede llegar la tendencia alcista o hasta dónde puede
+38:47
+llegar la tendencia bajista pues esto lo vamos a determinar a través de los dos
+38:52
+últimos elementos que forman parte de el análisis de la acción del precio la
+38:58
+teoría de las ondas de Elliot se trata de una herramienta de análisis técnico creada por Ralph Nelson Elliot alrededor
+39:05
+del 1930 y se basa en que el precio de cualquier activo financiero sea un
+39:11
+conjunto de patrones repetitivos denominados ondas que reflejan la naturaleza cíclica del comportamiento
+39:18
+del mercado y que pueden proporcionar información de lo que ocurrirá a continuación bien pues hay dos tipos de
+39:25
+ondas hay ondas impulsivas y ondas correctivas y es un poco justo lo que hemos comentado anteriormente pero la
+39:32
+teoría de las ondas de Elliot nos permite ubicar Cuál es el punto en el cual se encuentra el mercado y ahora lo
+39:38
+vas a entender enseguida hemos hablado antes de la Pauta básica esto es la Pauta básica uniendo un conjunto de
+39:45
+pautas básicas alcistas formas una tendencia alcista y uniendo un conjunto
+39:50
+de pautas básicas bajistas formas una tendencia bajista máximos y mínimos
+39:55
+crecientes máximos y mínimos decrecientes que debido a las condiciones en las que se da cada una de
+40:02
+esas pautas se le da una forma distinta a cada una de esas ondas y me explico
+40:09
+hemos hablado de tendencia alcista y bajista y de dos tipos de ondas impulsivas y correctivas las impulsivas
+40:14
+van a favor de la tendencia las correctivas van en contra de la tendencia las ondas impulsivas en una
+40:22
+tendencia bajista Cuáles son esta esta esta por qué porque van a favor de la
+40:27
+tendencia y las correctivas esta y esta porque van en contra pues crees que es
+40:34
+lo mismo las características
+40:39
+de la 1 dos 3 cu la quinta onda impulsiva que de la
+40:46
+tercera crees que es lo mismo crees que una persona que ha entrado aquí y que ha
+40:52
+ganado todo esto de de dinero porque ha comprado antes se toma igual este
+40:58
+movimiento que este es imposible el ser humano nunca se toma igual lo mismo el primer partido de Liga
+41:05
+es uno el decimoctavo es otro tanto para el jugador como para el espectador qué tienes más Qué te hace más ilusión ver
+41:13
+al fichaje nuevo el primer partido o el partido número 47 el 47 ya lo has
+41:18
+aceptado como normal te lo tomas distinto Pues en el trading es lo mismo No es lo mismo esto de aquí que
+41:26
+esto de aquí con lo cual que no sea lo mismo que el
+41:31
+contexto sea distinto provoca que la forma de analizar o que la
+41:40
+definición sea distinta y es y aquí es donde entra la teoría de las ondas de Elliot la teoría de las ondas de Elliot
+41:46
+marca cinco ondas distintas el precio está en una tendencia bajista entra en una especie de acumulación y entra onda
+41:53
+número un onda número dos onda número TR onda número cu y onda número cinco este
+41:58
+conjunto de cinco ondas son las teoría de las ondas de Elliot tienes un curso completo abajo increíble de trading con
+42:04
+teoría de las ondas de Elliot es uno de los elementos más importantes del trading Y en este caso la onda número
+42:10
+uno es la onda de ruptura la onda número dos es la onda de pullback Simple aquí
+42:16
+tenemos la uno aquí tenemos la dos la onda número tres es la onda más larga y
+42:21
+la onda número cuatro es la onda pullback complejo y la onda número cinco es la última por qué La uno por qué es
+42:28
+la más difícil porque venimos de una acumulación es difícil entender si esto es un movimiento impulsivo o es un
+42:35
+pullback o es una falsa ruptura o qué es la onda número dos es simplemente un pullback simple rápido hemos roto
+42:41
+pullback rápido anterior resistencia ahora soporte la onda número tres porque es la más larga nuevamente contexto
+42:49
+porque la gente ya ha identificado que hemos hecho una onda número uno y una dos y sabe que puede venir
+42:57
+Esto entonces aquí hay mucha gente comprando al principio de la dos cuando ya ha empezado la tres cuando hemos roto
+43:03
+el máximo cuando estamos desarrollados etcétera etcétera con lo cual provoca que la onda número tres sea la más larga
+43:09
+Por qué la cuatro es un pullback complejo porque el mercado es proporcional Y si has subido tres no
+43:16
+corriges 0,5 corriges Uno del mismo modo que si has subido seis no corriges Uno
+43:24
+corriges tres y finalmente llega la onda número cinco
+43:29
+que es una onda final última que es más justita por qué porque la gente lleva ganando dinero los más avispados desde
+43:36
+la un los normales desde la dos o sea desde la tres con lo cual llega a la 5 y
+43:42
+ya el movimiento está desarrollado está extremadamente alcista o extremadamente
+43:48
+bajista con lo que la gente lo que quiere es sacar dinero rápido y olvidarse y a otra cosa y esa onda
+43:54
+número cinco es la última y la onda más cortita de todas las que hay Y para que
+43:59
+lo entiendas y lo veas correctamente en gráfico pues vamos a poner un ejemplo muy rápido esto es algo que ocurre en
+44:05
+cualquier par cualquier activo y cualquier temporalidad fíjate queé es lo que tenemos tenemos una tendencia
+44:10
+alcista impulso pulv impulso pullback impulso pullback y cuando el precio
+44:16
+intenta levantarse no puede formando una acumulación qué es lo que ocurre entonces lo que ocurre es que se forma
+44:23
+una primera ruptura esto Qué es la onda número uno aquí tenemos una onda número
+44:28
+uno tenemos una onda número dos en forma de pullback Simple tenemos una onda número tres que va desde
+44:36
+aquí hasta aquí esto simplemente es volatilidad olvidémonos de esto es la
+44:42
+vela de principios de enero de turno Y luego qué es lo que tenemos una onda número cuatro a b c en forma de pullback
+44:51
+complejo para equilibrarse ante esta gran onda número tres y finalmente tenemos una onda número C Que fíjate que
+44:58
+es bastante desacelerada finaliza y nos damos la vuelta y cambio de dirección esto es la
+45:05
+teoría de las ondas de Elliot una forma de Ordenar el precio una forma de que tú
+45:11
+entiendas que no es lo mismo este pullback de aquí que este pullback de
+45:16
+aquí que aquí le queda poco recorrido aquí le queda la mayoría del recorrido
+45:21
+aún y no es por capricho no es porque una entidad superior haya venido y ha
+45:26
+dicho las ondas de heliot es esto y se interpreta así no Simplemente porque la naturaleza contextual del ser humano
+45:33
+hace distinto cada uno de los puntos de la tendencia y Eso provoca que el movimiento sea distinto tanto impulsivo
+45:41
+como también correctivo y ahora ya sabemos cómo se mueven y Cuál es el orden de los ciclos o tendencias
+Qué es Fibonacci
+45:47
+alcistas y de los ciclos o tendencias bajistas sin embargo hasta dónde pueden
+45:53
+llegar esos movimientos hasta dónde puede llegar la onda impulsiva o la onda correctiva porque hemos hablado de orden
+45:59
+de pullback Simple de pullback complejo de onda larga de onda corta no sé qué pero Cuáles son las medidas que pueden y
+46:06
+deberían tener cada una de esas ondas pues en este caso añadimos la última herramienta de el análisis de acción del
+46:13
+precio y es fibonacci fibonacci o la teoría de fibonacci Es una herramienta
+46:18
+que se complementa al 1000 con la teoría de las ondas de Elliot y van prácticamente de la mano la teoría de
+46:25
+fibonacci fue introducida al mundo occident en el siglo X a través de Leonardo Da pisa También conocido como
+46:31
+fibonacci y se trata de una secuencia matemática de números infinita en la cual cada número sale de la suma de los
+46:38
+dos anteriores iniciándose a través del número cer tenemos el 0 1 1 2 3 5 8 como
+46:49
+ves cada número sale de la suma de los dos anteriores después del 8o cuál va pues sumamos 8 + 5 y da 13 después del
+46:58
+13 cuál va sumamos 13 + 8 y da 21 y así hasta el infinito la secuencia de
+47:05
+fibonacci se encuentra ampliamente en la naturaleza y en muchas áreas de la vida
+47:10
+estamos hablando de hojas pétalos conchas cuerpos animales rostros humanos
+47:17
+estructuras celulares ADN arte música Y por qué no también en el trading el
+47:24
+trading con fibonacci se lleva a a través de tener en cuenta un conjunto de números que provienen de esa secuencia
+47:32
+de números infinito que hemos comentado anteriormente puedes buscar información sobre el número ureo o puedes ir al
+47:39
+curso que también tengo abajo en el primer comentario fijado y descripción para entender exactamente qué es esto de
+47:45
+fibonacci fibonacci tiene a través de esos números una parte de extensión y
+47:50
+una parte de retroceso El retroceso simplemente mide hasta dónde puede llegar un movimiento correctivo mides
+47:57
+desde el máximo del impulso hasta el mínimo del impulso y te da una secuencia de números la extensión mide hasta donde
+48:04
+puede llegar un movimiento impulsivo mides desde el desde el principio del impulso hasta el final del impulso y
+48:10
+hasta el final del pullback Y nuevamente te sale una secuencia de números en los cuales tú tienes que tener en cuenta que
+48:18
+fibonacci podría llegar y podría contactar y a través de eso entiendes
+48:23
+cuál puede ser la duración de cada una de las ondas pero como digo sin intención de extenderme en este punto te
+48:31
+recomiendo que vayas a esos vídeos en los cuales encontrarás de forma mucho más definida y desarrollada con horas y
+48:38
+horas de contenido tanto fibonacci como teoría de Elliot como teoría de eliot
+48:43
+unida a fibonacci y hasta aquí termina la parte en la cual hablamos de los elementos que forman parte del análisis
+Introducción Indicadores
+48:50
+de la acción del precio que como hemos comentado forma parte del Análisis técnico y para que nos ubiquemos un poco
+48:57
+de dónde venimos y sobre todo a dónde vamos lo que hemos comentado hasta ahora es que tenemos una parte principal que
+49:04
+es el análisis técnico el cual está compuesto de dos herramientas
+49:09
+principales el análisis de la acción del
+49:14
+precio y el análisis de indicadores hemos empezado por el
+49:21
+análisis de acción del precio porque es la parte más importante y para conocer los indicadores tienes que dominar
+49:28
+primero esto Aunque Son puntos complementarios ahora hablaremos de ello y dentro del análisis de la acción del
+49:34
+precio hemos hablado de velas hemos hablado de que un conjunto de velas forma
+49:39
+patrones hemos hablado de que un conjunto de patrones forma ciclos hemos hablado de soportes y
+49:45
+resistencias hemos hablado de teoría de Elliot para ordenar esos ciclos y hemos
+49:51
+hablado de fibonacci para terminar de ordenar esos ciclos Pues bien esto era
+49:56
+la acción del precio estos son los puntos más básicos y fundamentales para dominar el análisis técnico ahora vamos
+50:04
+a tratar la parte de indicadores que la compondré y la separaré por los propios
+50:10
+indicadores y por el volumen Oye es que el volumen es un indicador el volumen
+50:15
+necesita un comentario aparte con lo cual habiendo comentado esto lo que vamos a hacer a continuación es detallar
+50:23
+la parte de indicadores para terminar de aprender a realizar análisis técnico
+50:29
+empezaremos con el volumen y luego ya pasaremos a los indicadores como tal el volumen principalmente se utiliza para
+Cómo funciona el Volumen
+50:35
+cuatro elementos distintos y los vamos a representar en un gráfico como digo
+50:41
+cualquiera podéis buscarlos literalmente donde queráis y veréis que
+50:46
+constantemente los encontráis primero para confirmación de una tendencia es
+50:52
+decir si tú estás viendo que una tendencia como es este caso de aquí es alcista y que el volumen como se puede
+51:00
+ver en la media móvil que tiene aplicada el volumen también es alcista Oye por qué el volumen es alcista hombre pues si
+51:05
+miras los mínimos tienden a subir Y si miras los máximos tienden a subir esto
+51:10
+te indica que la tendencia sube y el volumen sube con lo que la gente está animada a seguir incrementando y a
+51:17
+seguir pagando más por lo mismo lo hemos comentado antes punto número dos indicar
+51:22
+la fuerza de movimientos de ruptura es decir tienes aquí un nivel de resistencia evidente si tú te fijas Y
+51:29
+ves que en el momento en el cual se forma esa ruptura el volumen está
+51:35
+creciendo fíjate como crece claramente te das cuenta de que el volumen está
+51:41
+incrementando en un momento de ruptura con lo que te puede dar mayor veracidad ese movimiento de ruptura punto número
+51:48
+tres para entender cambios en la tendencia fíjate veníamos de una tendencia alcista veníamos de un volumen
+51:56
+alcista qué es lo que ocurre de repente que exactamente
+52:02
+aquí lo que ocurre con el volumen Es que aquí fíjate eh más específicamente aquí
+52:09
+el volumen forma el máximo aquí se forma un pico máximo de volumen justamente en
+52:15
+este momento de aquí cuando el precio podría estar arrancando y después de un pullback Pues otro movimiento alcista y
+52:22
+demás no pero qué ocurre a partir de entonces que los máximos del el
+52:27
+volumen son decrecientes y los mínimos son decrecientes con lo cual el volumen lo
+52:34
+que te está indicando es Sí sí el precio ha hecho un pullback y sigue subiendo pero ojo porque cada vez hay menos
+52:40
+interés aquí que termina ocurriendo con este movimiento Pam movimiento de
+52:46
+distribución con lo cual venimos de un impulso pullback impulso pullback impulso distribución qué es lo que puede
+52:53
+ocurrir a continuación tendencia bajista el volumen nos ha ayudado primero a
+52:58
+entender el interés de la dirección precio subía volumen subía segundo a
+53:05
+entender el interés de la ruptura ruptura volumen subida tercero a entender la falta de interés dentro del
+53:11
+movimiento alcista final automáticamente Rango o movimiento de distribución pero
+53:17
+Hay un pero aún hay otro elemento un cuarto elemento para lo que el volumen es útil
+53:24
+y es para encontrar divergencias en el propio volumen una divergencia en el
+53:30
+volumen ocurre cuando una vela tiene un cuerpo más grande de lo habitual pero el
+53:36
+volumen es más bajo de lo normal esto significa que hay divergencia porque la
+53:41
+vela es muy grande pero el volumen es muy pequeñito con lo cual hay una subida
+53:46
+Clara evidente Pero qué es lo que ocurre que Hay muy poca gente participando es
+53:53
+decir es una subida por falta de par participación bajista con lo cual esto es una divergencia también podría
+54:00
+ocurrir en la situación contraria hay una vela muy pequeñita Pero hay un gran
+54:06
+movimiento de volumen esto significaría que hay mucha gente participando en un
+54:11
+movimiento determinado Pero hay falta de consenso falta de dirección por eso Pese a que el volumen es grande la vela es
+54:19
+pequeña armonía dentro del volumen implicaría que el movimiento es alcista
+54:24
+la vela es alcista como es este caso y el volumen también acompaña es decir la
+54:30
+dirección del precio en este caso alcista pero también podría ser bajista va acompañada de esa armonía en el
+54:36
+volumen vela a vela y por otro lado tenemos los indicadores un indicador Es
+Mejores Indicadores para hacer Trading
+54:41
+una representación gráfica de la información que está dando el propio precio Es decir se extraen los datos de
+54:48
+las velas japonesas o candlestick se les aplica una fórmula matemática y se le da
+54:53
+a ese conjunto de datos una representación un poco más visual estaremos de acuerdo con dos puntos
+55:00
+negativos los indicadores son atrasados Es decir para poder ver un indicador
+55:05
+necesitamos ver el cierre de las velas con lo cual en todo momento van a estar dando información atrasada en segundo
+55:12
+lugar no hay ningún tipo de información que nos vaya a dar el indicador que no nos la esté dando ya al precio porque el
+55:18
+indicador obtiene la información del precio ahora bien Es una forma muy atractiva visual y objetiva de aplicar
+55:26
+información de ejecutar estrategias y de analizar un gráfico de hecho ya lo sabréis y si no pues os recomiendo que
+55:33
+vayáis a verlo pero hice un vídeo analizando la estrategia de Iván
+55:40
+Sherman un Trader argentino que fue el ganador de la competición de trading del
+55:46
+año 2023 una competición donde se apuntan los mejores traders del mundo y que no solo la ganó Por cierto fue el
+55:52
+primer hispano sino que también dobló otro triplico al segundo Pues bien Ivan
+55:58
+Sherman lo que hacía era utilizar diferentes medias móviles que es un tipo de indicador para determinar cuándo
+56:05
+comprar y cuándo vender por qué Porque a estas medias móviles les aplicaba datos o patrones
+56:15
+condicionantes es decir cuando el precio está por encima de una media móvil es tendencia alcista y cuando rompe otra
+56:23
+media móvil compra poniendo un stop loss por debajo de la segunda por ejemplo es decir no hay información
+56:30
+subjetiva aplicas datos objetivos y visuales a lo que sí ya te está dando el
+56:36
+precio sí es más atrasado pero es una forma de análisis técnico Los
+56:41
+indicadores como digo se calculan a través de fórmulas matemáticas de los datos que obtienen de las velas por
+56:48
+ejemplo esto de aquí es una vela y tú al indicador le dices Oye calcúlame o
+56:54
+súmame el cierre de todas las velas de los últimos 50
+57:01
+días me lo sumas y lo divides y aquí te sale una fórmula con
+57:09
+lo cual lo que tienes es un movimiento impulsivo un correctivo tal tal tal tal Y si tú le dices súmame el cierre de los
+57:17
+últimos 50 días de todas y cada una de estas velas y me lo divides entre 50
+57:22
+pues te dará pues qué s yo 5000 583 lo divides entre 50 y te da un
+57:29
+número pues eso es una media móvil que acompaña al precio y esto es lo que ocurre con cada uno de los indicadores
+57:37
+utilizan la información de las velas y aplican una fórmula matemática evidentemente las medias móviles una
+57:43
+información o es una fórmula muy básica muy simple Pero hay diferentes tipos de indicadores que aplican diferentes tipos
+57:49
+de fórmulas matemáticas por ejemplo tenemos indicadores de tendencia que miden la fuerza y dirección de una
+57:55
+tendencia funcionando muy bien tanto en ciclos alcistas como bajistas las medias móviles serían los más utilizados
+58:03
+tenemos indicadores de momentum también conocidos Como osciladores y miden la fuerza relativa de movimientos
+58:08
+específicos del precio funcionando muy bien en acumulaciones y distribuciones el rsi el magdi o el estocástico serían
+58:17
+los más comunes indicadores de volumen los cuales miden si un movimiento de precios concreto por muy grande que sea
+58:23
+contiene fuerza real que puede alargar lo más el perfil de volumen o el propio
+58:28
+volumen serían los más comunes e indicadores de volatilidad los cuales miden el grado de oscilación y
+58:35
+fluctuación del precio en una tendencia determinada los más utilizados son bandas de bullinger o atr la realidad es
+58:43
+que hemos comentado muchas cosas he intentado comprimir al máximo todos los elementos importantes del Análisis
+¿Qué hacer a continuación?
+58:49
+técnico separados entre análisis de la acción del precio e indicadores Y a partir de ahora la pregunta podría ser
+58:56
+Cómo empezar Cómo unirlo todo qué hago a partir de ahora Cómo puedo enfocarlo etcétera etcétera Pues bien la realidad
+59:02
+es que lo primero que tendrías que hacer es especializarte en el análisis de la acción del precio aprender Qué son las
+59:08
+velas japonesas los patrones impulsos y pullbacks ciclos teoría de Elliot Fiona
+59:14
+todos estos elementos que realmente te permiten entender el trasfondo de cualquier movimiento sin tener que
+59:22
+Añadir ningún extra ni indicadores ni fórmulas mágicas ni historias raras
+59:27
+evidentemente Los indicadores te dan una ventaja te permiten automatizar estrategias y te dan esa cultura general
+59:33
+podríamos decir que es importante para cualquier estrategia y cualquier forma de análisis pero no tiene sentido ir a
+59:39
+por los indicadores si no conoces la acción del precio porque en el trading o el análisis con indicadores necesitarás
+59:47
+conceptos de acción del precio sin embargo al revés no ocurre igual te recomiendo que abajo en el primer
+59:52
+comentario fijado y en la descripción del vídeo te pases por listas de seguimiento de acción del
+59:58
+precio de fibonacci de teoría de Elliot de velas japonesas de patrones todo
+1:00:04
+contenido 100% gratuito tanto teórico como práctico para que sigas formándote como Trader sin necesidad de invertir tu
+1:00:11
+dinero Este vídeo lo voy a dejar por aquí Espero que te haya gustado que te haya servido que es lo importante si es
+1:00:17
+así Dale me gusta suscríbete compártelo con amigos con la familia y nos vemos en el próximo vídeo adiós
