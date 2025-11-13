@@ -56,18 +56,18 @@ def generar_reporte_excel_dashboard(resultados_trading, estrategia, user_name, v
     
     try:
         # Paso 1: Generar archivo Excel con todos los datos ordenados
-        if verbose:
-            print(f"   📈 Paso 1: Generando archivo Excel...")
+        #if verbose:
+        #    print(f"   📈 Paso 1: Generando archivo Excel...")
         
-        archivo_excel = generar_archivo_excel(resultados_trading, estrategia, user_name, timestamp, verbose)
-        if archivo_excel:
-            archivos_generados.append(archivo_excel)
+        #archivo_excel = generar_archivo_excel(resultados_trading, estrategia, user_name, timestamp, verbose)
+        #if archivo_excel:
+        #    archivos_generados.append(archivo_excel)
         
         # Paso 2: Generar archivos CSV por símbolo
         if verbose:
             print(f"   📊 Paso 2: Generando archivos CSV...")
         
-        archivos_csv = generar_archivos_csv(resultados_trading, user_name, timestamp, verbose)
+        archivos_csv = generar_archivos_csv(resultados_trading, user_name, timestamp, estrategia, verbose)
         archivos_generados.extend(archivos_csv)
         
         # Paso 3: Generar gráficos interactivos individuales por símbolo
@@ -199,7 +199,7 @@ def extraer_señales_trading(resultados_trading, verbose=False):
     
     return pd.DataFrame(datos_señales)
 
-def generar_archivos_csv(resultados_trading, user_name, timestamp, verbose=False):
+def generar_archivos_csv(resultados_trading, user_name, timestamp, estrategia, verbose=False):
     """
     Genera archivos CSV individuales por símbolo ordenados por fecha.
     """
@@ -224,7 +224,8 @@ def generar_archivos_csv(resultados_trading, user_name, timestamp, verbose=False
                             # Si no tiene timezone, asumir UTC y añadir timezone
                             df_csv['datetime'] = df_csv['datetime'].dt.strftime('%Y-%m-%d %H:%M:%S') + '+0000'
                 
-                nombre_archivo = f"{user_name}_datos_{symbol}_{timestamp}.csv"
+                #nombre_archivo = f"{user_name}_datos_{symbol}_{timestamp}.csv"
+                nombre_archivo = f"{user_name}_datos__{symbol}_{estrategia}.csv"
                 ruta_archivo = f"/app/tmp/{nombre_archivo}"
                 
                 df_csv.to_csv(ruta_archivo, index=False, encoding='utf-8')
@@ -464,7 +465,8 @@ def armar_grafico_con_paneles(paneles_config, symbol, user_name, estrategia, tim
         # Eje X solo en el último panel
         fig.update_xaxes(title_text='Fecha y Hora', row=num_paneles, col=1)
         
-        nombre_archivo = f"{user_name}_grafico_interactivo_{symbol}_{estrategia}_{timestamp}.html"
+        #nombre_archivo = f"{user_name}_grafico_interactivo_{symbol}_{estrategia}_{timestamp}.html"
+        nombre_archivo = f"{user_name}_grafico_interactivo_{symbol}_{estrategia}.html"
         ruta_archivo = f"/app/tmp/{nombre_archivo}"
         fig.write_html(ruta_archivo)
         
