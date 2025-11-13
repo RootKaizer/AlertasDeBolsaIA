@@ -44,12 +44,24 @@ def cargar_configuracion(estrategia):
     combinacion_indicadores = config[estrategia].get('combinacion_indicadores', 'rsi, macd, media_movil, bollinger, estocastico, volatilidad')
     combinacion_nombres = config[estrategia].get('combinacion_nombres', 'Default_Strategy')
 
+    # Cargar símbolos - VERIFICACIÓN CRÍTICA
+    symbols_str = config[estrategia].get('symbols', '')
+    if not symbols_str:
+        raise ValueError(f"La estrategia '{estrategia}' no tiene definido el listado de símbolos (parámetro 'symbols')")
+    
+    symbols = [symbol.strip() for symbol in symbols_str.split(',') if symbol.strip()]
+    if not symbols:
+        raise ValueError(f"La estrategia '{estrategia}' tiene el parámetro 'symbols' vacío o inválido")
+
     return {
-        "rsi_under": float(config[estrategia]['rsi_under']),
-        "rsi_upper": float(config[estrategia]['rsi_upper']),
+        # Símbolos específicos de la estrategia (nuevo)
+        "symbols": symbols,
+        # Datos para la consulta de indices
         "intervalo": config[estrategia]['intervalo'],
         "periodo": config[estrategia]['periodo'],
         # Nuevos parámetros para indicadores técnicos
+        "rsi_under": float(config[estrategia]['rsi_under']),
+        "rsi_upper": float(config[estrategia]['rsi_upper']),
         "rsi_periodo": int(config[estrategia].get('rsi_periodo', '14')),
         "macd_periodo_corto": int(config[estrategia].get('macd_periodo_corto', '12')),
         "macd_periodo_largo": int(config[estrategia].get('macd_periodo_largo', '26')),
@@ -92,11 +104,14 @@ def obtener_indices_mercado(estrategia, modo_debug=False):
     # Cargar configuración de la estrategia
     try:
         config = cargar_configuracion(estrategia)
-        rsi_under = config["rsi_under"]
-        rsi_upper = config["rsi_upper"]
+        # Símbolos - prioridad: kwargs > properties > default
+        symbols = config["symbols"]
+        # Datos para la consulta de indices
         intervalo = config["intervalo"]
         periodo = config["periodo"]
         # Nuevos parámetros para indicadores técnicos
+        rsi_under = config["rsi_under"]
+        rsi_upper = config["rsi_upper"]
         rsi_periodo = config["rsi_periodo"]
         macd_periodo_corto = config["macd_periodo_corto"]
         macd_periodo_largo = config["macd_periodo_largo"]
@@ -118,6 +133,10 @@ def obtener_indices_mercado(estrategia, modo_debug=False):
         combinacion_indicadores = config["combinacion_indicadores"]
         combinacion_nombres = config["combinacion_nombres"]
         
+    except ValueError as e:
+        print(f"❌ Error de configuración: {e}")
+        return None
+    
     except Exception as e:
         print(f"Error al cargar la configuración: {e}")
         return None
@@ -126,11 +145,22 @@ def obtener_indices_mercado(estrategia, modo_debug=False):
 
     # Paso 1: Obtener datos históricos
     print("Obteniendo datos históricos...")
-    datos_historicos = obtener_datos_historicos(intervalo, periodo)
-    print(f"Datos históricos obtenidos para {len(datos_historicos)} mercados.")
+    print(f"📊 Índices a obtener: {symbols}")  # NUEVO: mostrar los índices
     
-    if not datos_historicos:
-        print("No se pudieron obtener los datos históricos.")
+    datos_historicos = obtener_datos_historicos(intervalo, periodo, verbose=modo_debug, symbols=symbols)
+
+    # MEJORAR EL MENSAJE DE RESULTADO
+    if datos_historicos:
+        # Filtrar símbolos que sí obtuvieron datos
+        simbolos_con_datos = [symbol for symbol, data in datos_historicos.items() if data is not None]
+        simbolos_sin_datos = [symbol for symbol in symbols if symbol not in simbolos_con_datos]
+        
+        print(f"✅ Datos históricos obtenidos para {len(simbolos_con_datos)} mercados: {simbolos_con_datos}")
+        
+        if simbolos_sin_datos:
+            print(f"⚠️  No se pudieron obtener datos para: {simbolos_sin_datos}")
+    else:
+        print("❌ No se pudieron obtener los datos históricos.")
         return None
     
 
