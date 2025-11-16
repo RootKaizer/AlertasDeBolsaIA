@@ -1,23 +1,22 @@
 import sys
-from helpers.config_loader import cargar_configuracion
+from helpers.config_loader import cargar_configuracion_apis
 from helpers.date_utils import calcular_fechas, validar_intervalo_date
-from helpers.api_utils import obtener_historico_mercados_hasta_hoy
+from helpers.api_utils import obtener_mejores_datos, obtener_historico_mercados_hasta_hoy
+
 
 
 def obtener_datos_historicos(intervalo, tiempo_atras, verbose=False, symbols=None):
-    # Cargar configuración con verbose
-    config_result = cargar_configuracion(verbose=verbose)
+    # Cargar configuración de todas las APIs
+    config_apis = cargar_configuracion_apis(verbose=verbose)
     
     # Verificar que la configuración se cargó correctamente
-    if not config_result:
-        error_msg = "No se pudo cargar la configuración básica (URL o API Key)"
+    if not config_apis:
+        error_msg = "No se pudo cargar la configuración de ninguna API"
         if verbose:
             print(f"    ❌ {error_msg}")
         else:
             print(f"❌ {error_msg}")
         return None
-    
-    url_base_path, api_key = config_result
     
     # Verificar que se proporcionaron símbolos (obligatorio)
     if symbols is None:
@@ -36,7 +35,7 @@ def obtener_datos_historicos(intervalo, tiempo_atras, verbose=False, symbols=Non
             print(f"❌ {error_msg}")
         return None
 
-    # Validar argumentos con la nueva función
+    # Validar argumentos
     if not validar_intervalo_date(intervalo):
         error_msg = "Valor de intervalo erróneo"
         if verbose:
@@ -53,20 +52,12 @@ def obtener_datos_historicos(intervalo, tiempo_atras, verbose=False, symbols=Non
             print(f"❌ {error_msg}")
         return None
 
-    # Calcular fechas
-    start_date, end_date = calcular_fechas(tiempo_atras)
-    if not start_date or not end_date:
-        error_msg = f"No se pudieron calcular las fechas para el intervalo {tiempo_atras}"
-        if verbose:
-            print(f"    ❌ {error_msg}")
-        else:
-            print(f"❌ {error_msg}")
-        return None
-
     if verbose:
         print(f"    📊 Obteniendo datos para {len(symbols)} símbolos: {symbols}")
-        print(f"    📅 Período: {start_date} hasta {end_date}")
-        print(f"    ⏱️  Intervalo: {intervalo}")
+        print(f"    📅 tiempo_atras: {tiempo_atras}")
+        print(f"    ⏱️ Intervalo: {intervalo}")
+        print(f"    🌍 Timezone: UTC")
+        print(f"    🌍 APIs disponibles: {list(config_apis.keys())}")
 
     # Obtener datos históricos
     historico_mercados_hasta_hoy = {}
@@ -75,12 +66,15 @@ def obtener_datos_historicos(intervalo, tiempo_atras, verbose=False, symbols=Non
     for symbol in symbols:
         if verbose:
             print(f"      🔄 Obteniendo datos para {symbol}...")
-            
-        datos_symbol = obtener_historico_mercados_hasta_hoy(
-            url_base_path, symbol, api_key, 
-            interval=intervalo, 
-            start_date=start_date, 
-            end_date=end_date,
+
+        # Usar la función que prueba múltiples APIs
+        # Usar la función que prueba múltiples APIs
+        datos_symbol = obtener_mejores_datos(
+            symbol=symbol,
+            intervalo=intervalo,
+            tiempo_atras=tiempo_atras,
+            config_apis=config_apis,
+            timezone="UTC",
             verbose=verbose
         )
         

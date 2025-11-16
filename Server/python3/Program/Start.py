@@ -79,7 +79,7 @@ def main():
         print("⚡ MODO NORMAL (por defecto)")
     
     # Inicializar el modo debug
-    debug = DebugMotorBolsaIA()
+    debug = DebugMotorBolsaIA(modo_debug=modo_debug)
     
     # Mostrar banner del sistema
     mostrar_titulo_estrategia("SISTEMA DE ANÁLISIS DE MERCADOS")
@@ -101,8 +101,9 @@ def main():
             print("❌ Error al obtener los índices del mercado")
             return
         
-        debug.escribir_paso(1, "obtener_indices_mercado", {}, 
-                          respuesta=f"Índices obtenidos: {len(resultados_trading)} símbolos")
+        debug.escribir_paso(1, "obtener_indices_mercado_completado", {
+            "simbolos_procesados": len(resultados_trading)
+        })
 
 
         # Paso 2: Mostrar resultados
@@ -133,8 +134,9 @@ def main():
         )
 
         if archivos_reportes:
-            debug.escribir_paso(3, "generar_reportes_excel_dashboard", {}, 
-                            respuesta=f"Reportes generados: {len(archivos_reportes)} archivos")
+            debug.escribir_paso(3, "generar_reportes_excel_dashboard_completado", {
+                "archivos_generados": len(archivos_reportes)
+            })
             print(f"✅ Reportes generados: {len(archivos_reportes)} archivos")
         else:
             print("❌ Error generando reportes")

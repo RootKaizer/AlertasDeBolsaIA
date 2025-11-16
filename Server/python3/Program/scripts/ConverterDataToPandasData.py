@@ -1,5 +1,5 @@
 import pandas as pd
-import numpy as np
+from datetime import datetime
 
 def convertir_a_dataframe(datos_historicos, verbose=False):
     """
@@ -8,6 +8,11 @@ def convertir_a_dataframe(datos_historicos, verbose=False):
     :param verbose: Si es True, muestra detalles de los cálculos y conversiones
     :return: Diccionario con DataFrames por símbolo.
     """
+    if not datos_historicos:
+        if verbose:
+            print("❌ No hay datos históricos para convertir")
+        return {}
+    
     dataframes = {}
     
     for symbol, data in datos_historicos.items():
@@ -16,27 +21,70 @@ def convertir_a_dataframe(datos_historicos, verbose=False):
             print(f"PROCESANDO SÍMBOLO: {symbol}")
             print(f"{'='*50}")
         
+        if 'values' not in data or not data['values']:
+            if verbose:
+                print(f"❌ No hay datos válidos para {symbol}")
+            continue
+        
         if 'values' in data:
+            # Crear DataFrame
+            df = pd.DataFrame(data['values'])
+
             # Mostrar datos de entrada si verbose está activado
             if verbose:
-                print(f"\nDATOS DE ENTRADA PARA {symbol}:")
-                print(f"Número de registros: {len(data['values'])}")
-                if len(data['values']) > 0:
+                print(f"DATOS DE ENTRADA PARA {symbol}:")
+                print(f"Número de registros: {len(df)}")
+                if len(df) > 0:
+                    primer_registro = df.iloc[0]
                     print("Primer registro:")
-                    for key, value in data['values'][0].items():
-                        print(f"  {key}: {value}")
-
-            df = pd.DataFrame(data['values'])
-            
+                    print(f"  datetime: {primer_registro['datetime']}")
+                    print(f"  open: {primer_registro['open']:.5f}")
+                    print(f"  high: {primer_registro['high']:.5f}")
+                    print(f"  low: {primer_registro['low']:.5f}")
+                    print(f"  close: {primer_registro['close']:.5f}")
+                    print(f"  volume: {primer_registro['volume']}")
+                
             # Conversión de datetime
             if verbose:
                 print(f"\nCÁLCULO: Conversión de datetime")
-                print(f"  Función: pd.to_datetime(df['datetime'])")
-                print(f"  Valores de entrada: {len(df['datetime'])} registros de fecha/hora")
-                print(f"  Ejemplo: {df['datetime'].iloc[0] if len(df) > 0 else 'N/A'}")
+                print(f"  Función: pd.to_datetime(df['datetime'], errors='coerce')")
+                print(f"  Valores de entrada: {len(df)} registros de fecha/hora")
+                if len(df) > 0:
+                    print(f"  Ejemplo: {df['datetime'].iloc[0]}")
 
-            df['datetime'] = pd.to_datetime(df['datetime'])  # Convertir a formato de fecha y hora
+            df['datetime'] = pd.to_datetime(df['datetime'], errors='coerce')  # Convertir a formato de fecha y hora
 
+            # Verificar si hay fechas que no se pudieron parsear
+            fechas_invalidas = df['datetime'].isna().sum()
+            if fechas_invalidas > 0:
+                if verbose:
+                    print(f"⚠️  Advertencia: {fechas_invalidas} fechas no pudieron ser parseadas automáticamente")
+                    print("🔄 Intentando parsing manual para fechas problemáticas...")
+                
+                # Método de respaldo: parsing manual para fechas problemáticas
+                for idx in df[df['datetime'].isna()].index:
+                    fecha_original = df.loc[idx, 'datetime']
+                    try:
+                        # Limpiar formato de fecha (ej: "2025-10-16 04:00:00:00" -> "2025-10-16 04:00:00")
+                        fecha_limpia = str(fecha_original).rstrip(':00')
+                        if len(fecha_limpia) == 19:  # Formato YYYY-MM-DD HH:MM:SS
+                            df.loc[idx, 'datetime'] = pd.to_datetime(fecha_limpia, errors='coerce')
+                        elif len(fecha_limpia) == 16:  # Formato YYYY-MM-DD HH:MM
+                            df.loc[idx, 'datetime'] = pd.to_datetime(fecha_limpia + ':00', errors='coerce')
+                        elif len(fecha_limpia) == 10:  # Formato YYYY-MM-DD
+                            df.loc[idx, 'datetime'] = pd.to_datetime(fecha_limpia + ' 00:00:00', errors='coerce')
+                    except:
+                        continue
+                
+                # Contar fechas aún inválidas después del parsing manual
+                fechas_invalidas_final = df['datetime'].isna().sum()
+                if fechas_invalidas_final > 0:
+                    if verbose:
+                        print(f"❌ {fechas_invalidas_final} fechas aún no pudieron ser parseadas")
+                    # Eliminar filas con fechas inválidas
+                    df = df.dropna(subset=['datetime'])
+                    if verbose:
+                        print(f"✅ Filas restantes después de limpieza: {len(df)}")
 
             # Renombrar columnas
             if verbose:
@@ -73,7 +121,6 @@ def convertir_a_dataframe(datos_historicos, verbose=False):
                     for col in numeric_columns:
                         if col in df.columns:
                             print(f"  {col}: '{df[col].iloc[0]}' -> {float(df[col].iloc[0])}")
-
 
             df[['Open', 'High', 'Low', 'Close', 'Volume']] = df[['Open', 'High', 'Low', 'Close', 'Volume']].astype(float)  # Convertir valores numéricos
 
