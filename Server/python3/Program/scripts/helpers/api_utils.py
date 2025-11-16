@@ -42,7 +42,10 @@ def obtener_datos_twelvedata(url_base_path, symbol, api_key, interval, start_dat
         # Validar respuesta
         validated_data = _validar_respuesta_api(data, symbol, "Twelve Data", verbose)
         if validated_data:
-            return _formatear_datos_salida(validated_data, symbol, "Twelve Data", verbose)
+            # Procesar con el nuevo formateo (similar a Yahoo)
+            processed_data = _procesar_respuesta_twelve_data(validated_data, symbol, verbose)
+            if processed_data:
+                return _formatear_datos_salida(processed_data, symbol, "Twelve Data", verbose)
         return None
         
     except Exception as e:
@@ -148,6 +151,44 @@ def obtener_datos_yahoo_finance(symbol, interval, tiempo_atras=None, timezone="U
             print(f"    ❌ Error Yahoo Finance para {symbol}: {e}")
         return None
 
+
+
+def _procesar_respuesta_twelve_data(data, symbol, verbose=False):
+    """Convierte la respuesta de Twelve Data al formato estándar (similar a Yahoo)"""
+    try:
+        if 'values' not in data:
+            if verbose:
+                print(f"    ❌ Twelve Data - Estructura de respuesta inválida para {symbol}")
+            return None
+        
+        values = []
+        for registro in data['values']:
+            values.append({
+                'datetime': registro['datetime'],
+                'open': float(registro['open']) if registro['open'] is not None else 0,
+                'high': float(registro['high']) if registro['high'] is not None else 0,
+                'low': float(registro['low']) if registro['low'] is not None else 0,
+                'close': float(registro['close']) if registro['close'] is not None else 0,
+                'volume': int(registro['volume']) if registro['volume'] is not None else 0
+            })
+        
+        # Ordenar por fecha (más reciente primero)
+        if values:
+            values.sort(key=lambda x: x['datetime'], reverse=True)
+            
+            if verbose:
+                print(f"    ✅ Twelve Data - Procesados {len(values)} registros para {symbol}")
+                
+            return {'values': values}
+        else:
+            if verbose:
+                print(f"    ⚠️  Twelve Data - No se pudieron procesar registros válidos para {symbol}")
+            return None
+        
+    except Exception as e:
+        if verbose:
+            print(f"    ❌ Error procesando Twelve Data: {e}")
+        return None
 
 
 def _procesar_respuesta_alpha_vantage(data, interval, verbose=False):
