@@ -1,11 +1,7 @@
 import requests
 import time
-from datetime import datetime
-import urllib.parse
-
-import requests
-import time
 from datetime import datetime, timedelta
+import pytz
 import urllib.parse
 
 
@@ -157,57 +153,161 @@ def obtener_datos_yahoo_finance(symbol, interval, tiempo_atras=None, timezone="U
 def _procesar_respuesta_alpha_vantage(data, interval, verbose=False):
     """Convierte la respuesta de Alpha Vantage al formato estándar"""
     try:
-        time_series_key = 'Time Series (Daily)' if interval == 'daily' else f'Time Series ({interval})'
+        # VERIFICAR PRIMERO SI HAY ERRORES O MENSAJES INFORMATIVOS
+        if 'Information' in data:
+            info_msg = data['Information']
+            if verbose:
+                print(f"    💡 Alpha Vantage - Información: {info_msg}")
+            
+            # Detectar mensaje de límite de API
+            if 'rate limit' in info_msg.lower() or 'requests per day' in info_msg.lower():
+                # Extraer el número de peticiones diarias del mensaje
+                import re
+                match = re.search(r'(\d+)\s*requests per day', info_msg)
+                if match:
+                    daily_limit = match.group(1)
+                    print(f"    🚫 ALERTA: Límite de Alpha Vantage alcanzado - {daily_limit} peticiones por día")
+                    print(f"    💡 Solución: Esperar 24 horas o actualizar a plan premium")
+                else:
+                    print(f"    🚫 ALERTA: Límite de API de Alpha Vantage alcanzado")
+                    print(f"    💡 Mensaje: {info_msg}")
+            
+            return None
+        
+        if 'Error Message' in data:
+            error_msg = data['Error Message']
+            if verbose:
+                print(f"    ❌ Alpha Vantage - Error: {error_msg}")
+            return None
+        
+        if 'Note' in data:
+            note_msg = data['Note']
+            if verbose:
+                print(f"    ⚠️  Alpha Vantage - Nota: {note_msg}")
+            
+            # Detectar mensajes de límite en la nota también
+            if 'rate limit' in note_msg.lower() or 'call frequency' in note_msg.lower():
+                print(f"    🚫 ALERTA: Límite de frecuencia de Alpha Vantage")
+                print(f"    💡 Mensaje: {note_msg}")
+            
+            return None
+        
+
+        # Obtener timezone de los metadatos
+        time_zone = data.get("Meta Data", {}).get("6. Time Zone", "US/Eastern")
+        if verbose:
+            print(f"    🌍 Alpha Vantage - Timezone original: {time_zone}")
+        
+        # Determinar la clave correcta para la serie temporal
+        # Alpha Vantage usa diferentes formatos para diferentes intervalos
+        if interval == 'daily':
+            time_series_key = 'Time Series (Daily)'
+        elif interval == 'weekly':
+            time_series_key = 'Weekly Time Series'
+        elif interval == 'monthly':
+            time_series_key = 'Monthly Time Series'
+        else:
+            # Para datos intraday: "Time Series (60min)"
+            time_series_key = f'Time Series ({interval})'
+        
+        if verbose:
+            print(f"    🔍 Alpha Vantage - Buscando clave: '{time_series_key}'")
+        
+        # Debug: mostrar todas las claves disponibles
+        available_keys = list(data.keys())
+        if verbose:
+            print(f"    📋 Alpha Vantage - Claves disponibles: {available_keys}")
         
         if time_series_key not in data:
             if verbose:
-                print(f"    ⚠️  Alpha Vantage - Clave no encontrada: {time_series_key}")
+                print(f"    ⚠️  Alpha Vantage - Clave no encontrada: '{time_series_key}'")
+                print(f"    🔍 Alpha Vantage - Las claves disponibles son: {available_keys}")
                 if 'Error Message' in data:
                     print(f"    ❌ Error Alpha Vantage: {data['Error Message']}")
+                if 'Note' in data:
+                    print(f"    💡 Nota Alpha Vantage: {data['Note']}")
             return None
         
         time_series = data[time_series_key]
+        
+        if verbose:
+            print(f"    ✅ Alpha Vantage - Clave encontrada, procesando {len(time_series)} registros")
+        
+        # Mapear timezones de Alpha Vantage a zonas pytz
+        tz_mapping = {
+            'US/Eastern': 'US/Eastern',
+            'US/Central': 'US/Central', 
+            'US/Pacific': 'US/Pacific',
+            'UTC': 'UTC',
+            'EST': 'US/Eastern',
+            'EDT': 'US/Eastern',
+            'CST': 'US/Central',
+            'CDT': 'US/Central',
+            'PST': 'US/Pacific',
+            'PDT': 'US/Pacific'
+        }
+        
+        tz_name = tz_mapping.get(time_zone, 'US/Eastern')
+        exchange_tz = pytz.timezone(tz_name)
+        utc_tz = pytz.UTC
+        
         values = []
+        processed_count = 0
         
         for datetime_str, prices in time_series.items():
             # Validar que el formato sea correcto antes de agregar
             try:
+                # Parsear la fecha en la timezone del exchange
                 if interval == 'daily':
-                    # Para datos diarios: "2025-10-16" -> "2025-10-16 00:00:00"
-                    dt_str = f"{datetime_str} 00:00:00"
+                    # Formato: "2025-11-14"
+                    dt_naive = datetime.strptime(datetime_str, '%Y-%m-%d')
+                    # Asignar timezone del exchange (horario de mercado)
+                    dt_exchange = exchange_tz.localize(dt_naive)
                 else:
-                    # Para datos intraday: limpiar formato
-                    # Ejemplo: "2025-10-16 04:00:00" (ya está bien)
-                    # Si tiene formato incorrecto, limpiarlo
-                    if ' ' in datetime_str:
-                        date_part, time_part = datetime_str.split(' ')
-                        # Tomar solo las primeras 8 caracteres del tiempo (HH:MM:SS)
-                        if len(time_part) > 8:
-                            time_part = time_part[:8]
-                        dt_str = f"{date_part} {time_part}"
-                    else:
-                        dt_str = f"{datetime_str} 00:00:00"
-            
-            
-                # Probar si el formato es parseable
-                datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+                    # Formato: "2025-11-14 20:00:00"
+                    dt_naive = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+                    # Asignar timezone del exchange
+                    dt_exchange = exchange_tz.localize(dt_naive)
+                
+                # Convertir a UTC
+                dt_utc = dt_exchange.astimezone(utc_tz)
 
                 values.append({
-                    'datetime': dt_str,
+                    'datetime': dt_utc.strftime('%Y-%m-%d %H:%M:%S'),
                     'open': float(prices['1. open']),
                     'high': float(prices['2. high']), 
                     'low': float(prices['3. low']),
                     'close': float(prices['4. close']),
                     'volume': int(float(prices['5. volume']))
                 })
+
+                processed_count += 1
+
             except ValueError as e:
                 if verbose:
-                    print(f"    ⚠️  Alpha Vantage - Fecha inválida ignorada: {dt_str} - Error: {e}")
+                    print(f"    ⚠️  Alpha Vantage - Fecha inválida ignorada: {datetime_str} - Error: {e}")
+                continue
+            except KeyError as e:
+                if verbose:
+                    print(f"    ⚠️  Alpha Vantage - Campo faltante en {datetime_str}: {e}")
                 continue
         
-        # Ordenar por fecha (más antiguo primero)
+        # Ordenar por fecha (más reciente primero)
         if values:
-            values.sort(key=lambda x: x['datetime'])
+            values.sort(key=lambda x: x['datetime'], reverse=True)
+            
+            if verbose:
+                print(f"    🔄 Alpha Vantage - Convertido de {time_zone} a UTC")
+                print(f"    ✅ Alpha Vantage - Procesados {processed_count} registros válidos de {len(time_series)} totales")
+                # Mostrar ejemplo de conversión
+                if values:
+                    primer_valor = values[0]
+                    ultimo_valor = values[-1]
+                    primer_fecha_original = list(time_series.keys())[0]
+                    print(f"    📊 Primer registro: {primer_fecha_original} {time_zone} -> {primer_valor['datetime']} UTC")
+                    print(f"    📊 Último registro: {list(time_series.keys())[-1]} {time_zone} -> {ultimo_valor['datetime']} UTC")
+                    print(f"    💰 Precio más reciente: {primer_valor['close']}")
+            
             return {'values': values}
         else:
             if verbose:
@@ -232,12 +332,25 @@ def _procesar_respuesta_yahoo(data, symbol, verbose=False):
         result = data['chart']['result'][0]
         timestamps = result['timestamp']
         quotes = result['indicators']['quote'][0]
+
+        # Obtener timezone de la respuesta
+        meta = result.get('meta', {})
+        timezone = meta.get('timezone', 'UTC')
+        gmt_offset = meta.get('gmtoffset', 0)  # Offset en segundos (-18000 = -5 horas para EST)
         
         values = []
         for i, timestamp in enumerate(timestamps):
-            dt = datetime.fromtimestamp(timestamp)
+            # CORRECCIÓN: Ajustar el timestamp restando el offset para convertirlo a UTC
+            # Yahoo timestamps están en hora local del exchange, necesitamos convertirlos a UTC
+            timestamp_utc = timestamp - gmt_offset
+            
+            # Convertir a datetime UTC
+            dt_utc = datetime.utcfromtimestamp(timestamp_utc)
+            
+            # Formatear como string UTC
+            dt_str = dt_utc.strftime('%Y-%m-%d %H:%M:%S')
             values.append({
-                'datetime': dt.strftime('%Y-%m-%d %H:%M:%S'),
+                'datetime': dt_str,
                 'open': float(quotes['open'][i]) if quotes['open'][i] is not None else 0,
                 'high': float(quotes['high'][i]) if quotes['high'][i] is not None else 0,
                 'low': float(quotes['low'][i]) if quotes['low'][i] is not None else 0,
@@ -245,7 +358,19 @@ def _procesar_respuesta_yahoo(data, symbol, verbose=False):
                 'volume': int(quotes['volume'][i]) if quotes['volume'][i] is not None else 0
             })
         
-        return {'values': values}
+        # Ordenar por fecha (más reciente primero)
+        if values:
+            values.sort(key=lambda x: x['datetime'], reverse=True)
+            
+            if verbose:
+                print(f"    🌍 Yahoo Finance - Timezone original: {timezone} (offset: {gmt_offset})")
+                print(f"    🔄 Convertido a UTC para {symbol}")
+                
+            return {'values': values}
+        else:
+            if verbose:
+                print(f"    ⚠️  Yahoo Finance - No se pudieron procesar registros válidos para {symbol}")
+            return None
         
     except Exception as e:
         if verbose:
@@ -256,7 +381,7 @@ def _procesar_respuesta_yahoo(data, symbol, verbose=False):
 
 
 def _validar_respuesta_api(data, symbol, api_name, verbose=False):
-    """Valida la respuesta de cualquier API"""
+    """Valida la respuesta de cualquier API y convierte timezone si es necesario"""
     if not data or "values" not in data:
         if verbose:
             print(f"    ❌ {api_name} - Respuesta inválida para {symbol}")
@@ -267,6 +392,14 @@ def _validar_respuesta_api(data, symbol, api_name, verbose=False):
             print(f"    ⚠️  {api_name} - No hay datos para {symbol}")
         return None
     
+    # Para Twelve Data, verificar si necesitamos convertir timezone
+    if api_name == "Twelve Data" and "meta" in data:
+        exchange_timezone = data["meta"].get("exchange_timezone", "UTC")
+        if exchange_timezone != "UTC":
+            if verbose:
+                print(f"    🌍 Twelve Data - Convirtiendo de {exchange_timezone} a UTC")
+            data = _convertir_twelve_data_a_utc(data, exchange_timezone, verbose)
+    
     # Verificar datos futuros/ficticios
     primer_registro = data["values"][0]
     fecha_primer = primer_registro.get('datetime', '')
@@ -276,9 +409,17 @@ def _validar_respuesta_api(data, symbol, api_name, verbose=False):
             fecha_actual = datetime.now()
             fecha_primer_dt = datetime.strptime(fecha_primer, '%Y-%m-%d %H:%M:%S')
             
-            if fecha_primer_dt > fecha_actual + timedelta(hours=24):  # Margen de 24 horas
+            # Calcular diferencia con fecha actual
+            diferencia = fecha_actual - fecha_primer_dt
+            horas_retraso = diferencia.total_seconds() / 3600
+            
+            if horas_retraso > 24:  # Más de 24 horas de retraso
+                print(f"    ⚠️  ALERTA: {api_name} tiene {horas_retraso:.1f} horas de retraso para {symbol}")
+                print(f"    ⚠️  Último dato: {fecha_primer} vs Actual: {fecha_actual.strftime('%Y-%m-%d %H:%M:%S')}")
+                # No retornar None, solo mostrar advertencia
+                
+            if fecha_primer_dt > fecha_actual + timedelta(hours=24):
                 print(f"    ⚠️  ALERTA: {api_name} devuelve datos futuros para {symbol}")
-                print(f"    ⚠️  Primer registro: {fecha_primer} vs Actual: {fecha_actual.strftime('%Y-%m-%d %H:%M:%S')}")
                 return None
                 
         except ValueError as e:
@@ -299,7 +440,72 @@ def _formatear_datos_salida(data, symbol, api_name, verbose=False):
         print(f"    📊 Último registro: {ultimo_registro.get('datetime', 'N/A')}")
         print(f"    💰 Precio más reciente: {ultimo_registro.get('close', 'N/A')}")
     
+    # VERIFICACIÓN DE FECHAS
+        from datetime import datetime
+        fecha_actual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f"    ⏰ Fecha actual del sistema: {fecha_actual}")
+    
     return data
+
+
+
+def _convertir_twelve_data_a_utc(data, exchange_timezone, verbose=False):
+    """Convierte las fechas de Twelve Data de la timezone del exchange a UTC"""
+    try:
+        import pytz
+        from datetime import datetime
+        
+        # Mapear timezones
+        tz_mapping = {
+            'America/New_York': 'US/Eastern',
+            'America/Chicago': 'US/Central',
+            'America/Los_Angeles': 'US/Pacific',
+            'America/Denver': 'US/Mountain',
+            'UTC': 'UTC'
+        }
+        
+        tz_name = tz_mapping.get(exchange_timezone, exchange_timezone)
+        exchange_tz = pytz.timezone(tz_name)
+        utc_tz = pytz.UTC
+        
+        values_convertidos = []
+        
+        for registro in data["values"]:
+            datetime_str = registro['datetime']
+            
+            try:
+                # Parsear la fecha en la timezone del exchange
+                dt_naive = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+                dt_exchange = exchange_tz.localize(dt_naive)
+                
+                # Convertir a UTC
+                dt_utc = dt_exchange.astimezone(utc_tz)
+                
+                # Crear nuevo registro con fecha UTC
+                nuevo_registro = registro.copy()
+                nuevo_registro['datetime'] = dt_utc.strftime('%Y-%m-%d %H:%M:%S')
+                values_convertidos.append(nuevo_registro)
+                
+            except Exception as e:
+                if verbose:
+                    print(f"    ⚠️  Error convirtiendo fecha {datetime_str}: {e}")
+                # Si hay error, mantener el registro original
+                values_convertidos.append(registro)
+        
+        # Actualizar los datos con las fechas convertidas
+        data["values"] = values_convertidos
+        
+        if verbose and values_convertidos:
+            primer_original = data["values"][0]['datetime'] if data["values"] else "N/A"
+            print(f"    ✅ Twelve Data - Conversión completada: {exchange_timezone} -> UTC")
+            print(f"    📊 Ejemplo: {datetime_str} -> {values_convertidos[0]['datetime']}")
+        
+        return data
+        
+    except Exception as e:
+        if verbose:
+            print(f"    ❌ Error en conversión de timezone Twelve Data: {e}")
+        return data
 
 
 
