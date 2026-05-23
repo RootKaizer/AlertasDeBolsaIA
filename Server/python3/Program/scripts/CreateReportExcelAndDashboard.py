@@ -164,7 +164,7 @@ def crear_resumen_ejecutivo(resultados_trading, verbose=False):
                 'Símbolo': symbol,
                 'Último Precio': ultimo.get('Close', 'N/A'),
                 'Señal Mayoritaria': ultimo.get('estrategia_mayoritaria', 'N/A'),
-                'Fuerza Señal': ultimo.get('fuerza_señal', 'N/A'),
+                #'Fuerza Señal': ultimo.get('fuerza_señal', 'N/A'),
                 'Total Estrategias': len(señales_estrategia),
                 'Señales COMPRA': compras,
                 'Señales VENTA': ventas,
@@ -193,8 +193,8 @@ def extraer_señales_trading(resultados_trading, verbose=False):
                                 'Fecha_Hora': fila.get('datetime', 'N/A'),
                                 'Estrategia': col.replace('estrategia_', ''),
                                 'Señal': fila[col],
-                                'Precio': fila.get('Close', 'N/A'),
-                                'Fuerza': fila.get('fuerza_señal', 'N/A')
+                                'Precio': fila.get('Close', 'N/A')
+                                #'Fuerza': fila.get('fuerza_señal', 'N/A')  # COMENTADO: Fuerza de señal deshabilitada
                             })
     
     return pd.DataFrame(datos_señales)
@@ -202,6 +202,7 @@ def extraer_señales_trading(resultados_trading, verbose=False):
 def generar_archivos_csv(resultados_trading, user_name, timestamp, estrategia, verbose=False):
     """
     Genera archivos CSV individuales por símbolo ordenados por fecha.
+    NOTA: Se comenta la columna 'fuerza_señal' en los CSV exportados.
     """
     archivos_generados = []
     
@@ -210,6 +211,10 @@ def generar_archivos_csv(resultados_trading, user_name, timestamp, estrategia, v
             if len(df) > 0:
                 # Crear copia para no modificar el original
                 df_csv = df.copy()
+                
+                # COMENTADO: Excluir columna fuerza_señal en CSV
+                if 'fuerza_señal' in df_csv.columns:
+                    df_csv = df_csv.drop(columns=['fuerza_señal'])
                 
                 # Ordenar por fecha más reciente primero
                 if 'datetime' in df_csv.columns:
@@ -320,21 +325,22 @@ def configurar_paneles_graficos(symbol, df, estrategia, verbose=False):
                         {'y': 25, 'color': 'orange', 'estilo': 'dash', 'descripcion': 'Fuerza de tendencia ADX'}
                     ]
                 },
-                {
-                    'id': 'fuerza',
-                    'titulo': 'Fuerza de Señal',
-                    'descripcion': 'Fuerza consolidada de todas las señales de trading, donde valores positivos indican tendencia alcista y negativos tendencia bajista',
-                    'tipo': 'fuerza_señal',
-                    'metricas': ['fuerza_señal'],
-                    'datos': df_plot,
-                    'lineas_referencia': [
-                        {'y': 0.7, 'color': 'green', 'estilo': 'dash', 'descripcion': 'Compra Fuerte'},
-                        {'y': 0.3, 'color': 'lightgreen', 'estilo': 'dash', 'descripcion': 'Compra'},
-                        {'y': -0.3, 'color': 'lightcoral', 'estilo': 'dash', 'descripcion': 'Venta'},
-                        {'y': -0.7, 'color': 'red', 'estilo': 'dash', 'descripcion': 'Venta Fuerte'},
-                        {'y': 0, 'color': 'black', 'estilo': 'solid', 'descripcion': 'Neutral'}
-                    ]
-                }
+                # COMENTADO: Panel de Fuerza de Señal deshabilitado
+                # {
+                #     'id': 'fuerza',
+                #     'titulo': 'Fuerza de Señal',
+                #     'descripcion': 'Fuerza consolidada de todas las señales de trading, donde valores positivos indican tendencia alcista y negativos tendencia bajista',
+                #     'tipo': 'fuerza_señal',
+                #     'metricas': ['fuerza_señal'],
+                #     'datos': df_plot,
+                #     'lineas_referencia': [
+                #         {'y': 0.7, 'color': 'green', 'estilo': 'dash', 'descripcion': 'Compra Fuerte'},
+                #         {'y': 0.3, 'color': 'lightgreen', 'estilo': 'dash', 'descripcion': 'Compra'},
+                #         {'y': -0.3, 'color': 'lightcoral', 'estilo': 'dash', 'descripcion': 'Venta'},
+                #         {'y': -0.7, 'color': 'red', 'estilo': 'dash', 'descripcion': 'Venta Fuerte'},
+                #         {'y': 0, 'color': 'black', 'estilo': 'solid', 'descripcion': 'Neutral'}
+                #     ]
+                # }
             ],
             'filtros_comunes': {
                 'rango_fechas': {
@@ -370,7 +376,8 @@ def armar_grafico_con_paneles(paneles_config, symbol, user_name, estrategia, tim
         num_paneles = len(paneles_config['paneles'])
         
         # Configurar alturas de paneles (en porcentaje)
-        alturas_paneles = [0.4, 0.1, 0.15, 0.15, 0.1, 0.1]  # Mantener proporciones originales
+        # COMENTADO: Se quitó el panel de fuerza_señal, antes era [0.4, 0.1, 0.15, 0.15, 0.1, 0.1]
+        alturas_paneles = [0.4, 0.1, 0.15, 0.15, 0.2]  # Distribuir espacio sin panel fuerza_señal
         
         # Crear subplots
         fig = make_subplots(
@@ -388,8 +395,9 @@ def armar_grafico_con_paneles(paneles_config, symbol, user_name, estrategia, tim
             # Agregar el tipo de gráfico correspondiente
             if panel['tipo'] == 'velas_japonesas':
                 agregar_velas_japonesas(fig, panel['datos'], symbol, verbose)
-                if panel.get('señales', False):
-                    agregar_señales_trading_mejoradas(fig, panel['datos'], verbose)
+                # COMENTADO: Señales de trading (triángulos/flechas) deshabilitadas
+                # if panel.get('señales', False):
+                #     agregar_señales_trading_mejoradas(fig, panel['datos'], verbose)
                     
             elif panel['tipo'] == 'volumen':
                 agregar_volumen(fig, panel['datos'], verbose)
@@ -419,16 +427,17 @@ def armar_grafico_con_paneles(paneles_config, symbol, user_name, estrategia, tim
                         row=fila, col=1
                     )
                     
-            elif panel['tipo'] == 'fuerza_señal':
-                agregar_fuerza_señal(fig, panel['datos'], verbose)
-                # Agregar líneas de referencia si existen
-                for linea in panel.get('lineas_referencia', []):
-                    fig.add_hline(
-                        y=linea['y'], 
-                        line_dash=linea['estilo'], 
-                        line_color=linea['color'], 
-                        row=fila, col=1
-                    )
+            # COMENTADO: Panel de fuerza_señal deshabilitado
+            # elif panel['tipo'] == 'fuerza_señal':
+            #     agregar_fuerza_señal(fig, panel['datos'], verbose)
+            #     # Agregar líneas de referencia si existen
+            #     for linea in panel.get('lineas_referencia', []):
+            #         fig.add_hline(
+            #             y=linea['y'], 
+            #             line_dash=linea['estilo'], 
+            #             line_color=linea['color'], 
+            #             row=fila, col=1
+            #         )
         
         # AGREGAR PANEL DE FILTROS
         agregar_panel_filtros(fig, paneles_config['filtros_comunes'], num_paneles + 1)
@@ -450,17 +459,41 @@ def armar_grafico_con_paneles(paneles_config, symbol, user_name, estrategia, tim
         )
         
         # Configurar ejes para cada panel
+        # COMENTADO: Se removió el panel 6 (Fuerza)
         configuraciones_ejes = {
             1: {'titulo_y': 'Precio'},
             2: {'titulo_y': 'Volumen'},
             3: {'titulo_y': 'Momento'},
             4: {'titulo_y': 'MACD'},
-            5: {'titulo_y': 'Tendencia'},
-            6: {'titulo_y': 'Fuerza'}
+            5: {'titulo_y': 'Tendencia'}
+            # 6: {'titulo_y': 'Fuerza'}  # COMENTADO: Panel fuerza_señal deshabilitado
         }
         
         for fila, config in configuraciones_ejes.items():
             fig.update_yaxes(title_text=config['titulo_y'], row=fila, col=1)
+        
+        # PANEL 1 (VELAS): Ajustar rango del eje Y con margen de 1%
+        if len(paneles_config['paneles']) > 0 and 'datos' in paneles_config['paneles'][0]:
+            df_velas = paneles_config['paneles'][0]['datos']
+            if 'High' in df_velas.columns and 'Low' in df_velas.columns:
+                # Filtrar valores válidos (solo números mayores a 0)
+                high_values = pd.to_numeric(df_velas['High'], errors='coerce')
+                low_values = pd.to_numeric(df_velas['Low'], errors='coerce')
+                
+                # Mantener solo valores > 0
+                high_valid = high_values[high_values > 0]
+                low_valid = low_values[low_values > 0]
+                
+                if len(high_valid) > 0 and len(low_valid) > 0:
+                    precio_max = high_valid.max()
+                    precio_min = low_valid.min()
+                    
+                    # Calcular margen del 1% basado en el rango completo
+                    rango_total = precio_max - precio_min
+                    margen_1pct = rango_total * 0.01
+                    
+                    rango_y = [precio_min - margen_1pct, precio_max + margen_1pct]
+                    fig.update_yaxes(range=rango_y, autorange=False, row=1, col=1)
         
         # Eje X solo en el último panel
         fig.update_xaxes(title_text='Fecha y Hora', row=num_paneles, col=1)
@@ -867,92 +900,94 @@ def agregar_indicadores_tendencia(fig, df, verbose=False):
         if verbose:
             print(f"          ❌ Error agregando indicadores de tendencia: {e}")
 
-def agregar_fuerza_señal(fig, df, verbose=False):
-    """Agrega gráfico de fuerza de señal al subplot."""
-    try:
-        if 'fuerza_señal' in df.columns:
-            fig.add_trace(
-                go.Scatter(
-                    x=df['datetime'],
-                    y=df['fuerza_señal'],
-                    name='Fuerza Señal',
-                    line=dict(color='orange', width=2),
-                    fill='tozeroy',
-                    fillcolor='rgba(255,165,0,0.1)'
-                ),
-                row=6, col=1
-            )
-            
-            # Líneas de referencia
-            fig.add_hline(y=0.7, line_dash="dash", line_color="green", row=6, col=1)
-            fig.add_hline(y=0.3, line_dash="dash", line_color="lightgreen", row=6, col=1)
-            fig.add_hline(y=-0.3, line_dash="dash", line_color="lightcoral", row=6, col=1)
-            fig.add_hline(y=-0.7, line_dash="dash", line_color="red", row=6, col=1)
-            fig.add_hline(y=0, line_color="black", row=6, col=1)
-            
-        else:
-            if verbose:
-                print(f"          ⚠️ Fuerza de señal no encontrada")
-            
-    except Exception as e:
-        if verbose:
-            print(f"          ❌ Error agregando fuerza señal: {e}")
+# COMENTADO: Función agregar_fuerza_señal deshabilitada
+# def agregar_fuerza_señal(fig, df, verbose=False):
+#     """Agrega gráfico de fuerza de señal al subplot."""
+#     try:
+#         if 'fuerza_señal' in df.columns:
+#             fig.add_trace(
+#                 go.Scatter(
+#                     x=df['datetime'],
+#                     y=df['fuerza_señal'],
+#                     name='Fuerza Señal',
+#                     line=dict(color='orange', width=2),
+#                     fill='tozeroy',
+#                     fillcolor='rgba(255,165,0,0.1)'
+#                 ),
+#                 row=6, col=1
+#             )
+#             
+#             # Líneas de referencia
+#             fig.add_hline(y=0.7, line_dash="dash", line_color="green", row=6, col=1)
+#             fig.add_hline(y=0.3, line_dash="dash", line_color="lightgreen", row=6, col=1)
+#             fig.add_hline(y=-0.3, line_dash="dash", line_color="lightcoral", row=6, col=1)
+#             fig.add_hline(y=-0.7, line_dash="dash", line_color="red", row=6, col=1)
+#             fig.add_hline(y=0, line_color="black", row=6, col=1)
+#             
+#         else:
+#             if verbose:
+#                 print(f"          ⚠️ Fuerza de señal no encontrada")
+#             
+#     except Exception as e:
+#         if verbose:
+#             print(f"          ❌ Error agregando fuerza señal: {e}")
 
-def agregar_señales_trading_mejoradas(fig, df, verbose=False):
-    """Agrega señales de trading mejoradas con flechas y triángulos."""
-    try:
-        if 'estrategia_mayoritaria' in df.columns:
-            # Filtrar solo las filas con señales relevantes
-            señales_df = df[df['estrategia_mayoritaria'].notna()].copy()
-            
-            for _, row in señales_df.iterrows():
-                señal = str(row['estrategia_mayoritaria'])
-                fuerza = row.get('fuerza_señal', 0)
-                precio = row['High'] * 1.02  # Mostrar ligeramente arriba del high
-                
-                # Determinar símbolo y tamaño basado en la fuerza
-                if 'COMPRA_FUERTE' in señal or 'VENTA_FUERTE' in señal:
-                    # Usar flechas para señales fuertes
-                    simbolo = 'arrow-up' if 'COMPRA' in señal else 'arrow-down'
-                    # Tamaño basado en fuerza (3x el tamaño base para 100% de fuerza)
-                    tamaño_base = 15
-                    tamaño = tamaño_base + (abs(fuerza) * 2 * tamaño_base) if pd.notna(fuerza) else tamaño_base * 2
-                    color = 'green' if 'COMPRA' in señal else 'red'
-                    texto = f"{señal}<br>Fuerza: {fuerza:.2f}"
-                else:
-                    # Usar triángulos para señales normales
-                    simbolo = 'triangle-up' if 'COMPRA' in señal else 'triangle-down'
-                    tamaño = 12
-                    color = 'lightgreen' if 'COMPRA' in señal else 'lightcoral'
-                    texto = f"{señal}<br>Fuerza: {fuerza:.2f}" if pd.notna(fuerza) else señal
-                
-                fig.add_trace(
-                    go.Scatter(
-                        x=[row['datetime']],
-                        y=[precio],
-                        mode='markers+text',
-                        marker=dict(
-                            symbol=simbolo,
-                            size=tamaño,
-                            color=color,
-                            line=dict(width=2, color='black')
-                        ),
-                        text=[f" {señal.split('_')[0]}"],
-                        textposition="top center",
-                        name=señal,
-                        hovertemplate=texto,
-                        showlegend=False
-                    ),
-                    row=1, col=1
-                )
-                
-        else:
-            if verbose:
-                print(f"          ⚠️ No se encontraron señales de trading")
-                
-    except Exception as e:
-        if verbose:
-            print(f"          ❌ Error agregando señales trading mejoradas: {e}")
+# COMENTADO: Función agregar_señales_trading_mejoradas deshabilitada
+# def agregar_señales_trading_mejoradas(fig, df, verbose=False):
+#     """Agrega señales de trading mejoradas con flechas y triángulos."""
+#     try:
+#         if 'estrategia_mayoritaria' in df.columns:
+#             # Filtrar solo las filas con señales relevantes
+#             señales_df = df[df['estrategia_mayoritaria'].notna()].copy()
+#             
+#             for _, row in señales_df.iterrows():
+#                 señal = str(row['estrategia_mayoritaria'])
+#                 fuerza = row.get('fuerza_señal', 0)
+#                 precio = row['High'] * 1.02  # Mostrar ligeramente arriba del high
+#                 
+#                 # Determinar símbolo y tamaño basado en la fuerza
+#                 if 'COMPRA_FUERTE' in señal or 'VENTA_FUERTE' in señal:
+#                     # Usar flechas para señales fuertes
+#                     simbolo = 'arrow-up' if 'COMPRA' in señal else 'arrow-down'
+#                     # Tamaño basado en fuerza (3x el tamaño base para 100% de fuerza)
+#                     tamaño_base = 15
+#                     tamaño = tamaño_base + (abs(fuerza) * 2 * tamaño_base) if pd.notna(fuerza) else tamaño_base * 2
+#                     color = 'green' if 'COMPRA' in señal else 'red'
+#                     texto = f"{señal}<br>Fuerza: {fuerza:.2f}"
+#                 else:
+#                     # Usar triángulos para señales normales
+#                     simbolo = 'triangle-up' if 'COMPRA' in señal else 'triangle-down'
+#                     tamaño = 12
+#                     color = 'lightgreen' if 'COMPRA' in señal else 'lightcoral'
+#                     texto = f"{señal}<br>Fuerza: {fuerza:.2f}" if pd.notna(fuerza) else señal
+#                 
+#                 fig.add_trace(
+#                     go.Scatter(
+#                         x=[row['datetime']],
+#                         y=[precio],
+#                         mode='markers+text',
+#                         marker=dict(
+#                             symbol=simbolo,
+#                             size=tamaño,
+#                             color=color,
+#                             line=dict(width=2, color='black')
+#                         ),
+#                         text=[f" {señal.split('_')[0]}"],
+#                         textposition="top center",
+#                         name=señal,
+#                         hovertemplate=texto,
+#                         showlegend=False
+#                     ),
+#                     row=1, col=1
+#                 )
+#                 
+#         else:
+#             if verbose:
+#                 print(f"          ⚠️ No se encontraron señales de trading")
+#                 
+#     except Exception as e:
+#         if verbose:
+#             print(f"          ❌ Error agregando señales trading mejoradas: {e}")
 
 # =============================================================================
 # FUNCIÓN PRINCIPAL MODIFICADA
