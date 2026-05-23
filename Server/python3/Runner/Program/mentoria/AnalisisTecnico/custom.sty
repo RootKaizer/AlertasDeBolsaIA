@@ -1,0 +1,36 @@
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+
+% Colores personalizados
+\definecolor{azulprofundo}{RGB}{0,51,102}
+\definecolor{verdeoscuro}{RGB}{0,102,51}
+\definecolor{naranja}{RGB}{255,140,0}
+
+% Formato de títulos
+\titleformat{\section}
+{\color{azulprofundo}\normalfont\Large\bfseries}
+{\thesection}{1em}{}
+
+\titleformat{\subsection}
+{\color{verdeoscuro}\normalfont\large\bfseries}
+{\thesubsection}{1em}{}
+
+\titleformat{\subsubsection}
+{\color{naranja}\normalfont\normalsize\bfseries}
+{\thesubsubsection}{1em}{}
+
+% Encabezado y pie de página
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{Análisis Técnico - Guía Completa}
+
+% Espaciado de párrafos
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+
+% Mejorar listas
+\usepackage{enumitem}
+\setlist{nosep}

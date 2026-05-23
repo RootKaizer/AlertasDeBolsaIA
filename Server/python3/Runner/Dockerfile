@@ -112,8 +112,10 @@ RUN pip install --no-cache-dir \
     pydantic==2.6.4 \
     pydantic-core==2.16.3 \
     httpx==0.27.0 \
-    aiohttp==3.9.5
+    aiohttp==3.9.5 \
+    openai==1.68.0          # <-- OPENAI AGREGADO
 
+    
 # =============================================================================
 # VERIFICACIÓN POR CATEGORÍAS
 # =============================================================================
@@ -139,6 +141,9 @@ import xlsxwriter; print(f'  ✅ xlsxwriter: {xlsxwriter.__version__}'); \
 print(''); \
 print('🤖 VERIFICANDO MACHINE LEARNING...'); \
 import sklearn; print(f'  ✅ scikit-learn: {sklearn.__version__}'); \
+print(''); \
+print('🤖 OPENAI...'); \
+import openai; print(f'  ✅ openai: {openai.__version__}'); \
 print(''); \
 print('🎉 TODOS LOS PAQUETES INSTALADOS CORRECTAMENTE');"
 
