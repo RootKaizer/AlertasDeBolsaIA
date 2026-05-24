@@ -112,9 +112,38 @@ RUN pip install --no-cache-dir \
     pydantic==2.6.4 \
     pydantic-core==2.16.3 \
     httpx==0.27.0 \
-    aiohttp==3.9.5 \
-    openai==1.68.0          # <-- OPENAI AGREGADO
+    aiohttp==3.9.5
 
+# =============================================================================
+# OPENAI
+# =============================================================================
+RUN pip install --no-cache-dir \
+    openai==1.30.1 \
+    tiktoken==0.7.0
+
+# =============================================================================
+# LANGCHAIN Y ECOSISTEMA
+# =============================================================================
+RUN pip install --no-cache-dir \
+    langchain==0.2.6 \
+    langchain-core==0.2.38 \
+    langchain-community==0.2.6 \
+    langchain-openai==0.1.23 \
+    langchain-ollama==0.1.0 \
+    langchain-google-genai==1.0.4
+
+# =============================================================================
+# DEPENDENCIAS ADICIONALES PARA GOOGLE GENAI
+# =============================================================================
+RUN pip install --no-cache-dir \
+    google-generativeai==0.7.2 \
+    google-api-core==2.19.0 \
+    google-auth==2.30.0 \
+    google-cloud-aiplatform==1.54.0 \
+    proto-plus==1.24.0 \
+    protobuf==4.25.3 \
+    grpcio==1.64.0 \
+    grpcio-status==1.62.2
     
 # =============================================================================
 # VERIFICACIÓN POR CATEGORÍAS
@@ -142,8 +171,17 @@ print(''); \
 print('🤖 VERIFICANDO MACHINE LEARNING...'); \
 import sklearn; print(f'  ✅ scikit-learn: {sklearn.__version__}'); \
 print(''); \
-print('🤖 OPENAI...'); \
+print('🤖 VERIFICANDO OPENAI Y LANGCHAIN...'); \
 import openai; print(f'  ✅ openai: {openai.__version__}'); \
+import tiktoken; print('  ✅ tiktoken: OK'); \
+import langchain; print(f'  ✅ langchain: {langchain.__version__}'); \
+import langchain_core; print('  ✅ langchain-core: OK'); \
+import langchain_community; print('  ✅ langchain-community: OK'); \
+import langchain_openai; print('  ✅ langchain-openai: OK'); \
+import langchain_ollama; print('  ✅ langchain-ollama: OK'); \
+import langchain_google_genai; print('  ✅ langchain-google-genai: OK'); \
+import google.generativeai; print('  ✅ google-generativeai: OK'); \
+import langchain_core.messages; print('  ✅ langchain_core.messages: OK'); \
 print(''); \
 print('🎉 TODOS LOS PAQUETES INSTALADOS CORRECTAMENTE');"
 
@@ -162,4 +200,3 @@ EXPOSE 8000
 # Iniciar contenedor
 #CMD ["python3", "Start.py", "mediano_plazo"]
 CMD ["python3"]
-
